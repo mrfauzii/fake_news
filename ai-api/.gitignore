@@ -3,3 +3,5 @@ models/
 chroma_db/
 .playwright-browsers/
 .env
+*.pyc
+__pycache__/

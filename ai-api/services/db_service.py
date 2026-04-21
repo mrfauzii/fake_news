@@ -5,44 +5,69 @@ import json
 from contextlib import closing
 
 def get_latest_title():
-    """Ambil judul terbaru dari knowledge_base"""
-    query = "SELECT judul FROM knowledge_base ORDER BY tanggal DESC LIMIT 1"
+    """Ambil title terbaru dari knowledge_base"""
+    query = "SELECT title FROM knowledge_base ORDER BY published_at DESC LIMIT 1"
     with closing(get_connection()) as conn, conn.cursor() as cursor:
         cursor.execute(query)
         result = cursor.fetchone()
         return result[0].lower() if result else ""
 
-
 def insert_to_mysql(df):
     """
-    Simpan dataframe ke MySQL.
-    df harus punya kolom: judul, link, kategori_hoaks, klaim/penjelasan, fakta, link_counter
-    Return list id yang berhasil disimpan (str)
+    Simpan dataframe ke MySQL (normalized):
+    - knowledge_base (utama)
+    - knowledge_links (relasi 1-to-many)
+
+    Kolom df:
+    title, link, category, klaim/penjelasan, fact_text, link_counter (list url)
     """
+
     list_id_chroma = []
 
+    # replace NaN -> None
     df = df.where(pd.notnull(df), None)
 
-    insert_query = """
-        INSERT INTO knowledge_base (judul, link, kategori, hoax_text, fakta, link_counter)
-        VALUES (%s, %s, %s, %s, %s, %s)
+    insert_kb_query = """
+        INSERT INTO knowledge_base (title,source_url, category, hoax_text, fact_text)
+        VALUES (%s, %s, %s, %s, %s)
+    """
+
+    insert_link_query = """
+        INSERT INTO knowledge_links (knowledge_id, url)
+        VALUES (%s, %s)
     """
 
     with closing(get_connection()) as db, closing(db.cursor()) as cursor:
         for _, row in df.iterrows():
-            teks_hoaks = row.get('klaim') or row.get('penjelasan')
-            link_mentah = row.get('link_counter')
-            link_json = json.dumps(link_mentah) if link_mentah else None
 
-            cursor.execute(insert_query, (
+            teks_hoaks = row.get('klaim') or row.get('penjelasan')
+            links = row.get('link_counter')
+
+            # 🔧 handle kalau links masih string JSON
+            if isinstance(links, str):
+                try:
+                    links = json.loads(links)
+                except:
+                    links = None
+
+            # 🔥 insert ke knowledge_base
+            cursor.execute(insert_kb_query, (
                 row.get('judul'),
                 row.get('link'),
                 row.get('kategori_hoaks'),
                 teks_hoaks,
-                row.get('fakta'),
-                link_json
+                row.get('fakta')
             ))
-            list_id_chroma.append(str(cursor.lastrowid))
+
+            kb_id = cursor.lastrowid
+            list_id_chroma.append(str(kb_id))
+
+            # 🔥 insert ke knowledge_links (batch)
+            if links and isinstance(links, list):
+                link_data = [(kb_id, url) for url in links if url]
+
+                if link_data:
+                    cursor.executemany(insert_link_query, link_data)
 
         db.commit()
 
@@ -52,7 +77,7 @@ def insert_to_mysql(df):
 
 def get_row_by_id(id_):
     """Ambil seluruh kolom dari knowledge_base kecuali id"""
-    query = "SELECT judul, hoax_text, fakta, kategori, link, link_counter FROM knowledge_base WHERE id=%s"
+    query = "SELECT title, hoax_text, fact_text, category FROM knowledge_base WHERE id=%s"
     with closing(get_connection()) as conn, closing(conn.cursor(dictionary=True)) as cursor:
         cursor.execute(query, (id_,))
         row = cursor.fetchone()

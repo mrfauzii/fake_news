@@ -1,17 +1,18 @@
 from .rss_service import fetch_rss
 from .search_service import cari_link, is_trusted
-from .scraper_service import scrape_all, build_chunks, add_vectors
+from .scraper_service import scrape_all, build_chunks, add_vectors, semantic_chunking
 
 
-def run_pipeline(pesan, model, limit_rss=10, max_articles=5):
+async def run_pipeline(pesan, browser, transformer, limit_rss=7, max_articles=3):
     articles = fetch_rss(pesan, limit_rss)
 
     results = []
-    urls = []
-
     # =========================
     # 1. KUMPULKAN URL
     # =========================
+    urls = []
+    seen = set()
+
     for item in articles:
         judul = item.get("judul")
 
@@ -26,25 +27,26 @@ def run_pipeline(pesan, model, limit_rss=10, max_articles=5):
         if not link:
             continue
 
-        # optional: filter trusted
         if not is_trusted(link):
             continue
 
+        # 🔥 deduplicate di sini
+        if link in seen:
+            continue
+
+        seen.add(link)
         urls.append(link)
 
         if len(urls) >= max_articles:
             break
 
-    if not urls:
-        return {"results": []}
+        if not urls:
+            return {"results": []}
 
     # =========================
     # 2. SCRAPE SEMUA URL
     # =========================
-    scraped_articles = scrape_all(urls)
-
-    print(urls)
-    print(scraped_articles)
+    scraped_articles = await scrape_all(browser, urls)
 
     # =========================
     # 3. PROCESS PER ARTICLE
@@ -60,9 +62,12 @@ def run_pipeline(pesan, model, limit_rss=10, max_articles=5):
 
         # fallback title dari RSS kalau scraping gagal
         title = article.get("title") or (articles[i].get("judul") if i < len(articles) else None)
+        text = "\n\n".join(content)
+        semantic_paragraphs = semantic_chunking(text,transformer)
 
-        chunks = build_chunks(content,i)
-        chunks = add_vectors(chunks, model)
+        chunks = build_chunks(semantic_paragraphs, i)
+
+        chunks = add_vectors(chunks, transformer)
 
         results.append({
             "judul": title,
@@ -73,5 +78,6 @@ def run_pipeline(pesan, model, limit_rss=10, max_articles=5):
         })
 
     return {
-        "results": results
+        "results": results,
+        "urls": urls
     }

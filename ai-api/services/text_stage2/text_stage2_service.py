@@ -66,26 +66,38 @@ def is_score_gap_valid(chunks, threshold_gap=0.2):
 # =========================
 # MAIN PIPELINE
 # =========================
-def run_stage2_web_check(query,klaim,transformer,nli_model,client):
+async def run_stage2_web_check(query,klaim,transformer,nli_model,client,browser):
     
-    data = run_pipeline(query, transformer)
-    data = data["results"][0]
-    chunk_vectors = [c["vector"] for c in data["chunks"]]
+    data = await run_pipeline(query, browser, transformer)
+    
+    urls = data["urls"]
+    print("urls:", urls)
+    all_chunks = []
+
+    for article in data["results"]:
+        all_chunks.extend(article["chunks"])
+
+    chunk_vectors = [c["vector"] for c in all_chunks]
     # 1. Retrieval
-    top_k = retrieve_top_k(query,transformer, chunk_vectors, data["chunks"])
+    top_k = retrieve_top_k(query,transformer, chunk_vectors, all_chunks)
     # 2. Filter similarity
     filtered = filtered = [c for c in top_k if c["score"] >= 0.5]
+    
     if not filtered:
         return {
             "status": "fail",
-            "query": query
+            "data": data,
+            "query": query,
+            "urls" : urls
         }
 
     # ambil chunks saja
     selected_chunks = [{"text": f["text"]} for f in filtered]
+    print("SELECTED CHUNKS:", selected_chunks)
 
     # 3. NLI
     chunks_with_nli = apply_nli(nli_model, klaim, selected_chunks)
+    print("CHUNKS WITH NLI:", chunks_with_nli)
 
     # 4. Validasi NLI
     if not is_nli_valid(chunks_with_nli):

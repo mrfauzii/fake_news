@@ -42,7 +42,12 @@ def clear_chroma(collection):
         return
 
     print(f"⚠️ Menghapus {total} data dari ChromaDB...")
-    collection.delete(where={})
+
+    data = collection.get()
+    ids = data.get("ids", [])
+
+    collection.delete(ids=ids)
+
     print("✅ Data berhasil dihapus.")
 
 # ==========================================
@@ -74,7 +79,7 @@ def seed_parquet_to_chroma(collection, path_file=PARQUET_PATH):
     if not required_cols.issubset(df_seed.columns):
         print("❌ Kolom wajib tidak ditemukan: 'id' dan 'vektor'")
         return
-
+    df_seed["id"] = df_seed["id"].astype(int) + 1
     ids_list = df_seed["id"].astype(str).tolist()
     vektor_list = df_seed["vektor"].tolist()
 

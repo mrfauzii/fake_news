@@ -4,7 +4,7 @@ from services.img_stage1.feature_service import compute_features
 from services.img_stage1.model_service import predict
 
 
-async def detect_image_fake_controller(browser, data):
+async def detect_image_fake_controller(data):
     try:
         # 1. input
         image_url = data.get("image_url")

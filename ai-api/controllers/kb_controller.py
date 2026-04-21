@@ -1,6 +1,5 @@
 import pandas as pd
 from services.scraper_service import *
-from flask import jsonify
 import pandas as pd
 from services.db_service import insert_to_mysql, get_latest_title
 from services.chroma_service import insert_to_chroma
@@ -13,6 +12,7 @@ def update_knowledge_base_controller(model, collection, batch_size=32):
     df = scrape_all(df)
     df = retry_scrape_nan(df)
     df = clean_dataframe(df)
+    print(df.columns)
     
     if df is None or df.empty:
         print("✅ Tidak ada data hoaks baru untuk diproses hari ini.")
@@ -20,8 +20,7 @@ def update_knowledge_base_controller(model, collection, batch_size=32):
 
     list_id = insert_to_mysql(df)
     insert_to_chroma(df, list_id, model, collection, batch_size)
-    return jsonify({
+    return {
         "status": "success",
         "message": "Scraping dan sinkronisasi selesai"
-    }), 200
-    
+    }

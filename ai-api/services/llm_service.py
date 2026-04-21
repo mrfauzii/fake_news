@@ -126,4 +126,9 @@ def llm_fallback_func(klaim, chunks, client):
     elif raw_text.startswith("```"):
         raw_text = raw_text[3:-3].strip()
 
-    return json.loads(raw_text)
+    result = json.loads(raw_text)
+
+    return {
+        "result": result,
+        "chunks": chunks
+    }

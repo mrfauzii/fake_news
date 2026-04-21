@@ -1,5 +1,6 @@
 import asyncio
-asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
@@ -29,11 +30,14 @@ async def lifespan(app: FastAPI):
     app.state.playwright = await async_playwright().start()
     app.state.browser = await app.state.playwright.chromium.launch(headless=True)
 
+    print("✅ Playwright browser started")
+
     yield
 
-    # CLEANUP (penting)
+    # CLEANUP
     await app.state.browser.close()
     await app.state.playwright.stop()
+    print("🛑 Playwright stopped")
 
 
 # ==============================

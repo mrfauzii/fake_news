@@ -1,6 +1,11 @@
 import re
-from playwright.sync_api import sync_playwright
+from playwright.async_api import Page
 from dateutil import parser
+import json
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+import asyncio
+semaphore = asyncio.Semaphore(3)
 # ==============================
 # CLEANING
 # ==============================
@@ -16,16 +21,40 @@ def clean_text(text):
 def filter_paragraphs(paragraphs):
     clean_paras = []
 
-    for p in paragraphs:
-        p = p.strip()
+    bad_keywords = [
+        "baca juga",
+        "iklan",
+        "advertisement",
+        "copyright",
+        "ikuti kami",
+        "scroll",
+        "scroll to continue",
+        "lihat juga",
+        "video:",
+        "adsbygoogle"
+    ]
 
-        if len(p) < 30:
+    for p in paragraphs:
+        if not p:
             continue
 
-        if any(x in p.lower() for x in [
-            "baca juga", "iklan", "advertisement",
-            "copyright", "ikuti kami", "SCROLL","SCROLL TO CONTINUE WITH CONTENT"
-        ]):
+        p = p.strip()
+        lower = p.lower()
+
+        # 1. length filter (lebih ketat)
+        if len(p) < 50:
+            continue
+
+        # 2. noise keyword filter
+        if any(x in lower for x in bad_keywords):
+            continue
+
+        # 3. garbage pattern filter
+        if p.startswith('"') and p.endswith('"') and len(p) < 80:
+            continue
+
+        # 4. mostly metadata junk
+        if "..." in p and len(p) < 100:
             continue
 
         clean_paras.append(p)
@@ -36,45 +65,30 @@ def filter_paragraphs(paragraphs):
 # ==============================
 # EXTRACT CONTENT
 # ==============================
-def extract_content(page):
-    selectors = [
-        "article p",
-        "main p",
-        "div[data-component='text-block'] p",
-        "div.read__content p",
-        "div.entry-content p",
-        "p"
-    ]
-
-    for sel in selectors:
-        elements = page.locator(sel)
-        paragraphs = elements.all_text_contents()
-
-        paragraphs = filter_paragraphs(paragraphs)
-
-        if paragraphs:
-            print(f"PAKAI: {sel}")
-            return paragraphs
-
-    return []
-
+async def extract_content(page):
+    try:
+        paragraphs = await page.locator("article p, main p, div.entry-content p, p").all_text_contents()
+        return filter_paragraphs(paragraphs)
+    except:
+        return []
 
 # ==============================
 # SCRAPE 1 ARTICLE
 # ==============================
-def scrape_article(page, url):
+async def scrape_article(page, url):
     try:
-        page.goto(url, timeout=30000, wait_until="domcontentloaded")
-        page.wait_for_timeout(3000)
+        await page.goto(url, timeout=30000, wait_until="domcontentloaded")
 
         # ambil metadata
-        title, date = extract_metadata(page)
-        date = normalize_date(date)
+        title, date = await extract_metadata(page)
+        date = await normalize_date(date)
 
         # ambil content
-        paragraphs = extract_content(page)
+        paragraphs =  await extract_content(page)
         paragraphs = [clean_text(p) for p in paragraphs]
 
+        if not paragraphs or len(paragraphs) < 3:
+            print("EMPTY ARTICLE:", url)
         return {
             "url": url,
             "title": title,
@@ -82,7 +96,8 @@ def scrape_article(page, url):
             "content": paragraphs
         }
 
-    except:
+    except Exception as e:
+        print("SCRAPE ERROR:", url, str(e))
         return {
             "url": url,
             "title": None,
@@ -94,29 +109,52 @@ def scrape_article(page, url):
 # ==============================
 # SCRAPE MULTIPLE URL
 # ==============================
-def scrape_all(urls):
-    results = []
+# async def scrape_article(page: Page, url: str):
+#     try:
+#         await page.goto(url, timeout=15000)
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+#         title = await page.title()
+#         content = await page.content()
 
-        context = browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36"
-        )
+#         return {
+#             "url": url,
+#             "title": title,
+#             "content": content
+#         }
 
-        page = context.new_page()
+#     except Exception as e:
+#         print(f"❌ Error scrape {url}: {e}")
+#         return None
 
-        for url in urls:
-            if not url:
-                results.append(None)
-                continue
+async def scrape_one(context, url):
+    print("SCRAPING:", url)
+    async with semaphore:
+        page = await context.new_page()
+        try:
+            return await scrape_article(page, url)
+        finally:
+            await page.close()
 
-            article = scrape_article(page, url)
-            results.append(article)
 
-        browser.close()
+async def scrape_all(browser, urls):
+    context = await browser.new_context(
+        user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36"
+    )
 
-    return results
+    try:
+        tasks = [
+            scrape_one(context, url)
+            for url in urls
+            if url
+        ]
+        
+        print("TASK COUNT:", len(tasks))
+
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        return results
+
+    finally:
+        await context.close()
 
 # ==============================
 # BUILD CHUNKS 
@@ -143,81 +181,36 @@ def add_vectors(chunks, model):
 
     return chunks
 
-import json
-
-def extract_metadata(page):
-    title = None
-    date = None
-
-    # ======================
-    # TITLE
-    # ======================
+async def extract_metadata(page):
     try:
-        title = page.locator("h1").first.text_content()
-        if title:
-            title = title.strip()
+        title = await page.locator("h1").first.text_content()
+        title = title.strip() if title else None
     except:
-        pass
+        title = None
 
-    # ======================
-    # DATE (multi fallback)
-    # ======================
-
-    # 1. meta tag umum
-    meta_selectors = [
+    selectors = [
         "meta[property='article:published_time']",
         "meta[name='publishdate']",
         "meta[name='date']",
-        "meta[property='og:published_time']"
+        "time"
     ]
 
-    for sel in meta_selectors:
+    for sel in selectors:
         try:
             el = page.locator(sel).first
-            if el.count() > 0:
-                date = el.get_attribute("content")
-                if date:
-                    return title, date.strip()
+            if sel == "time":
+                date = await el.get_attribute("datetime") or await el.text_content()
+            else:
+                date = await el.get_attribute("content")
+
+            if date:
+                return title, date.strip()
         except:
             continue
 
-    # 2. <time> tag
-    try:
-        el = page.locator("time").first
-        if el.count() > 0:
-            date = el.get_attribute("datetime") or el.text_content()
-            if date:
-                return title, date.strip()
-    except:
-        pass
-
-    # 3. JSON-LD (paling akurat di banyak news site)
-    try:
-        scripts = page.locator("script[type='application/ld+json']")
-        count = scripts.count()
-
-        for i in range(count):
-            raw = scripts.nth(i).text_content()
-            if not raw:
-                continue
-
-            data = json.loads(raw)
-
-            # bisa dict atau list
-            if isinstance(data, list):
-                data = data[0]
-
-            if isinstance(data, dict) and "datePublished" in data:
-                date = data["datePublished"]
-                if date:
-                    return title, date.strip()
-
-    except:
-        pass
-
     return title, None
 
-def normalize_date(date_str):
+async def normalize_date(date_str):
     if not date_str:
         return None
 
@@ -226,3 +219,37 @@ def normalize_date(date_str):
         return dt.strftime("%Y-%m-%d")
     except:
         return None
+    
+
+
+def semantic_chunking(text, transformer,threshold=0.80):
+    model = transformer
+    paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
+    if not paragraphs:
+        return []
+
+    embeddings = model.encode(paragraphs)
+
+    chunks = []
+    current_chunk = [paragraphs[0]]
+    current_embs = [embeddings[0]]
+
+    for i in range(1, len(paragraphs)):
+        centroid = np.mean(current_embs, axis=0).reshape(1, -1)
+
+        sim = cosine_similarity(
+            centroid,
+            embeddings[i].reshape(1, -1)
+        )[0][0]
+
+        if sim >= threshold:
+            current_chunk.append(paragraphs[i])
+            current_embs.append(embeddings[i])
+        else:
+            chunks.append("\n\n".join(current_chunk))
+            current_chunk = [paragraphs[i]]
+            current_embs = [embeddings[i]]
+
+    chunks.append("\n\n".join(current_chunk))
+
+    return chunks

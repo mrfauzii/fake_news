@@ -20,12 +20,12 @@ def run_stage1_kb_check(collection, transformer, nli, query, top_k=1, gap_thresh
     print("FILTERED:", filtered)
     if not filtered:
         return {
-            "top_k": top_k,
-            "data": []
+            "status": "fail"
         }
-
+    print("FILTERED:", filtered)
     candidate_rows = [get_row_by_id(r["id"]) for r in filtered]
-    pairs = [(query, row.get("judul", "")) for row in candidate_rows]
+    print("CANDIDATE ROWS:", candidate_rows)
+    pairs = [(query, row.get("title", "")) for row in candidate_rows]
     print("PAIRS UNTUK NLI:", pairs)
     nli_scores = run_nli(nli, pairs)
     print("NLI SCORES:", nli_scores)
@@ -37,8 +37,8 @@ def run_stage1_kb_check(collection, transformer, nli, query, top_k=1, gap_thresh
     
     if majority_label == "entailment":
         label = 1
-    elif majority_label == "contradiction":
-        pairs = [(row.get("fakta", ""), query) for row in candidate_rows]
+    elif majority_label == "contradiction" or majority_label == "neutral":
+        pairs = [(row.get("fact_text", ""), query) for row in candidate_rows]
         nli_scores = run_nli(nli, pairs)
         label_count = Counter([r["label"] for r in nli_scores])
         majority_label = label_count.most_common(1)[0][0]
@@ -71,10 +71,8 @@ def run_stage1_kb_check(collection, transformer, nli, query, top_k=1, gap_thresh
             "nli_label": nli_res["label"],
             "nli_score": nli_res["score"],
             "hoax_text": row.get("hoax_text"),
-            "fakta": row.get("fakta"),
-            "kategori": row.get("kategori"),
-            "link": row.get("link"),
-            "link_counter": row.get("link_counter"),
+            "fact_text": row.get("fact_text"),
+            "category": row.get("category"),
         })
 
     return {

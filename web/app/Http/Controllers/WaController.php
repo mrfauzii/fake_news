@@ -40,22 +40,20 @@ class WaController extends Controller
             if (str_starts_with($message, '#detect')) {
 
                 $lastMessage = MessageCache::where('sender_number', $sender)
-                ->where('created_at', '>=', Carbon::now()->subMinutes(5))
-                ->latest() // urut terbaru
-                ->first(); // ambil 1 saja
+                    ->where('created_at', '>=', Carbon::now()->subMinutes(5))
+                    ->latest() // urut terbaru
+                    ->first(); // ambil 1 saja
                 if ($lastMessage) {
 
-                $text = "📩 Pesan sebelumnya:\n\n " . $lastMessage->latest_message;
+                    $text = "📩 Pesan sebelumnya:\n\n " . $lastMessage->latest_message;
 
                     $reply = $text;
 
                     // 🔥 OPTIONAL: HAPUS SETELAH DIPAKAI
                     MessageCache::where('sender_number', $sender)->delete();
-
                 } else {
                     $reply = "⚠️ Tidak ada pesan dalam 5 menit terakhir.";
                 }
-
             } else {
                 $reply = "❓ Command tidak dikenali";
             }
@@ -69,7 +67,6 @@ class WaController extends Controller
             ]);
 
             return response()->json(['status' => 'replied']);
-
         } catch (\Exception $e) {
 
             Log::error('ERROR WA', [
@@ -99,7 +96,7 @@ class WaController extends Controller
 
         // 3. LOGIKA KETUA: Kalau akunnya ada DAN itu bukan akun yang lagi login sekarang -> HAPUS!
         if ($existingUser && $existingUser->id !== $currentUser->id) {
-            $existingUser->delete(); 
+            $existingUser->delete();
         }
 
         // 4. "Kalau ga ada ya create biasa aja" -> Update nomor WA ke akun yang sekarang login

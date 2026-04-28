@@ -35,7 +35,7 @@
                     <span>Dapatkan Melalui Whatsapp</span>
                 </span>
             </a>
-            <a href="#" class="lh-nav-btn lh-nav-btn--user" aria-label="Profil" onclick="alert('Fitur Profil akan segera hadir')">
+            <a href="#" class="lh-nav-btn lh-nav-btn--user js-profile-toggle" aria-label="Profil" aria-controls="user-profile-popup" aria-expanded="false" data-profile-toggle="user-profile-popup">
                 <iconify-icon icon="mdi:user" width="26" height="26"></iconify-icon>
                 <span class="lh-nav-tooltip lh-nav-tooltip--left" role="tooltip">
                     <iconify-icon icon="mdi:user" width="18" height="18"></iconify-icon>
@@ -43,6 +43,8 @@
                 </span>
             </a>
         </nav>
+
+        @include('user.partials.profile-popup', ['popupId' => 'user-profile-popup'])
     </header>
 
     <!-- ========== HERO BACKGROUND ========== -->
@@ -148,8 +150,10 @@
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/user/background.css') }}">
 <link rel="stylesheet" href="{{ asset('css/user/navbar.css') }}">
+<link rel="stylesheet" href="{{ asset('css/user/profile-popup.css') }}">
 @endpush
 
 @push('scripts')
 <script src="{{ asset('js/pencarian.js') }}"></script>
+<script src="{{ asset('js/user/profile-popup.js') }}"></script>
 @endpush

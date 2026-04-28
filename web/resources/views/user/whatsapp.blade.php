@@ -12,6 +12,7 @@
 
     <link rel="stylesheet" href="{{ asset('css/user/navbar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/user/whatsapp.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/user/profile-popup.css') }}">
 </head>
 <body>
     <div class="wa-page">
@@ -35,14 +36,14 @@
                         <span>Riwayat Pencarian Anda</span>
                     </span>
                 </a>
-                <a href="#wa-cta" class="lh-nav-btn lh-nav-btn--whatsapp-visible wa-nav-btn wa-nav-btn--whatsapp wa-nav-btn--active" aria-label="Dapatkan melalui WhatsApp" aria-current="page">
+                <a href="{{ route('whatsapp.page') }}" class="lh-nav-btn lh-nav-btn--whatsapp-visible wa-nav-btn wa-nav-btn--whatsapp wa-nav-btn--active" aria-label="Dapatkan melalui WhatsApp" aria-current="page">
                     <iconify-icon icon="garden:whatsapp-fill-16" width="24" height="24"></iconify-icon>
                     <span class="lh-nav-tooltip lh-nav-tooltip--always-visible" role="tooltip">
                         <iconify-icon icon="garden:whatsapp-fill-16" width="18" height="18"></iconify-icon>
                         <span>Dapatkan Melalui Whatsapp</span>
                     </span>
                 </a>
-                <a href="#" class="lh-nav-btn wa-nav-btn" aria-label="Profil">
+                <a href="#" class="lh-nav-btn wa-nav-btn js-profile-toggle" aria-label="Profil" aria-controls="user-profile-popup" aria-expanded="false" data-profile-toggle="user-profile-popup">
                     <iconify-icon icon="mdi:user" width="26" height="26"></iconify-icon>
                     <span class="lh-nav-tooltip lh-nav-tooltip--left" role="tooltip">
                         <iconify-icon icon="mdi:user" width="18" height="18"></iconify-icon>
@@ -50,6 +51,8 @@
                     </span>
                 </a>
             </nav>
+
+            @include('user.partials.profile-popup', ['popupId' => 'user-profile-popup'])
         </header>
 
         <main class="wa-content">
@@ -78,7 +81,7 @@
                 <h2>Mengapa menggunakan WhatsApp?</h2>
                 <div class="wa-reason__row">
                     <div class="wa-brand-circle">
-                        <iconify-icon icon="ic:baseline-whatsapp" width="100" height="100"></iconify-icon>
+                        <img src="{{ asset('img/wa-3d.png') }}" alt="Ilustrasi WhatsApp 3D" class="wa-brand-image">
                     </div>
                     <div class="wa-benefits">
                         <div class="wa-pill wa-pill--blue">Lebih cepat dan praktis</div>
@@ -132,5 +135,6 @@
             </section>
         </main>
     </div>
+    <script src="{{ asset('js/user/profile-popup.js') }}"></script>
 </body>
 </html>

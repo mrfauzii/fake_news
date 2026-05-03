@@ -38,20 +38,22 @@
     </div>
 
     <!-- RATING -->
-    <div class="stats-card">
-        <div class="stats-top">
-            <span>RATA-RATA RATING</span>
-            <div class="icon-box yellow">
-                <i class="fa fa-star"></i>
+     {{--
+        <div class="stats-card">
+            <div class="stats-top">
+                <span>RATA-RATA RATING</span>
+                <div class="icon-box yellow">
+                    <i class="fa fa-star"></i>
+                </div>
+            </div>
+            <h2>4.8 <small>/ 5.0</small></h2>
+
+            <div class="rating-stars">
+                <span class="stars">★ ★ ★ ★ ☆</span>
+                <span class="total"> dari 840 total ulasan</span>
             </div>
         </div>
-        <h2>4.8 <small>/ 5.0</small></h2>
-
-        <div class="rating-stars">
-            <span class="stars">★ ★ ★ ★ ☆</span>
-            <span class="total"> dari 840 total ulasan</span>
-        </div>
-    </div>
+    --}}
 
 </div>
 
@@ -78,17 +80,12 @@
                 <h4>Andi Maulana</h4>
                 <span>Kamis, 9 April 2027 • 14:20 WIB</span>
 
-                <div class="rating">
-                    ★ ★ ★ ★ ☆
-                </div>
-
                 <p>
                     Aplikasi sangat membantu untuk memverifikasi link yang beredar di grup WhatsApp keluarga.
                     Namun, proses loading saat deteksi link berita internasional terasa sedikit lambat dibanding link lokal.
                 </p>
 
                 <div class="umpanbalik-actions">
-                    <button class="btn-primary">Balas</button>
                     <button class="btn-outline">Detail</button>
                 </div>
             </div>
@@ -107,16 +104,11 @@
                 <h4>Siti Pertiwi</h4>
                 <span>Rabu, 8 April 2027 • 09:15 WIB</span>
 
-                <div class="rating">
-                    ★ ★ ★ ★ ★
-                </div>
-
                 <p>
                     Suka dengan tampilan barunya! Sangat minimalis dan tidak membingungkan.
                 </p>
 
                 <div class="umpanbalik-actions">
-                    <button class="btn-primary">Balas</button>
                     <button class="btn-outline">Detail</button>
                 </div>
             </div>
@@ -127,7 +119,7 @@
 
 
     <!-- ITEM 3 (DIBALAS) -->
-    <div class="umpanbalik-item replied">
+    <div class="umpanbalik-item read">
         <div class="umpanbalik-left">
             <img src="https://i.pravatar.cc/42" class="avatar">
 
@@ -135,26 +127,16 @@
                 <h4>Budi Wijaya</h4>
                 <span>Selasa, 7 April 2027 • 16:45 WIB</span>
 
-                <div class="rating">
-                    ★ ★ ★ ★ ☆
-                </div>
-
                 <p>
                     Ada kesalahan deteksi pada link situs berita resmi "Warta Ekonomi".
                 </p>
 
-                <div class="reply-box">
-                    <strong>Tanggapan Admin</strong>
-                    <p>
-                        Terima kasih Pak Budi, kami telah melakukan verifikasi domain tersebut.
-                    </p>
+                <div class="umpanbalik-actions">
+                    <button class="btn-outline">Detail</button>
                 </div>
-
-                <button class="btn-outline">Detail Percakapan</button>
             </div>
         </div>
-
-        <span class="badge reply-badge">Dibalas</span>
+        <span class="badge read-badge">Dibaca</span>
     </div>
 
 </div>

@@ -557,17 +557,32 @@ th, td {
 }
 
 .news-list {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 15px;
-    margin-top: 15px;
 }
 
 .news-card {
     background: white;
-    padding: 15px;
-    border-radius: 10px;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+
     position: relative;
+    display: block; /* penting */
+}
+
+.news-card .news-content {
+    margin-left: 40px; /* biar gak ketabrak nomor */
+}
+
+.news-card .meta {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+
+    font-size: 12px;
+    color: #777;
 }
 
 .label-hoax {
@@ -729,6 +744,44 @@ th, td {
     justify-content: center;
     font-size: 12px;
 }
+
+.news-card .rank {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+
+    background: orange;
+    color: white;
+
+    width: 28px;
+    height: 28px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* parent wajib relative */
+.main-news-card {
+    position: relative;
+}
+
+.news-content {
+    position: relative;
+}
+
+/* pindahkan ke pojok kanan atas */
+.main-news-card .meta {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+
+    font-size: 12px;
+    color: #777;
+}
+
 /* STATS CARD - Ringkasan data */
 .feedback-title h1 {
     margin: 0;

@@ -61,33 +61,45 @@
         </div>
 
         <div class="main-news-card">
+
             <div class="rank-big">1</div>
+
+            <!-- PINDAH KE SINI -->
+            <p class="meta">Dicari oleh 12.8k pengguna</p>
 
             <img src="https://via.placeholder.com/300x200" class="news-img">
 
             <div class="news-content">
                 <span class="label-hoax">HOAX</span>
-                <p class="meta">Dicari oleh 12.8k pengguna</p>
 
                 <h3>Pemerintah Umumkan Lockdown Nasional?</h3>
 
                 <p class="desc">
-                    Informasi beredar melalui WhatsApp...
+                    Informasi beredar melalui pesan singkat WhatsApp yang mengklaim adanya ...
                 </p>
 
-                <button class="btn-primary">Lihat Verifikasi →</button>
-                <p class="risk">Skor Resiko: <b>98/100</b></p>
+                <p class="risk">Skor : <b>98/100</b></p>
             </div>
+
         </div>
 
         <div class="news-list">
 
             <div class="news-card">
+
                 <div class="rank">2</div>
-                <span class="label-warning">DISINFORMASI</span>
-                <h4>Video Viral Harta Karun</h4>
-                <p>Video lama diedit ulang...</p>
-                <small>8.4k Pencarian</small>
+
+                <div class="news-content">
+
+                    <span class="label-warning">DISINFORMASI</span>
+                    <p class="meta">8.4k Pencarian</p>
+
+                    <h4>Video Viral Harta Karun</h4>
+
+                    <p>Video lama diedit ulang...</p>
+
+                </div>
+
             </div>
 
             <div class="news-card">
@@ -132,7 +144,7 @@
             <small>STATISTIK PLATFORM</small>
 
             <h2>42.5k</h2>
-            <p>Aduan diproses hari ini</p>
+            <p>Aduan pada bulan ini</p>
 
             <div class="progress-bar">
                 <div class="progress"></div>

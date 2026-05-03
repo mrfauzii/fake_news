@@ -10,7 +10,7 @@ class RiwayatController extends Controller
     public function index()
     {
         $data = Riwayat::all();
-        return view('admin.riwayat.index', compact('data'));
+        return view('admin.riwayat', compact('data'));
     }
 
     public function edit($id)

@@ -21,38 +21,41 @@ def process_fake_news_pipeline(
         s1 = run_stage1_kb_check(collection, transformer, nli, raw_text)
 
         if s1.get("status") == "success":
+            s1["stage"] = "stage_1"
             return s1
 
 
         # ===== STAGE 2 =====
-        # s2 = run_stage3_online_search(
-        #     raw_text,
-        #     transformer,
-        #     nli,
-        #     searx_session,
-        #     headers,
-        #     text_classifier
-        # )
+        s2 = run_stage3_online_search(
+            raw_text,
+            transformer,
+            nli,
+            searx_session,
+            headers,
+            text_classifier
+        )
 
-        # if s2.get("status") == "success":
-        #     return s2
+        if s2.get("status") == "success":
+            s2["stage"] = "stage_2"
+            return s2
 
 
-        # # ===== FALLBACK LLM =====
-        # if s2.get("status") == "fail":
-        #     query = llm_query_extractor_fallback(raw_text, client)
+        # ===== FALLBACK LLM =====
+        if s2.get("status") == "fail":
+            query = llm_query_extractor_fallback(raw_text, client)
 
-        #     s2_retry = run_stage3_online_search(
-        #         query,
-        #         transformer,
-        #         nli,
-        #         searx_session,
-        #         headers,
-        #         text_classifier
-        #     )
+            s2_retry = run_stage3_online_search(
+                query,
+                transformer,
+                nli,
+                searx_session,
+                headers,
+                text_classifier
+            )
 
-        #     if s2_retry.get("status") == "success":
-        #         return s2_retry
+            if s2_retry.get("status") == "success":
+                s2_retry["stage"] = "stage_2"
+                return s2_retry
 
         # ===== FINAL FALLBACK =====
         # fact_check_data = extract_clean_query(raw_text, transformer)

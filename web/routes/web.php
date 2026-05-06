@@ -93,9 +93,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
     // User Management
     Route::get('/user', [UserController::class, 'index']);
+    Route::get('/user-data', [UserController::class, 'getUserData']);
 
     // Umpan Balik
     Route::get('/umpanbalik', [UmpanBalikController::class, 'index']);
+    Route::get('/umpanbalik-data', [UmpanBalikController::class, 'getFeedbackData']);
 
     // Riwayat
     Route::prefix('riwayat')->group(function () {

@@ -1,3 +1,6 @@
+/* =======================
+   1. RESET / BASE
+======================= */
 * {
     margin: 0;
     padding: 0;
@@ -10,30 +13,19 @@ body {
     background: #fff;
 }
 
-.top-features {
-    padding-top: -100px;
+img {
+    display: block;
+    max-width: 100%;
 }
 
-.top-features .container {
-    padding: 40px 0;
-}
-
-/* CONTAINER */
+/* =======================
+   2. GLOBAL
+======================= */
 .container {
     width: 85%;
     max-width: 1100px;
     margin: 0 auto;
     padding: 0 10px;
-}
-
-.navbar .container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    width: 100%;
-    max-width: none;   /* ⬅️ ini penting */
-    padding: 0 40px;   /* jarak dari pinggir */
 }
 
 section {
@@ -53,50 +45,164 @@ p {
     line-height: 1.8;
 }
 
-img {
-    display: block;
-    max-width: 100%;
-}
-
-/* NAVBAR */
+/* =======================
+   3. LAYOUT
+======================= */
 .navbar {
     background: rgba(255, 255, 255, 0.95);
-    padding: 6px;
+    height: 74px; /* samakan dengan navbar login */
     box-shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
     position: sticky;
     top: 0;
     z-index: 10;
+
+    display: flex;
+    align-items: center;
 }
 
 .navbar .container {
+    width: 100%;          /* full layar */
+    max-width: none;      /* hilangkan batas */
+    margin: 0;            /* hilangkan center */
+    padding: 0 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 0 40px;
 }
 
 .logo-img {
-    height: 42px;
+    height: 60px;
 }
 
+footer {
+    background: #b8201d;
+    color: #fff;
+    text-align: center;
+    padding: 26px 0;
+    font-weight: 600;
+}
+
+/* =======================
+   4. COMPONENT
+======================= */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 999px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+    border: none;
+}
+
+.btn-card,
+.btn-red,
+.btn-outline,
+.btn-login {
+    transition: all 0.3s ease;
+}
+
+/* hover (sama kayak card) */
+.btn-card:hover,
+.btn-red:hover,
+.btn-outline:hover,
+.btn-login:hover {
+    transform: translateY(-6px);
+}
+
+/* klik (turun sedikit biar realistis) */
+.btn-card:active,
+.btn-red:active,
+.btn-outline:active,
+.btn-login:active {
+    transform: translateY(0px) scale(0.97);
+}
+
+.btn-red {
+    background: #a81a15;
+    color: #fff;
+    padding: 15px 28px;
+    box-shadow: 0 8px 24px rgba(168, 26, 21, 0.28);
+}
+
+.btn-outline {
+    background: #a81a15;
+    color: #fff;
+    padding: 15px 26px;
+    box-shadow: 0 8px 24px rgba(168, 26, 21, 0.28);
+}
+
+.btn-red,
+.btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    padding: 14px 26px;
+    border-radius: 999px; /* bikin rounded */
+    font-size: 15px;
+    font-weight: 600;
+
+    border: none;
+    cursor: pointer;
+
+    background: linear-gradient(180deg, #b8201d, #73070b);
+    color: #fff;
+
+    box-shadow: 0 6px 18px rgba(184, 32, 29, 0.25);
+
+    transition: all 0.2s ease;
+}
+
+.btn-red:hover,
+.btn-outline:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(184, 32, 29, 0.3);
+}
+
+.btn-card {
+    font-family: 'Lexend', sans-serif; 
+    font-size: 15px;
+    font-weight: 600;
+    width: 100%;
+    padding: 14px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    border: none;              
+    outline: none;      
+}
+
+/* LOGIN BUTTON */
 .btn-login {
     background: linear-gradient(180deg, #b8201d 0%, #73070b 100%);
     color: #fff;
-    padding: 8px 18px; /* lebih kecil */
+    padding: 8px 18px;
     border-radius: 999px;
     text-decoration: none;
     font-weight: 600;
-    font-size: 14px; /* kecilin teks */
-    box-shadow: 0 8px 18px rgba(184, 32, 29, 0.18); /* shadow lebih ringan */
+    font-size: 14px;
+    box-shadow: 0 8px 18px rgba(184, 32, 29, 0.18);
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 10px;
 }
-/* HERO */
+
+/* =======================
+   5. HERO
+======================= */
 .hero {
     padding: 60px 0 80px;
-    background: #fff5f5;
+    background: #ffffff;
     position: relative;
-    overflow: hidden; 
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
 }
 
 .hero-flex {
@@ -131,59 +237,10 @@ img {
     margin-top: 20px;
 }
 
-.btn-red,
-.btn-outline,
-.btn-card {
-    font-family: 'Lexend', sans-serif;
-    font-weight: 600; /* atau 700 kalau mau lebih tebal */
-    letter-spacing: 0.3px;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-}
-
-.btn-red:hover,
-.btn-card:hover,
-.btn-outline:hover {
-    transform: translateY(-2px);
-}
-
-.btn-red,
-.btn-outline {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-
-    font-size: 15px;
-    font-weight: 700;
-    line-height: 1;
-}
-
-.btn-red {
-    background: #a81a15;
-    color: #fff;
-    padding: 15px 28px;
-    border-radius: 999px;
-    border: none;
-    font-weight: 700;
-    font-size: 15px;
-    box-shadow: 0 8px 24px rgba(168, 26, 21, 0.28);
-}
-
-.btn-outline {
-    background: #a81a15; /* merah sama */
-    color: #fff;
-    border: none;
-    padding: 15px 26px;
-    border-radius: 999px;
-    font-weight: 700;
-    box-shadow: 0 8px 24px rgba(168, 26, 21, 0.28);
-}
-
 .hero-img {
     position: absolute;
     right: 0;
-    top: -30px; /* nempel ke header */
+    top: -30px;
     height: 100%;
     display: flex;
     align-items: center;
@@ -193,8 +250,8 @@ img {
     content: "";
     position: absolute;
     bottom: 20px;
-    left: -100vw; /* biar garis panjang ke kiri */
-    width: 200vw; /* full lebar layar */
+    left: -100vw;
+    width: 200vw;
     height: 4px;
     background: #8b0000;
 }
@@ -205,19 +262,17 @@ img {
     max-width: none;
 }
 
-.hero {
-    background: #ffffff;
-    position: relative;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-}
-
 .hero-border {
     margin-top: 40px;
 }
 
-/* FEATURES */
+/* =======================
+   6. TOP FEATURES
+======================= */
+.top-features {
+    margin-top: -100px;
+}
+
 .top-features .container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -229,24 +284,7 @@ img {
     padding: 30px;
     border-radius: 20px;
     text-align: center;
-    box-shadow: none;
     border: 2px solid transparent;
-}
-
-/* VARIASI WARNA */
-.box.red {
-    background: rgba(255, 77, 77, 0.08);
-    border: 2px solid #ef4f4f;
-}
-
-.box.blue {
-    background: rgba(77, 121, 255, 0.12);
-    border: 2px solid #6b8cff;
-}
-
-.box.green {
-    background: rgba(52, 199, 89, 0.15);
-    border: 2px solid #3ecf74;
 }
 
 .box h4 {
@@ -260,66 +298,39 @@ img {
     font-size: 14px;
     color: #5f4a4a;
     margin-bottom: 20px;
-    line-height: 1.6;
 }
 
-.btn-card {
-    display: inline-block;
-    justify-content: center;
-    font-family: 'Lexend', sans-serif;
-    font-size: 16px; 
-    width: 100%;
-    padding: 14px;
-    border-radius: 999px;
-    font-weight: 600;
-    border: none;
-    text-decoration: none;
-    margin-top: 10px;
+/* warna */
+.box.red {
+    background: rgba(255, 77, 77, 0.08);
+    border: 2px solid #ef4f4f;
+}
+.box.blue {
+    background: rgba(77, 121, 255, 0.12);
+    border: 2px solid #6b8cff;
+}
+.box.green {
+    background: rgba(52, 199, 89, 0.15);
+    border: 2px solid #3ecf74;
 }
 
-/* warna lebih soft */
-.red-btn {
-    background: linear-gradient(180deg, #ff6b6b, #d62828);
-    color: white;
-}
-
-.blue-btn {
-    background: linear-gradient(180deg, #6ea8ff, #2f4fdb);
-    color: white;
-    font-size: 16px;
-    font-weight: 600;
-}
-
-.green-btn {
-    background: linear-gradient(180deg, #4cd964, #28b463);
-    color: white;
-    font-size: 16px;
-    font-weight: 600;
-}
+/* tombol warna */
+.red-btn { background: linear-gradient(180deg, #ff6b6b, #d62828); color: white; }
+.blue-btn { background: linear-gradient(180deg, #6ea8ff, #2f4fdb); color: white; }
+.green-btn { background: linear-gradient(180deg, #4cd964, #28b463); color: white; }
 
 .icon {
     width: 72px;
     margin: 0 auto 18px;
 }
 
-.red { border-top: 5px solid #ff4d4d; }
-.blue { border-top: 5px solid #4d79ff; }
-.green { border-top: 5px solid #33cc66; }
-
-/* FITUR */
+/* =======================
+   7. FITUR
+======================= */
 .fitur {
     padding: 60px 0;
     text-align: center;
-    border-top: 4px solid #8b0000; /* garis merah */
-    margin-top: 0px;
-}
-
-.fitur h2 {
-    text-align: center;
-    color: #8b0000;
-    font-weight: 600;
-    margin-bottom: 40px;
-    position: relative;
+    border-top: 4px solid #8b0000;
 }
 
 .fitur h2::after {
@@ -329,7 +340,6 @@ img {
     height: 3px;
     background: #8b0000;
     margin: 10px auto 0;
-    border-radius: 10px;
 }
 
 .fitur-list {
@@ -340,30 +350,17 @@ img {
 }
 
 .card {
-    flex: 1;
-    background: #ffffff;
+    background: #fff;
     padding: 30px;
     border-radius: 20px;
     text-align: center;
-    border: 1.5px solid rgba(184, 32, 29, 0.4); /* merah tipis */
+    border: 1.5px solid rgba(184, 32, 29, 0.4);
     box-shadow: 0 10px 25px rgba(0,0,0,0.06);
     transition: 0.3s;
 }
 
 .card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-}
-
-.card h4 {
-    margin: 24px 0 16px;
-    color: #602026;
-    font-size: 1.3rem;
-}
-
-.card p {
-    color: #6b5252;
-    line-height: 1.75;
 }
 
 .icon-big {
@@ -371,73 +368,31 @@ img {
     margin: 0 auto;
 }
 
-/* HOW */
+/* =======================
+   8. HOW
+======================= */
 .how {
     padding: 60px 0;
     text-align: center;
-    border-top: 4px solid #8b0000; /* garis merah */
+    border-top: 4px solid #8b0000;
     margin-top: 40px;
-}
-
-.how h2 {
-    text-align: center;
-    color: #8b0000;
-    font-weight: 600;
-    margin-bottom: 40px;
-    position: relative;
-}
-
-.how h2::after {
-    content: "";
-    display: block;
-    width: 120px;
-    height: 3px;
-    background: #8b0000;
-    margin: 10px auto 0;
-    border-radius: 10px;
 }
 
 .steps {
     display: flex;
-    align-items: center;
     justify-content: center;
-    gap: 25px; /* lebih rapi */
+    gap: 25px;
     flex-wrap: wrap;
 }
 
 .step-card {
-    background: #ffffff;
+    background: #fff;
     padding: 25px;
     border-radius: 20px;
     width: 260px;
     text-align: center;
-
-    border: 1.5px solid rgba(184, 32, 29, 0.4); /* merah tipis */
+    border: 1.5px solid rgba(184, 32, 29, 0.4);
     box-shadow: 0 10px 25px rgba(0,0,0,0.06);
-    transition: 0.3s;
-}
-
-.step-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-}
-
-.step-card .icon {
-    width: 80px;
-    margin-bottom: 15px;
-}
-
-.step-card h4 {
-    color: #8b0000;
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 10px;
-}
-
-.step-card p {
-    font-size: 14px;
-    color: #555;
-    line-height: 1.6;
 }
 
 .arrow {
@@ -445,23 +400,15 @@ img {
     color: #8b0000;
     display: flex;
     align-items: center;
-    justify-content: center;
 }
 
-/* FOOTER */
-footer {
-    background: #b8201d;
-    color: #fff;
-    text-align: center;
-    padding: 26px 0;
-    font-weight: 600;
-}
-
+/* =======================
+   9. RESPONSIVE
+======================= */
 @media (max-width: 1024px) {
     .hero-flex,
     .top-features .container,
-    .fitur-list,
-    .steps {
+    .fitur-list {
         grid-template-columns: 1fr;
         display: grid;
     }
@@ -469,37 +416,15 @@ footer {
     .hero {
         padding-top: 80px;
     }
-
-    .hero-btn {
-        justify-content: flex-start;
-    }
 }
 
 @media (max-width: 768px) {
-    .navbar {
-        padding: 18px 0;
-    }
-
-    .hero {
-        padding: 60px 0 30px;
-    }
-
-    .hero-flex {
-        gap: 24px;
-    }
-
     .hero-text h1 {
         font-size: 3rem;
     }
 
-    .hero-img img {
-        max-width: 100%;
-    }
-
-    .btn-login,
-    .btn-red,
-    .btn-outline,
-    .btn-card {
+    .btn,
+    .btn-login {
         width: 100%;
     }
 }

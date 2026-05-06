@@ -1,9 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>@yield('title')</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="{{ asset('css/dashboard/admin-style.css') }}">
+    <title>@yield('title', 'Admin Panel')</title>
+
+    <!-- GLOBAL CSS -->
+    <link rel="stylesheet" href="{{ asset('css/admin/global.css') }}">
+
+    <!-- PAGE CSS -->
+    @stack('styles')
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">

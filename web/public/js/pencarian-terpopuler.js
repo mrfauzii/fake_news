@@ -232,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const detailUrl = buildSearchUrl(item.query);
             return `
                 <article class="lh-popular-card">
-                    <div class="lh-popular-card__medal ${item.medalClass}" data-rank="${item.rank}"></div>
+                    <div class="lh-popular-card__rank rank-${item.rank}" data-rank="${item.rank}">#${item.rank} TRENDING</div>
                     <div class="lh-popular-card__excerpt">${escapeHtml(item.excerpt)}</div>
                     <div class="lh-popular-card__content">
                         <div class="lh-popular-card__row">

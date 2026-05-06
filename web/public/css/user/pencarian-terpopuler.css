@@ -169,18 +169,6 @@
     display: none; /* medals removed; use rank badge instead */
 }
 
-.lh-popular-card__medal--gold {
-    background-image: url('/img/rank-1.svg');
-}
-
-.lh-popular-card__medal--silver {
-    background-image: url('/img/rank-2.svg');
-}
-
-.lh-popular-card__medal--bronze {
-    background-image: url('/img/rank-3.svg');
-}
-
 .lh-popular-card__excerpt {
     min-height: 206px;
     padding: 14px 12px 12px;
@@ -222,9 +210,9 @@
     background: rgba(255,255,255,0.18);
 }
 
-.lh-popular-card__rank.rank-1 { background: linear-gradient(90deg,#c92a12,#8e0e10); }
-.lh-popular-card__rank.rank-2 { background: linear-gradient(90deg,#a73b3b,#6d2b2b); }
-.lh-popular-card__rank.rank-3 { background: linear-gradient(90deg,#8b4a2b,#5b321e); }
+.lh-popular-card__rank.rank-popular { background: linear-gradient(90deg,#a40f12,#8e0a0d); }
+.lh-popular-card__rank.rank-hoax { background: linear-gradient(90deg,#c92a12,#8e0e10); }
+.lh-popular-card__rank.rank-fakta { background: linear-gradient(90deg,#1d7f45,#145a31); }
 
 @media (max-width: 720px) {
     .lh-popular-card__rank { top: 6px; left: 10px; padding: 5px 8px; font-size: 11px; }

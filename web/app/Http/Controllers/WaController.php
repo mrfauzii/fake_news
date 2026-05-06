@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\MessageCache;
-use App\Models\User;
 use App\Models\Users;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -21,11 +20,11 @@ class WaController extends Controller
             $message = trim(strtolower($request->input('message')));
             $name = $request->input('name');
 
-            User::firstOrCreate(
+            Users::firstOrCreate(
                 ['phone_number' => $sender],
                 ['name' => $name ?? 'User WA']
             );
-
+            
             // 🔥 2. JIKA BUKAN COMMAND (#)
             if (!str_contains($message, '#')) {
 

@@ -1,0 +1,214 @@
+/* =========================
+   GRID
+========================= */
+.riwayat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+
+    align-items: start; 
+}
+
+.warning-icon {
+    color: #f4b400; /* kuning */
+    margin: 0 5px;
+}
+
+/* =========================
+   CARD
+========================= */
+.riwayat-card {
+    background: #fff;
+    border: 1px solid #b8201d;
+    border-radius: 12px;
+    padding: 15px;
+
+    height: auto;        /* ⬅️ WAJIB */
+    min-height: unset;   /* ⬅️ HAPUS batas minimum */
+}
+
+.riwayat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.label {
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.desc {
+    font-size: 13px;
+    color: #333;
+}
+
+/* =========================
+   IMAGE
+========================= */
+.card-img {
+    display: block;
+    width: 250px;          /* ⬅️ ukuran kecil */
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto 15px;  /* ⬅️ bikin tengah */
+    border-radius: 10px;
+}
+
+.image-card {
+    grid-row: span 2;
+} 
+
+/* =========================
+   BOTTOM
+========================= */
+.card-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+/* =========================
+   PROGRESS
+========================= */
+.progress-circle {
+    width: 90px;
+    position: relative;
+}
+
+/* svg */
+.progress-circle svg {
+    width: 100%;
+    height: auto;
+}
+
+/* background abu */
+.progress-circle .bg {
+    fill: none;
+    stroke: #ddd;
+    stroke-width: 10;
+}
+
+/* merah utama */
+.progress-circle .progress-red {
+    fill: none;
+    stroke: #b8201d;
+    stroke-width: 10;
+    stroke-linecap: round;
+
+    stroke-dasharray: 120 37; 
+    stroke-dashoffset: 0; /* ⬅️ 70% */
+}
+
+/* hijau kecil */
+.progress-circle .progress-green {
+    fill: none;
+    stroke: #7ed6a7;
+    stroke-width: 10;
+    stroke-linecap: round;
+
+    stroke-dasharray: 37 120;
+    stroke-dashoffset: -120;   /* posisi kanan */
+}
+
+/* teks */
+.progress-circle span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -20%);
+    font-weight: bold;
+}
+
+/* =========================
+   LEGEND
+========================= */
+.legend {
+    font-size: 12px;
+}
+
+.dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.red {
+    background: #e74c3c;
+}
+
+.green {
+    background: #2ecc71;
+}
+
+/* =========================
+   BUTTON
+========================= */
+.btn-detail {
+    background: #b8201d;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.btn-detail:hover {
+    background: #8e1412;
+}
+
+/* =========================
+   CARD HEADER (BARU)
+========================= */
+.card-header {
+    margin-bottom: 10px;
+}
+
+/* GARIS PEMBATAS */
+.divider {
+    height: 2px;
+    background: #b8201d;
+    margin: 10px 0;
+    border-radius: 2px;
+}
+
+/* RAPIIIN LEGEND */
+.legend p {
+    margin: 2px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* POSISI BOTTOM BIAR LEBIH RAPI */
+.card-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+/* BIAR BUTTON GA KEPENTOK */
+.btn-detail {
+    white-space: nowrap;
+}
+
+/* RESPONSIVE BIAR GA PECah */
+@media (max-width: 768px) {
+    .riwayat-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .search-wrapper {
+        width: 100%;
+    }
+
+    .card-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

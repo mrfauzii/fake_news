@@ -88,16 +88,18 @@ Route::post('/telusuri-gambar', [PencarianController::class, 'telusuriGambar'])-
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+// Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
     // User Management
     Route::get('/user', [UserController::class, 'index']);
+    Route::get('/user-data', [UserController::class, 'getUserData']);
 
     // Umpan Balik
     Route::get('/umpanbalik', [UmpanBalikController::class, 'index']);
+    Route::get('/umpanbalik-data', [UmpanBalikController::class, 'getFeedbackData']);
 
     // Riwayat
     Route::prefix('riwayat')->group(function () {
@@ -106,7 +108,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
         Route::post('/update/{id}', [RiwayatController::class, 'update']);
         Route::get('/delete/{id}', [RiwayatController::class, 'delete']);
     });
-});
+//});
 
 
 /*

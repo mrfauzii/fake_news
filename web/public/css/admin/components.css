@@ -1,0 +1,23 @@
+.badge {
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 10px;
+}
+
+.new-badge {
+    background: #ffe5e5;
+    color: red;
+}
+
+.read-badge {
+    background: #eee;
+    color: #555;
+}
+
+.btn-outline {
+    border: 1px solid #b30000;
+    color: #b30000;
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: white;
+}

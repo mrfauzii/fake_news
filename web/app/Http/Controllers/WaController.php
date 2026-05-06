@@ -87,7 +87,7 @@ class WaController extends Controller
             'wa_number' => 'required'
         ]);
 
-        /** @var \App\Models\User $currentUser */
+        /** @var \App\Models\Users $currentUser */
         $currentUser = Auth::user();
         $waNumber = trim($request->wa_number);
 

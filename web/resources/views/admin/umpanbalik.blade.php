@@ -2,6 +2,10 @@
 
 @section('title', 'Umpan Balik')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/admin/umpanbalik-style.css') }}">
+@endpush
+
 @section('content')
 
 <!-- ===== HEADER TITLE ===== -->

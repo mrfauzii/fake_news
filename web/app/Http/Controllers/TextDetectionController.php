@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -13,7 +13,7 @@ use App\Models\KnowledgeBase;
 use App\Models\Stage1Results;
 use App\Models\Stage2Result;
 
-class HoaxDetectionController extends Controller
+class TextDetectionController extends Controller
 {
     public function detectText(Request $request)
     {

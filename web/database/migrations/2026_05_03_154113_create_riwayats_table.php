@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('image_search_results', function (Blueprint $table) {
+       Schema::create('riwayats', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('request_id')->constrained('requests')->onDelete('cascade');
-            $table->json('source_url')->nullable();
-            $table->float('similarity_score')->nullable();
-            $table->float('mean_date_score')->nullable();
+            $table->string('judul');
+            $table->text('deskripsi');
+            $table->integer('persentase_hoax');
+            $table->string('gambar')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('image_search_results');
+        Schema::dropIfExists('riwayats');
     }
 };

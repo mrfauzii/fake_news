@@ -32,6 +32,9 @@ def detect_text_fake_news_controller(text_request, knowledge_base, transformer, 
                     embedding,
                     id_request
                 )
+        if result.get("data"):
+            for item in result["data"]:
+                item.pop("query_embedding", None)
 
         return result
 

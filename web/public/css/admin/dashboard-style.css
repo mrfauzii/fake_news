@@ -1,0 +1,58 @@
+/* HEADER */
+.feedback-title h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.feedback-title p {
+    margin-top: 5px;
+    color: #666;
+}
+
+/* STATS */
+.stats-container {
+    display: flex;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.stats-card {
+    flex: 1;
+    background: #ffffff;
+    padding: 22px;
+    border-radius: 16px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    transition: all 0.25s ease;
+    cursor: pointer;
+}
+
+.stats-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.icon-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* GRID */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+/* SECTION */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

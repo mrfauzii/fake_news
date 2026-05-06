@@ -1,0 +1,43 @@
+/* =========================
+   CONTAINER
+========================= */
+.user-container {
+    margin-top: 10px;
+}
+
+/* =========================
+   TABLE CARD STYLE
+========================= */
+.user-table {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+}
+
+/* TABLE */
+.user-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* HEADER */
+.user-table th {
+    background: #f9f9f9;
+    text-align: left;
+    padding: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* BODY */
+.user-table td {
+    padding: 14px;
+    border-top: 1px solid #eee;
+    color: #444;
+}
+
+/* HOVER */
+.user-table tr:hover {
+    background: #fafafa;
+}

@@ -3,42 +3,39 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Riwayat;
 
 class RiwayatController extends Controller
 {
     public function index()
     {
-        $data = Riwayat::all();
-        return view('admin.riwayat.index', compact('data'));
-    }
+        $data = [
 
-    public function edit($id)
-    {
-        $data = Riwayat::findOrFail($id);
-        return view('admin.riwayat.edit', compact('data'));
-    }
+            [
+                'judul' => '[KABAR PENTING]',
+                'deskripsi' => 'Pemerintah membagikan Bantuan Sosial Ramadan sebesar Rp1,5 juta bagi warga yang memiliki BPJS Kesehatan. Daftar sekarang melalui link Telegram ini: bit.ly/bansos-ramadhan2026 agar dana segera cair.',
+                'gambar' => null,
+                'hoax' => 70,
+                'benar' => 30,
+            ],
 
-    public function update(Request $request, $id)
-{
-    $request->validate([
-        'judul' => 'required',
-        'status' => 'required'
-    ]);
+            [
+                'judul' => 'Informasi PDAM',
+                'deskripsi' => null,
+                'gambar' => 'img/contoh-berita.png',
+                'hoax' => 20,
+                'benar' => 80,
+            ],
 
-    $data = Riwayat::findOrFail($id);
+            [
+                'judul' => '[HOAX TERBARU]',
+                'deskripsi' => 'Beredar informasi bahwa pemerintah akan memberikan bantuan pulsa gratis melalui WhatsApp. Informasi tersebut tidak benar.',
+                'gambar' => null,
+                'hoax' => 85,
+                'benar' => 15,
+            ],
 
-    $data->update([
-        'judul' => $request->judul,
-        'status' => $request->status
-    ]);
+        ];
 
-    return redirect('/admin/riwayat')->with('success', 'Data berhasil diupdate');
-}
-
-    public function delete($id)
-    {
-        Riwayat::findOrFail($id)->delete();
-        return redirect('/admin/riwayat');
+        return view('admin.riwayat', compact('data'));
     }
 }

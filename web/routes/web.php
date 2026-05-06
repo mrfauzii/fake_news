@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\HoaxDetectionController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\ImageDetectionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,8 +45,9 @@ Route::get('/dapatkan-whatsapp', function () {
 Route::get('/uji-coba-deteksi', function () {
     return view('uji-coba-deteksi');
 });
-Route::post('/api/detect-text', [HoaxDetectionController::class, 'detectText']);
-
+Route::post('/api/detect-text', [HoaxDetectionController::class, 'detectText'])
+    ->name('detect.text');
+Route::post('/api/detect-image', [ImageDetectionController::class, 'detect'])->name('detect.image');
 
 /*
 |--------------------------------------------------------------------------
@@ -85,16 +87,18 @@ Route::prefix('auth/google')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+// Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
     // User Management
     Route::get('/user', [UserController::class, 'index']);
+    Route::get('/user-data', [UserController::class, 'getUserData']);
 
     // Umpan Balik
     Route::get('/umpanbalik', [UmpanBalikController::class, 'index']);
+    Route::get('/umpanbalik-data', [UmpanBalikController::class, 'getFeedbackData']);
 
     // Riwayat
     Route::prefix('riwayat')->group(function () {
@@ -104,7 +108,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
         Route::get('/delete/{id}', [RiwayatController::class, 'delete']);
     });
 
-});
+// });
 
 
 /*

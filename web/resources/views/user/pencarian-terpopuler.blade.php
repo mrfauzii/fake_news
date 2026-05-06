@@ -18,11 +18,7 @@
             <p class="lh-popular-hero__subtitle">
                 Klik teks bergaris bawah berwarna kuning untuk memilih kategori dan periode pencarian.
             </p>
-            <div class="lh-popular-hero__meta">
-                <span class="lh-popular-hero__chip">Kategori aktif: <strong id="activeCategoryLabel">Hoax</strong></span>
-                <span class="lh-popular-hero__chip">Periode aktif: <strong id="activePeriodLabel">Juni 2026</strong></span>
-                <span class="lh-popular-hero__chip lh-popular-hero__chip--soft" id="popularCountLabel">3 hasil ditemukan</span>
-            </div>
+            {{-- Hero meta removed per request --}}
         </section>
 
         <section class="lh-popular-grid-wrap">

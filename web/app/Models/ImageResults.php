@@ -13,4 +13,9 @@ class ImageResults extends Model
         'title',
         'created_at'
     ];
+
+    public function stage1Results()
+    {
+        return $this->hasMany(Stage1Results::class, 'image_results_id');
+    }
 }

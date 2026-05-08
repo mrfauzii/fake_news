@@ -13,7 +13,7 @@ def search_similar(knowledge_base, query_embedding, top_k=5):
     for i in range(len(ids)):
         output.append({
             "id": ids[i],
-            "score": distances[i],  # makin kecil = makin mirip
+            "score": distances[i],  
             "query_embedding": query_embedding
         })
 
@@ -55,3 +55,34 @@ def input_text_request(text_request, vector, request_id):
         ids=[str(request_id)],
         embeddings=[vector]
     )
+    
+def search_similar_input(embedding,text_request,THRESHOLD = 0.85):
+
+    results = text_request.query(
+        query_embeddings=[embedding],
+        n_results=1
+    )
+    print(results)
+
+    ids = results.get("ids", [[]])[0]
+    distances = results.get("distances", [[]])[0]
+
+    # tidak ada data
+    if not ids:
+        return {
+            "status": "fail"
+        }
+
+    distance = distances[0]
+
+    # similarity kurang dari threshold
+    if distance < THRESHOLD:
+        return {
+            "status": "fail"
+        }
+
+    return {
+        "status": "success",
+        "request_id": ids[0],
+        "similarity": distance
+    }

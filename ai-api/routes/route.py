@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
 from controllers.image_detection_controller import detect_image_fake_controller
-from controllers.text_detection_controller import detect_text_fake_news_controller
+from controllers.text_detection_controller import detect_text_fake_news_controller,similarity_controller
 from controllers.kb_controller import update_knowledge_base_controller
 
 
@@ -28,6 +28,14 @@ def create_routes():
         return update_knowledge_base_controller(
             request.app.state.transformer,
             request.app.state.knowledge_base,
+        )
+    
+    @router.post("/similarity-search")
+    def similarity_search(request: Request,data: dict):
+        return similarity_controller(
+            request.app.state.text_request,
+            request.app.state.transformer,
+            data
         )
 
     @router.post("/image-detection")

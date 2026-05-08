@@ -10,11 +10,10 @@ use App\Http\Controllers\PencarianController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UmpanBalikController;
 use App\Http\Controllers\WaController;
-use App\Http\Controllers\Api\HoaxDetectionController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ApiController;
-use App\Http\Controllers\ImageDetectionController;
+use App\Http\Controllers\DetectionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,9 +44,11 @@ Route::get('/dapatkan-whatsapp', function () {
 Route::get('/uji-coba-deteksi', function () {
     return view('uji-coba-deteksi');
 });
-Route::post('/api/detect-text', [HoaxDetectionController::class, 'detectText'])
-    ->name('detect.text');
-Route::post('/api/detect-image', [ImageDetectionController::class, 'detect'])->name('detect.image');
+// Route::post('/api/detect-text', [TextDetectionController::class, 'detectText'])
+//     ->name('detect.text');
+// Hapus dua rute lama, ganti dengan satu rute ini:
+Route::post('/api/detect', [DetectionController::class, 'detect'])->name('detect.hoax');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -74,12 +75,12 @@ Route::prefix('auth/google')->group(function () {
     Route::get('/callback', [GoogleAuthController::class, 'callback'])->name('google.callback');
 });
 
-    Route::get('/pencarian', [PencarianController::class, 'index'])->name('beranda');
-    Route::get('/pencarian-terpopuler', function () {
-        return view('user.pencarian-terpopuler');
-    })->name('pencarian.populer');
-    Route::post('/telusuri', [PencarianController::class, 'telusuri'])->name('telusuri');
-    Route::post('/telusuri-gambar', [PencarianController::class, 'telusuriGambar'])->name('telusuri.gambar');
+Route::get('/pencarian', [PencarianController::class, 'index'])->name('beranda');
+Route::get('/pencarian-terpopuler', function () {
+    return view('user.pencarian-terpopuler');
+})->name('pencarian.populer');
+Route::post('/telusuri', [PencarianController::class, 'telusuri'])->name('telusuri');
+Route::post('/telusuri-gambar', [PencarianController::class, 'telusuriGambar'])->name('telusuri.gambar');
 
 /*
 |--------------------------------------------------------------------------
@@ -107,8 +108,7 @@ Route::prefix('auth/google')->group(function () {
         Route::post('/update/{id}', [RiwayatController::class, 'update']);
         Route::get('/delete/{id}', [RiwayatController::class, 'delete']);
     });
-
-// });
+//});
 
 
 /*

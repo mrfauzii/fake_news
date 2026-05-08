@@ -3,10 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Image;
 use App\Models\Images;
-use App\Models\TextRequest; 
-use App\Models\ImageSearchResult;
 use App\Models\ImageSearchResults;
 use App\Models\Requests;
 use Illuminate\Support\Facades\Http;

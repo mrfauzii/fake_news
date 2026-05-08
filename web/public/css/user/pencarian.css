@@ -152,6 +152,22 @@ a { text-decoration: none; color: inherit; }
     color: var(--color-text);
 }
 
+/* Image preview in input panel */
+#imagePreviewContainer {
+    width: 100%;
+    text-align: center;
+}
+
+#imagePreview {
+    display: block;
+    margin: 0 auto 8px !important;
+    object-fit: contain;
+}
+
+#imagePreviewText {
+    text-align: center !important;
+}
+
 /* Card Footer (input panel) */
 .lh-card__footer {
     display: flex;

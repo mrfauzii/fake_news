@@ -13,17 +13,26 @@
 
     <h1>Riwayat Global</h1>
 
-    <div class="search-wrapper">
+    <div class="page-header-right">
 
-        <input 
-            type="text"
-            placeholder="Search..."
-            class="search-input"
-            id="searchInput"
-        >
+        <div class="search-wrapper">
 
-        <button class="search-btn">
-            <i class="fa fa-search"></i>
+            <input 
+                type="text"
+                placeholder="Search..."
+                class="search-input"
+                id="searchInput"
+            >
+
+            <button class="search-btn">
+                <i class="fa fa-search"></i>
+            </button>
+
+        </div>
+
+        <button class="btn-export">
+            <i class="fa fa-download"></i>
+            Export CSV
         </button>
 
     </div>

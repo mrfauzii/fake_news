@@ -162,6 +162,42 @@
 }
 
 /* =========================
+   HEADER ACTIONS
+========================= */
+
+/* wrapper search + export */
+.page-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* tombol export */
+.btn-export {
+    background: #b8201d;
+    color: #fff;
+    border: none;
+
+    padding: 10px 16px;
+    border-radius: 8px;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    transition: 0.2s;
+}
+
+.btn-export:hover {
+    background: #8e1412;
+}
+
+/* =========================
    CARD HEADER (BARU)
 ========================= */
 .card-header {

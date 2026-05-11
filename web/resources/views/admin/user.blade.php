@@ -10,6 +10,7 @@
 
 <!-- HEADER -->
 <div class="page-header">
+
     <h1>Data Pengguna</h1>
 
     <div class="search-wrapper">
@@ -26,6 +27,7 @@
         </button>
 
     </div>
+
 </div>
 
 <p class="page-subtitle">
@@ -50,26 +52,21 @@
 
             <tbody id="userTableBody">
 
-                <tr>
-                    <td>1</td>
-                    <td>Budi Pratomo</td>
-                    <td>budiprtmo34@gmail.com</td>
-                    <td>085876542319</td>
-                </tr>
+                @foreach($users as $index => $user)
 
                 <tr>
-                    <td>2</td>
-                    <td>Siti Hartini</td>
-                    <td>sitih4rtini@gmail.com</td>
-                    <td>085476549315</td>
+
+                    <td>{{ $index + 1 }}</td>
+
+                    <td>{{ $user['nama'] }}</td>
+
+                    <td>{{ $user['email'] }}</td>
+
+                    <td>{{ $user['whatsapp'] }}</td>
+
                 </tr>
 
-                <tr>
-                    <td>3</td>
-                    <td>Andi Santoso</td>
-                    <td>sansand@gmail.com</td>
-                    <td>085476549318</td>
-                </tr>
+                @endforeach
 
             </tbody>
 
@@ -79,6 +76,7 @@
 
 </div>
 
+<!-- SEARCH JS -->
 <script>
 
 const searchInput = document.getElementById('searchInput');
@@ -94,9 +92,13 @@ searchInput.addEventListener('keyup', function () {
         const rowText = row.textContent.toLowerCase();
 
         if (rowText.includes(keyword)) {
+
             row.style.display = '';
+
         } else {
+
             row.style.display = 'none';
+
         }
 
     });

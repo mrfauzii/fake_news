@@ -10,9 +10,29 @@ use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-     public function index()
+    public function index()
     {
-        return view('admin.user');
+        $json = '[
+            {
+                "nama": "Budi Pratomo",
+                "email": "budiprtmo34@gmail.com",
+                "whatsapp": "085876542319"
+            },
+            {
+                "nama": "Siti Hartini",
+                "email": "sitih4rtini@gmail.com",
+                "whatsapp": "085476549315"
+            },
+            {
+                "nama": "Andi Santoso",
+                "email": "sansand@gmail.com",
+                "whatsapp": "085476549318"
+            }
+        ]';
+
+        $users = json_decode($json, true);
+
+        return view('admin.user', compact('users'));
     }
 
     /**
@@ -22,7 +42,7 @@ class UserController extends Controller
     {
         /** @var Users|null $user */
         $user = Auth::user();
-        
+
         if (!$user) {
             return response()->json([
                 'success' => false,
@@ -47,13 +67,19 @@ class UserController extends Controller
         $validated = $validator->validated();
 
         if (!empty($validated['phone_number'])) {
-            $registeredPhone = Users::where('phone_number', $validated['phone_number'])->first();
+
+            $registeredPhone = Users::where(
+                'phone_number',
+                $validated['phone_number']
+            )->first();
 
             if (!$registeredPhone) {
+
                 return response()->json([
                     'success' => false,
                     'message' => 'Nomor ini belum terdaftar. Silakan cek via WhatsApp pada menu Dapatkan Melalui WhatsApp.'
                 ], 422);
+
             }
         }
 
@@ -61,6 +87,7 @@ class UserController extends Controller
         $user->name = $validated['name'] ?? $user->name;
         $user->email = $validated['email'] ?? $user->email;
         $user->phone_number = $validated['phone_number'] ?? $user->phone_number;
+
         $user->save();
 
         return response()->json([
@@ -71,12 +98,29 @@ class UserController extends Controller
     }
 
     /**
-     * Return JSON data semua user buat admin
+     * Return JSON data dummy buat admin
      */
     public function getUserData()
     {
-        // Ambil semua data user
-        $users = Users::all();
+        $json = '[
+            {
+                "nama": "Budi Pratomo",
+                "email": "budiprtmo34@gmail.com",
+                "whatsapp": "085876542319"
+            },
+            {
+                "nama": "Siti Hartini",
+                "email": "sitih4rtini@gmail.com",
+                "whatsapp": "085476549315"
+            },
+            {
+                "nama": "Andi Santoso",
+                "email": "sansand@gmail.com",
+                "whatsapp": "085476549318"
+            }
+        ]';
+
+        $users = json_decode($json, true);
 
         return response()->json([
             'status' => 'success',
@@ -85,4 +129,3 @@ class UserController extends Controller
         ]);
     }
 }
-

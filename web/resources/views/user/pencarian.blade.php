@@ -8,14 +8,6 @@
     @include('user.partials.navbar')
 
     @include('user.partials.hero-bg')
-    <!-- ========== NAVBAR ========== -->
-    <header class="lh-navbar">
-        <!-- Logo -->
-        <a href="{{ route('beranda') }}" class="lh-logo">
-            <img src="{{ asset('img/logo-lensa.png') }}" alt="Logo Lensa Hoax" class="lh-logo__img">
-        </a>
-
-    @include('user.partials.hero-bg')
 
     <!-- ========== MAIN CONTENT ========== -->
     <main class="lh-main">

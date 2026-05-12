@@ -3,38 +3,31 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\history_view;
 
 class RiwayatController extends Controller
 {
     public function index()
     {
-        $data = [
+        $histories = history_view::with('request.image')->orderBy('created_at', 'desc')->get();
+        $data = $histories->map(function ($history) {
+            
+            $isImageSearch = $history->request && $history->request->image_id != null;
+            $isHoax = strtolower($history->final_label) === 'hoax';
+            $confidence = $history->final_confidence ?? 0;
+            
+            $persenHoax = $isHoax ? $confidence : (100 - $confidence);
+            $persenBenar = $isHoax ? (100 - $confidence) : $confidence;
 
-            [
-                'judul' => '[KABAR PENTING]',
-                'deskripsi' => 'Pemerintah membagikan Bantuan Sosial Ramadan sebesar Rp1,5 juta bagi warga yang memiliki BPJS Kesehatan. Daftar sekarang melalui link Telegram ini: bit.ly/bansos-ramadhan2026 agar dana segera cair.',
-                'gambar' => null,
-                'hoax' => 70,
-                'benar' => 30,
-            ],
-
-            [
-                'judul' => 'Informasi PDAM',
-                'deskripsi' => null,
-                'gambar' => 'img/contoh-berita.png',
-                'hoax' => 20,
-                'benar' => 80,
-            ],
-
-            [
-                'judul' => '[HOAX TERBARU]',
-                'deskripsi' => 'Beredar informasi bahwa pemerintah akan memberikan bantuan pulsa gratis melalui WhatsApp. Informasi tersebut tidak benar.',
-                'gambar' => null,
-                'hoax' => 85,
-                'benar' => 15,
-            ],
-
-        ];
+            return [
+                'judul'     => $isImageSearch ? '[GAMBAR] Pencarian oleh: ' . $history->username : '[TEKS] Pencarian oleh: ' . $history->username,
+                'deskripsi' => $isImageSearch ? null : $history->input_text,
+                'gambar'    => $isImageSearch && $history->request->image ? $history->request->image->file_path : null,
+                'hoax'      => round($persenHoax),
+                'benar'     => round($persenBenar),
+            ];
+            
+        })->toArray(); 
 
         return view('admin.riwayat', compact('data'));
     }

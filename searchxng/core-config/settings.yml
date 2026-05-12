@@ -1,0 +1,46 @@
+use_default_settings: true
+
+general:
+  instance_name: "Pur Search Engine"
+  enable_metrics: true
+
+server:
+  # Secret key sebaiknya via env var, tapi kalau mau hardcode di sini pastikan cuma satu
+  bind_address: "0.0.0.0"
+  port: 8010
+  public_instance: false
+  limiter: false        
+  image_proxy: true    
+
+search:
+  safe_search: 1
+  autocomplete: "google"
+  default_lang: "en"
+  formats:
+    - html
+    - json
+
+outgoing:
+  request_timeout: 5.0
+  max_request_timeout: 10.0
+  useragent_suffix: "pur-search-engine"
+  retries: 2
+  pool_connections: 20
+  pool_maxsize: 10
+
+redis:
+  url: redis://valkey:6379/0
+
+engines:
+  - name: google
+    disabled: false
+  - name: reuters
+    disabled: true
+  - name: bing
+    disabled: true
+  - name: duckduckgo
+    disabled: true
+
+categories:
+  - general
+  - news

@@ -29,7 +29,7 @@
         <!-- FORM -->
         <div class="p-8">
 
-            <form action="{{ route('detect.text') }}" method="POST">
+            <form action="{{ route('detect.hoax') }}" method="POST">
                 @csrf
 
                 <div class="mb-6">

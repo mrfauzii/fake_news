@@ -27,9 +27,8 @@
                     <textarea
                         class="lh-textarea"
                         id="inputInformasi"
-                        name="informasi"
-                        placeholder="Ketik, Tempel, atau Unggah informasi ....."
-                    ></textarea>
+                        name="query"
+                        placeholder="Ketik, Tempel, atau Unggah informasi ....."></textarea>
                     <!-- Image preview area -->
                     <div id="imagePreviewContainer" style="display: none; margin-top: 16px;">
                         <img id="imagePreview" src="" alt="Preview gambar" style="max-width: 100%; max-height: 300px; border-radius: 8px; display: block; margin-bottom: 8px;">

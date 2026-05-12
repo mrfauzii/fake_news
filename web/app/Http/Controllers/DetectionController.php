@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ImageDetectionController;
 use App\Http\Controllers\TextDetectionController;
+use Illuminate\Support\Facades\Log;
 
 class DetectionController extends Controller
 {
@@ -13,6 +14,8 @@ class DetectionController extends Controller
      */
     public function detect(Request $request)
     {
+        Log::info($request->all());
+
         // 1. Cek apakah user mengupload file dengan nama input 'image'
         if ($request->hasFile('image')) {
             // Lempar request ke ImageDetectionController
@@ -20,7 +23,8 @@ class DetectionController extends Controller
         }
 
         // 2. Cek apakah user mengirim teks dengan nama input 'input_text'
-        if ($request->filled('input_text')) {
+        if ($request->filled('query')) {
+            Log::info("Mendeteksi teks: " . $request->input('query'));
             // Lempar request ke TextDetectionController
             return app(TextDetectionController::class)->detectText($request);
         }

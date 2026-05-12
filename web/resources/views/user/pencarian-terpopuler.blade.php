@@ -59,6 +59,11 @@
 @endpush
 
 @push('scripts')
+<script>
+    window.realPopularItems = @json($popularItems) ;
+    window.defaultPeriod = "{{ $defaultPeriod }}";
+</script>
+
 <script src="{{ asset('js/pencarian-terpopuler.js') }}"></script>
 <script src="{{ asset('js/user/profile-popup.js') }}"></script>
 @endpush

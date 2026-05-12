@@ -137,6 +137,7 @@ document.addEventListener('DOMContentLoaded', function () {
         showLoading();
         clearImagePreview(); // Clear image preview when searching by text
 
+        // 1. UBAH URL ke /telusuri
         fetch('/telusuri', {
             method: 'POST',
             headers: {
@@ -144,20 +145,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 'X-CSRF-TOKEN': csrfToken,
             },
             body: JSON.stringify({
-                informasi: informasi,
+                informasi: informasi, 
             }),
         })
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                return response.json();
+                return response.json(); // Sedot JSON-nya 1 kali
             })
             .then(data => {
-                if (data.success) {
-                    displayResult(data);
+                // 🔥 PERBAIKAN LAPISAN KEDUA:
+                // Cek apakah ada lapisan kedua bernama 'data', kalau ada ambil isinya, kalau tidak pakai langsung
+                const actualData = data.data ? data.data : data;
+
+                if (actualData.success) {
+                    displayResult(actualData);
                 } else {
-                    showError(data.message || 'Terjadi kesalahan. Silakan coba lagi.');
+                    showError(actualData.message || 'Terjadi kesalahan. Silakan coba lagi.');
                 }
             })
             .catch(error => {
@@ -245,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Normalize and map verdict label
         const normalizedVerdict = String(verdict || '').toLowerCase();
         const verdictMap = {
-            hoax: { label: 'HOAX', className: 'lh-verdict--hoax' },
+            fake: { label: 'HOAX', className: 'lh-verdict--hoax' },
             valid: { label: 'FAKTA', className: 'lh-verdict--valid' },
             unclear: { label: 'PERLU VERIFIKASI', className: 'lh-verdict--unclear' },
             fakta: { label: 'FAKTA', className: 'lh-verdict--valid' },
@@ -266,12 +271,37 @@ document.addEventListener('DOMContentLoaded', function () {
         const faktaPercent = 100 - hoaxPercent;
 
         // Build sources HTML
+        // ========================================================
+        // Build sources HTML menggunakan link_counter
+        // ========================================================
         let sourcesHtml = '<li>Belum ada sumber yang terdeteksi.</li>';
-        if (Array.isArray(sources) && sources.length > 0) {
+        let linkCounterArray = [];
+
+        // 1. Cek dan ubah teks string JSON menjadi Array JavaScript
+        if (data.link_counter) {
+            try {
+                linkCounterArray = typeof data.link_counter === 'string' 
+                    ? JSON.parse(data.link_counter) 
+                    : data.link_counter;
+            } catch (e) {
+                console.error("Gagal memproses data link_counter:", e);
+            }
+        }
+
+        // 2. Buat list HTML jika array URL berhasil didapatkan
+        if (Array.isArray(linkCounterArray) && linkCounterArray.length > 0) {
+            sourcesHtml = linkCounterArray.map((url, index) => {
+                const safeUrl = escapeHtml(url || '#');
+                // Tambahkan style word-break agar URL yang panjang tidak merusak tampilan desain web
+                return `<li>Sumber ${index + 1}: <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" style="word-break: break-all; color: #B71C1C;">${safeUrl}</a></li>`;
+            }).join('');
+        } 
+        // 3. Fallback (cadangan) jika link_counter kosong, pakai struktur 'sources' yang lama
+        else if (Array.isArray(sources) && sources.length > 0) {
             sourcesHtml = sources.map(source => {
-                const safeTitle = escapeHtml(source?.title || 'Sumber tanpa judul');
+                const safeTitle = escapeHtml(source?.title || 'Sumber referensi');
                 const safeUrl = escapeHtml(source?.url || '#');
-                const hasUrl = Boolean(source?.url);
+                const hasUrl = Boolean(source?.url) && source.url !== '';
                 const sourceLink = hasUrl
                     ? `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer">${safeUrl}</a>`
                     : '-';

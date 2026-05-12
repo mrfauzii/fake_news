@@ -108,7 +108,8 @@ Route::post('/telusuri-gambar', [PencarianController::class, 'telusuriGambar'])-
         Route::post('/update/{id}', [RiwayatController::class, 'update']);
         Route::get('/delete/{id}', [RiwayatController::class, 'delete']);
     });
-//});
+
+// });
 
 
 /*

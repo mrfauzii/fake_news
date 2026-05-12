@@ -10,14 +10,24 @@
 
 <!-- HEADER -->
 <div class="page-header">
+
     <h1>Data Pengguna</h1>
 
     <div class="search-wrapper">
-        <input type="text" placeholder="Search..." class="search-input">
+
+        <input 
+            type="text"
+            placeholder="Search..."
+            class="search-input"
+            id="searchInput"
+        >
+
         <button class="search-btn">
             <i class="fa fa-search"></i>
         </button>
+
     </div>
+
 </div>
 
 <p class="page-subtitle">
@@ -26,8 +36,11 @@
 
 <!-- TABLE -->
 <div class="user-container">
+
     <div class="user-table">
+
         <table>
+
             <thead>
                 <tr>
                     <th><i class="fa fa-user"></i></th>
@@ -36,28 +49,62 @@
                     <th>Whatsapp</th>
                 </tr>
             </thead>
-            <tbody>
+
+            <tbody id="userTableBody">
+
+                @foreach($users as $index => $user)
+
                 <tr>
-                    <td>1</td>
-                    <td>Budi Pratomo</td>
-                    <td>budiprtmo34@gmail.com</td>
-                    <td>085876542319</td>
+
+                    <td>{{ $index + 1 }}</td>
+
+                    <td>{{ $user['nama'] }}</td>
+
+                    <td>{{ $user['email'] }}</td>
+
+                    <td>{{ $user['whatsapp'] }}</td>
+
                 </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Siti Hartini</td>
-                    <td>sitih4rtini@gmail.com</td>
-                    <td>085476549315</td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>Andi Santoso</td>
-                    <td>sansand@gmail.com</td>
-                    <td>085476549318</td>
-                </tr>
+
+                @endforeach
+
             </tbody>
+
         </table>
+
     </div>
+
 </div>
+
+<!-- SEARCH JS -->
+<script>
+
+const searchInput = document.getElementById('searchInput');
+
+searchInput.addEventListener('keyup', function () {
+
+    const keyword = searchInput.value.toLowerCase();
+
+    const rows = document.querySelectorAll('#userTableBody tr');
+
+    rows.forEach(function(row) {
+
+        const rowText = row.textContent.toLowerCase();
+
+        if (rowText.includes(keyword)) {
+
+            row.style.display = '';
+
+        } else {
+
+            row.style.display = 'none';
+
+        }
+
+    });
+
+});
+
+</script>
 
 @endsection

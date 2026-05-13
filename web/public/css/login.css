@@ -234,8 +234,8 @@ a {
    LOGIN PAGE LAYOUT
    ============================================================ */
 .login-page {
-    height: calc(100vh - var(--login-nav-height));
     min-height: calc(100vh - var(--login-nav-height));
+    height: auto;
     margin-top: var(--login-nav-height);
     padding-top: 0;
     display: grid;
@@ -248,6 +248,7 @@ a {
 .login-page__hero {
     position: relative;
     min-height: 100%;
+    height: auto;
     overflow: hidden;
     display: flex;
     align-items: stretch;
@@ -280,6 +281,7 @@ a {
     justify-content: flex-start;
     padding: 24px 40px 24px 34px;
     min-height: 100%;
+    height: auto;
 }
 
 .login-panel__inner {
@@ -375,7 +377,8 @@ a {
 
 .btn-social__label {
     flex: 1;
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
 /* ============================================================
@@ -405,6 +408,7 @@ a {
 @media (max-width: 1280px) {
     .login-page {
         grid-template-columns: minmax(390px, 54%) minmax(320px, 46%);
+        min-height: calc(100vh - var(--login-nav-height));
     }
 
     .login-page__hero {
@@ -433,8 +437,8 @@ a {
     .login-page {
         grid-template-columns: 1fr;
         align-items: stretch;
-        height: calc(100vh - var(--login-nav-height));
         min-height: calc(100vh - var(--login-nav-height));
+        height: auto;
         margin-top: var(--login-nav-height);
         padding-top: 0;
     }
@@ -491,6 +495,10 @@ a {
         gap: 10px;
         margin-bottom: 16px;
     }
+
+    .btn-social__label {
+        white-space: nowrap;
+    }
 }
 
 @media (max-width: 480px) {
@@ -499,7 +507,7 @@ a {
     }
 
     .login-page__hero {
-        min-height: min(190px, 30vh);
+        min-height: min(180px, 28vh);
     }
 
     .hero-image {
@@ -510,21 +518,27 @@ a {
         padding: 10px 14px 14px;
     }
 
+    .login-panel__inner {
+        max-width: 100%;
+    }
+
     .login-panel__title {
-        font-size: 24px;
+        font-size: 22px;
     }
 
     .login-panel__subtitle {
-        font-size: 14px;
+        font-size: 13px;
         margin-bottom: 12px;
     }
 
     .btn-social {
-        height: 52px;
-        font-size: 14px;
+        min-height: 50px;
+        height: auto;
+        font-size: 13px;
         gap: 8px;
-        padding: 0 14px;
+        padding: 10px 14px;
         border-radius: 14px;
+        align-items: flex-start;
     }
 
     .btn-social__icon {
@@ -538,5 +552,25 @@ a {
 
     .back-link {
         font-size: 14px;
+    }
+
+    .btn-social__label {
+        white-space: normal;
+        line-height: 1.25;
+    }
+}
+
+@media (max-width: 360px) {
+    .login-panel {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .login-page__hero {
+        min-height: 160px;
+    }
+
+    .btn-social {
+        padding: 10px 12px;
     }
 }

@@ -32,6 +32,13 @@ body {
     padding: 0;
 }
 
+/* Make WhatsApp page adapt to viewport and center content */
+.wa-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .wa-navbar {
     position: sticky;
     z-index: 10;
@@ -120,13 +127,15 @@ body {
 }
 
 .wa-content {
-    max-width: 1220px;
+    max-width: 1100px;
     margin: 0 auto;
+    width: 100%;
     background: transparent;
     display: flex;
     flex-direction: column;
     gap: var(--wa-section-gap);
-    padding: 0 var(--wa-section-gap) var(--wa-section-gap);
+    padding: 0 clamp(12px, 3vw, 40px) clamp(18px, 4vw, 48px);
+    box-sizing: border-box;
 }
 
 .wa-content > section {
@@ -155,10 +164,11 @@ body {
     grid-template-columns: 1fr 1fr;
     gap: clamp(18px, 2vw, 28px);
     align-items: center;
+    align-items: start;
 }
 
 .wa-hero__text {
-    max-width: 560px;
+    max-width: 100%;
     padding-top: 0;
     align-self: center;
 }
@@ -194,14 +204,16 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    height: 50px;
-    padding: 0 22px;
+    height: 48px;
+    min-width: 140px;
+    max-width: 360px;
+    padding: 0 20px;
     border-radius: 999px;
     background: linear-gradient(135deg, #73e7a3 0%, #4fd78a 48%, #31bb72 100%);
     color: #fff;
     border: 1px solid rgba(41, 147, 91, 0.45);
     text-decoration: none;
-    font-size: clamp(18px, 1.5vw, 23px);
+    font-size: clamp(15px, 1.2vw, 20px);
     font-weight: 800;
     letter-spacing: 0.1px;
     box-shadow: 0 10px 20px rgba(49, 187, 114, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.28);
@@ -242,6 +254,25 @@ body {
     width: 24px;
     height: 24px;
     flex-shrink: 0;
+}
+
+/* Make hero visual images responsive */
+.wa-hero__visual img,
+.wa-brand-image {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Limit nav hover expansion on large screens and prevent layout shift */
+.lh-nav-btn:hover {
+    width: min(260px, 34vw);
+}
+
+/* Ensure tooltip text doesn't overflow */
+.lh-nav-tooltip {
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .wa-btn-cta--small {
@@ -406,6 +437,14 @@ body {
     }
 
     .wa-hero__visual {
+        order: 1;
+    }
+
+    .wa-hero__text {
+        order: 2;
+    }
+
+    .wa-hero__visual {
         min-height: 180px;
     }
 
@@ -445,70 +484,282 @@ body {
         --wa-nav-height: 64px;
     }
 
+    /* Override navbar.css mobile styles for WhatsApp page */
+    .wa-page .lh-navbar {
+        position: fixed !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        top: auto !important;
+        height: 70px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        background: rgba(255,255,255,0.98) !important;
+        box-shadow: 0 -6px 18px rgba(12,12,12,0.06) !important;
+        z-index: 1100 !important;
+        border-bottom: none !important;
+        border: none !important;
+    }
+
+    .wa-page .lh-logo {
+        position: fixed !important;
+        top: 12px !important;
+        left: 12px !important;
+        z-index: 1200 !important;
+        gap: 0 !important;
+        width: auto !important;
+    }
+
+    .wa-page .lh-logo__img {
+        width: 46px !important;
+    }
+
+    .wa-page .lh-nav-icons {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-around !important;
+        width: 100% !important;
+        gap: 0 !important;
+        padding: 0 !important;
+    }
+
+    .wa-page .lh-nav-btn {
+        width: 56px !important;
+        height: 56px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        color: #73070B !important;
+        border: none !important;
+    }
+
+    .wa-page .lh-nav-btn > iconify-icon:first-child {
+        width: 26px !important;
+        height: 26px !important;
+        color: #73070B !important;
+    }
+
+    .wa-page .lh-nav-btn--search {
+        width: 64px !important;
+        height: 64px !important;
+        background: transparent !important;
+        transform: none !important;
+        box-shadow: none !important;
+        color: #73070B !important;
+    }
+
+    .wa-page .lh-nav-btn--search > iconify-icon:first-child {
+        width: 28px !important;
+        height: 28px !important;
+        color: #73070B !important;
+    }
+
+    .wa-page .lh-nav-tooltip {
+        display: none !important;
+    }
+
+    /* Prevent desktop WA-expanded button style from becoming oval on mobile. */
+    .wa-page .lh-nav-btn.lh-nav-btn--whatsapp-visible,
+    .wa-page .lh-nav-btn.lh-nav-btn--whatsapp-visible:hover,
+    .wa-page .lh-nav-btn.lh-nav-btn--whatsapp-visible:focus-visible,
+    .wa-page .lh-nav-btn.lh-nav-btn--whatsapp-visible:active {
+        width: 52px !important;
+        height: 52px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        justify-content: center !important;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    .wa-page .lh-nav-btn.lh-nav-btn--whatsapp-visible > iconify-icon:first-child {
+        width: 26px !important;
+        height: 26px !important;
+        color: #73070B !important;
+    }
+
+    .wa-page .lh-mobile-search {
+        display: none !important;
+    }
+
     .wa-content {
-        width: 100%;
-        padding: 0 16px 16px;
+        width: 100% !important;
+        padding: 0 16px 90px 16px !important;
+        margin-bottom: 0 !important;
     }
 
     .wa-hero,
     .wa-reason,
     .wa-steps,
     .wa-tips {
-        padding: 6px 2px 0;
+        padding: 6px 2px 0 !important;
+    }
+
+    .wa-hero {
+        gap: 14px !important;
     }
 
     .wa-navbar {
-        height: 64px;
-        padding: 0 10px;
+        position: fixed !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        top: auto !important;
+        height: 70px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        background: rgba(255,255,255,0.98) !important;
+        box-shadow: 0 -6px 18px rgba(12,12,12,0.06) !important;
+        z-index: 1100 !important;
+        border-bottom: none !important;
+        border: none !important;
+        margin-bottom: 0 !important;
+    }
+
+    .wa-logo {
+        position: fixed !important;
+        top: 12px !important;
+        left: 12px !important;
+        z-index: 1200 !important;
+        gap: 0 !important;
+        width: auto !important;
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        justify-content: center !important;
+        align-items: center !important;
     }
 
     .wa-logo__img {
-        width: 92px;
+        width: 46px !important;
+        height: auto !important;
     }
 
     .wa-nav-actions {
-        gap: 6px;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-around !important;
+        width: 100% !important;
+        gap: 0 !important;
+        padding: 0 !important;
+        position: relative !important;
     }
 
     .wa-nav-btn {
-        width: 36px;
-        height: 36px;
+        width: 56px !important;
+        height: 56px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        color: #73070B !important;
+        border: none !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s ease, box-shadow 0.25s ease, color 0.3s ease !important;
+    }
+
+    .wa-nav-btn:hover,
+    .wa-nav-btn:focus-visible {
+        background: rgba(115,7,11,0.08) !important;
+        box-shadow: none !important;
+        transform: scale(1.05) !important;
+    }
+
+    .wa-nav-btn:active {
+        transform: scale(0.92) !important;
+    }
+
+    .wa-nav-btn iconify-icon {
+        width: 26px !important;
+        height: 26px !important;
+        color: #73070B !important;
+        transition: color 0.3s ease !important;
     }
 
     .wa-nav-btn--whatsapp {
-        width: min(170px, 42vw);
-        padding: 0 12px 0 10px;
+        width: 56px !important;
+        height: 56px !important;
+        background: transparent !important;
+        transform: none !important;
+        box-shadow: none !important;
+        color: #73070B !important;
+        border-radius: 50% !important;
     }
 
-    .wa-navbar .lh-nav-btn.lh-nav-btn--whatsapp-visible,
-    .wa-navbar .lh-nav-btn.lh-nav-btn--whatsapp-visible:hover,
-    .wa-navbar .lh-nav-btn.lh-nav-btn--whatsapp-visible:focus-visible,
-    .wa-navbar .lh-nav-btn.lh-nav-btn--whatsapp-visible:active {
-        width: min(170px, 42vw) !important;
-        padding: 0 12px 0 10px !important;
+    .wa-nav-btn--whatsapp iconify-icon {
+        width: 26px !important;
+        height: 26px !important;
+        color: #73070B !important;
     }
 
-    .wa-nav-tooltip--always-visible {
-        opacity: 1;
-        max-width: 120px;
-        margin-left: 6px;
+    .wa-page .lh-nav-btn--active,
+    .wa-page .wa-nav-btn--active,
+    .wa-page .wa-nav-btn.wa-nav-btn--active {
+        width: 56px !important;
+        height: 56px !important;
+        border-radius: 50% !important;
+        background: linear-gradient(90deg,#73070B 0%,#B8201D 100%) !important;
+        color: #fff !important;
+        transform: translateY(-10px) scale(1) !important;
+        box-shadow: 0 10px 22px rgba(184,32,29,0.28) !important;
+        transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease-out, box-shadow 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), color 0.3s ease !important;
     }
 
-    .wa-btn-cta,
-    .wa-btn-cta--small {
-        width: 100%;
-        justify-content: center;
+    .wa-page .lh-nav-btn--active:hover,
+    .wa-page .wa-nav-btn--active:hover,
+    .wa-page .wa-nav-btn.wa-nav-btn--active:hover {
+        transform: translateY(-12px) scale(1.08) !important;
+        box-shadow: 0 14px 28px rgba(184,32,29,0.35) !important;
     }
 
-    .wa-hero__text,
-    .wa-reason,
-    .wa-steps,
-    .wa-tips {
-        padding-left: 2px;
-        padding-right: 2px;
+    .wa-page .lh-nav-btn.lh-nav-btn--whatsapp-visible.lh-nav-btn--active {
+        width: 56px !important;
+        height: 56px !important;
+        transform: translateY(-10px) !important;
+        box-shadow: 0 10px 22px rgba(184,32,29,0.28) !important;
     }
 
-    .wa-hero__text p {
-        max-width: none;
+    .wa-page .lh-nav-btn--active > iconify-icon:first-child,
+    .wa-page .wa-nav-btn--active > iconify-icon:first-child,
+    .wa-page .wa-nav-btn.wa-nav-btn--active > iconify-icon,
+    .wa-page .wa-nav-btn.wa-nav-btn--active > iconify-icon:first-child {
+        color: #fff !important;
+    }
+
+    /* Ensure WhatsApp icon is white when active on WhatsApp page */
+    .wa-page .lh-nav-btn.lh-nav-btn--whatsapp-visible.lh-nav-btn--active > iconify-icon:first-child {
+        color: #fff !important;
+    }
+
+    /* Override whatsapp button icon color to white when active */
+    .wa-page .wa-nav-btn.wa-nav-btn--active > iconify-icon,
+    .wa-page .wa-nav-btn.wa-nav-btn--active > iconify-icon:first-child {
+        color: #fff !important;
+    }
+
+    .wa-page .lh-nav-btn--search.lh-nav-btn--active {
+        width: 64px !important;
+        height: 64px !important;
+        transform: translateY(-16px) !important;
+        box-shadow: 0 12px 28px rgba(184,32,29,0.32) !important;
+        transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s cubic-bezier(0.4, 0.0, 0.2, 1) !important;
+    }
+
+    .wa-page .lh-nav-btn--search.lh-nav-btn--active:hover {
+        transform: translateY(-18px) !important;
+        box-shadow: 0 16px 32px rgba(184,32,29,0.38) !important;
+    }
+
+    .wa-content {
+        width: 100% !important;
+        padding: 0 16px 90px 16px !important;
+        margin-bottom: 0 !important;
     }
 }

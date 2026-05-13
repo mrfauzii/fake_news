@@ -29,7 +29,7 @@
                 <span>Dapatkan Melalui Whatsapp</span>
             </span>
         </a>
-        @if(session('user_login'))
+        @auth
             {{-- SUDAH LOGIN --}}
             <a href="#"
             class="lh-nav-btn lh-nav-btn--user js-profile-toggle {{ isset($variant) && $variant === 'wa' ? 'wa-nav-btn' : '' }}"
@@ -61,10 +61,10 @@
                 </span>
             </a>
 
-        @endif
+        @endauth
     </nav>
 
-    @if(session('user_login'))
+    @auth
         @include('user.partials.profile-popup', ['popupId' => 'user-profile-popup'])
-    @endif
+    @endauth
 </header>

@@ -35,7 +35,7 @@ Route::get('/pencarian/populer', [PopulerHistoryController::class, 'index'])->na
 
 // WhatsApp Page
 Route::get('/dapatkan-whatsapp', function () {
-    return view('whatsapp');
+    return view('user.whatsapp');
 })->name('whatsapp.page');
 
 // Uji coba deteksi

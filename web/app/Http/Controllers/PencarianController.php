@@ -25,11 +25,6 @@ class PencarianController extends Controller
     public function telusuri(Request $request): JsonResponse
     {
         try {
-            Log::info('Menerima permintaan pencarian teks dari Web UI', [
-                'user_id' => Auth::id(),
-                'request_data' => $request->all()
-            ]);
-
             // 1. Validasi input dari frontend
             $validated = $request->validate([
                 'informasi' => 'required|string|min:10|max:5000',
@@ -47,10 +42,6 @@ class PencarianController extends Controller
             $textDetectionController = new TextDetectionController();
             $detect = $textDetectionController->detectText($request);
 
-            Log::info('Mendelegasikan permintaan ke TextDetectionController', [
-                'user_id' => Auth::id(),
-                'query' => $detect
-            ]);
             return $detect;
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([

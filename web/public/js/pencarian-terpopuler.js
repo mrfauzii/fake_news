@@ -18,8 +18,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const state = {
         category: 'all',
-        period: 'Juni 2026',
-        periodYear: 2026,
+        period: window.defaultPeriod || 'Juni 2026', // <--- UBAH INI
+        periodYear: window.defaultPeriod ? parseInt(window.defaultPeriod.split(' ')[1]) : 2026, // <--- UBAH INI
         modalType: null,
     };
 
@@ -43,96 +43,99 @@ document.addEventListener('DOMContentLoaded', function () {
         { value: 'fakta', label: 'Fakta', description: 'Menampilkan berita fakta teratas.' },
     ];
 
-    const contentBlueprints = {
-        hoax: [
-            {
-                headline: 'Pemerintah membagikan bantuan Sosial Ramadan 2026',
-                excerpt: '[WASPADA PENTING] Pemerintah membagikan Bantuan Sosial Ramadan sebesar Rp1,5 juta bagi warga yang memiliki BPJS Kesehatan. Daftar sekarang melalui link Telegram ini agar dana segera cair.',
-                query: 'Pemerintah membagikan bantuan Sosial Ramadan 2026',
-                countBase: 2894,
-            },
-            {
-                headline: 'Presiden Prabowo ajak masyarakat dukung Trump',
-                excerpt: 'Beredar unggahan video yang mengeklaim Presiden Prabowo mengajak masyarakat mendukung Donald Trump dan memihak Amerika agar Indonesia aman dari teroris.',
-                query: 'Presiden Prabowo ajak masyarakat dukung Trump',
-                countBase: 2104,
-            },
-            {
-                headline: 'Tautan dana darurat di pesan instan adalah penipuan berulang',
-                excerpt: 'Unggahan yang mengaitkan bantuan dana darurat dengan tautan pesan instan tidak memiliki dasar resmi dan terdeteksi sebagai pola penipuan yang sering berulang.',
-                query: 'Tautan dana darurat di pesan instan adalah penipuan berulang',
-                countBase: 1704,
-            },
-        ],
-        fakta: [
-            {
-                headline: 'Jadwal layanan publik dan bantuan sosial telah dikonfirmasi',
-                excerpt: 'Hasil verifikasi menunjukkan informasi tentang jadwal layanan publik dan status bantuan sosial yang beredar telah dikonfirmasi oleh instansi terkait.',
-                query: 'Jadwal layanan publik dan bantuan sosial telah dikonfirmasi',
-                countBase: 986,
-            },
-            {
-                headline: 'Proyek perbaikan jalan di kawasan wisata memang sedang berlangsung',
-                excerpt: 'Pernyataan resmi dari pemerintah daerah memastikan bahwa proyek perbaikan jalan di kawasan wisata memang sedang berlangsung dan dapat dicek melalui pengumuman publik.',
-                query: 'Proyek perbaikan jalan di kawasan wisata memang sedang berlangsung',
-                countBase: 742,
-            },
-            {
-                headline: 'Data cuaca dan peringatan resmi telah dirilis',
-                excerpt: 'Informasi cuaca, peringatan dini, dan rilis resmi dari lembaga terkait dapat diverifikasi langsung pada kanal publik yang tersedia.',
-                query: 'Data cuaca dan peringatan resmi telah dirilis',
-                countBase: 621,
-            },
-        ],
-    };
+    // const contentBlueprints = {
+    //     hoax: [
+    //         {
+    //             headline: 'Pemerintah membagikan bantuan Sosial Ramadan 2026',
+    //             excerpt: '[WASPADA PENTING] Pemerintah membagikan Bantuan Sosial Ramadan sebesar Rp1,5 juta bagi warga yang memiliki BPJS Kesehatan. Daftar sekarang melalui link Telegram ini agar dana segera cair.',
+    //             query: 'Pemerintah membagikan bantuan Sosial Ramadan 2026',
+    //             countBase: 2894,
+    //         },
+    //         {
+    //             headline: 'Presiden Prabowo ajak masyarakat dukung Trump',
+    //             excerpt: 'Beredar unggahan video yang mengeklaim Presiden Prabowo mengajak masyarakat mendukung Donald Trump dan memihak Amerika agar Indonesia aman dari teroris.',
+    //             query: 'Presiden Prabowo ajak masyarakat dukung Trump',
+    //             countBase: 2104,
+    //         },
+    //         {
+    //             headline: 'Tautan dana darurat di pesan instan adalah penipuan berulang',
+    //             excerpt: 'Unggahan yang mengaitkan bantuan dana darurat dengan tautan pesan instan tidak memiliki dasar resmi dan terdeteksi sebagai pola penipuan yang sering berulang.',
+    //             query: 'Tautan dana darurat di pesan instan adalah penipuan berulang',
+    //             countBase: 1704,
+    //         },
+    //     ],
+    //     fakta: [
+    //         {
+    //             headline: 'Jadwal layanan publik dan bantuan sosial telah dikonfirmasi',
+    //             excerpt: 'Hasil verifikasi menunjukkan informasi tentang jadwal layanan publik dan status bantuan sosial yang beredar telah dikonfirmasi oleh instansi terkait.',
+    //             query: 'Jadwal layanan publik dan bantuan sosial telah dikonfirmasi',
+    //             countBase: 986,
+    //         },
+    //         {
+    //             headline: 'Proyek perbaikan jalan di kawasan wisata memang sedang berlangsung',
+    //             excerpt: 'Pernyataan resmi dari pemerintah daerah memastikan bahwa proyek perbaikan jalan di kawasan wisata memang sedang berlangsung dan dapat dicek melalui pengumuman publik.',
+    //             query: 'Proyek perbaikan jalan di kawasan wisata memang sedang berlangsung',
+    //             countBase: 742,
+    //         },
+    //         {
+    //             headline: 'Data cuaca dan peringatan resmi telah dirilis',
+    //             excerpt: 'Informasi cuaca, peringatan dini, dan rilis resmi dari lembaga terkait dapat diverifikasi langsung pada kanal publik yang tersedia.',
+    //             query: 'Data cuaca dan peringatan resmi telah dirilis',
+    //             countBase: 621,
+    //         },
+    //     ],
+    // };
 
-    const popularItems = buildPopularItems();
+    // const popularItems = buildPopularItems();
 
-    function buildPopularItems() {
-        return monthNames.flatMap((monthName, monthIndex) => buildMonthlyItems(monthName, 2026, monthIndex));
-    }
+    // function buildPopularItems() {
+    //     return monthNames.flatMap((monthName, monthIndex) => buildMonthlyItems(monthName, 2026, monthIndex));
+    // }
 
-    function buildMonthlyItems(monthName, year, monthIndex) {
-        const period = `${monthName} ${year}`;
-        const monthOffset = monthIndex * 37;
+    // function buildMonthlyItems(monthName, year, monthIndex) {
+    //     const period = `${monthName} ${year}`;
+    //     const monthOffset = monthIndex * 37;
 
-        // build only hoax and fakta items; 'all' will pick top 3 across these
-        return [
-            ...contentBlueprints.hoax.map((item, index) => createItem({
-                category: 'hoax',
-                period,
-                badge: 'HOAX',
-                count: item.countBase + monthOffset + (index * 13),
-                headline: item.headline,
-                excerpt: item.excerpt,
-                query: `${item.query} ${monthName} ${year}`,
-                sortOrder: index + 1,
-            })),
-            ...contentBlueprints.fakta.map((item, index) => createItem({
-                category: 'fakta',
-                period,
-                badge: 'FAKTA',
-                count: item.countBase + monthOffset + (index * 11),
-                headline: item.headline,
-                excerpt: item.excerpt,
-                query: `${item.query} ${monthName} ${year}`,
-                sortOrder: 4 + index,
-            })),
-        ];
-    }
+    //     // build only hoax and fakta items; 'all' will pick top 3 across these
+    //     return [
+    //         ...contentBlueprints.hoax.map((item, index) => createItem({
+    //             category: 'hoax',
+    //             period,
+    //             badge: 'HOAX',
+    //             count: item.countBase + monthOffset + (index * 13),
+    //             headline: item.headline,
+    //             excerpt: item.excerpt,
+    //             query: `${item.query} ${monthName} ${year}`,
+    //             sortOrder: index + 1,
+    //         })),
+    //         ...contentBlueprints.fakta.map((item, index) => createItem({
+    //             category: 'fakta',
+    //             period,
+    //             badge: 'FAKTA',
+    //             count: item.countBase + monthOffset + (index * 11),
+    //             headline: item.headline,
+    //             excerpt: item.excerpt,
+    //             query: `${item.query} ${monthName} ${year}`,
+    //             sortOrder: 4 + index,
+    //         })),
+    //     ];
+    // }
 
-    function createItem({ category, period, badge, count, headline, excerpt, query, sortOrder }) {
-        return {
-            category,
-            period,
-            badge,
-            count,
-            headline,
-            excerpt,
-            query,
-            sortOrder,
-        };
-    }
+    // function createItem({ category, period, badge, count, headline, excerpt, query, sortOrder }) {
+    //     return {
+    //         category,
+    //         period,
+    //         badge,
+    //         count,
+    //         headline,
+    //         excerpt,
+    //         query,
+    //         sortOrder,
+    //     };
+    // }
+    // Ambil data langsung dari Controller (Blade Inject)
+    
+    const popularItems = window.realPopularItems || [];
 
     function openModal(type) {
         state.modalType = type;

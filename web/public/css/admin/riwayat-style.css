@@ -162,6 +162,42 @@
 }
 
 /* =========================
+   HEADER ACTIONS
+========================= */
+
+/* wrapper search + export */
+.page-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* tombol export */
+.btn-export {
+    background: #b8201d;
+    color: #fff;
+    border: none;
+
+    padding: 10px 16px;
+    border-radius: 8px;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    transition: 0.2s;
+}
+
+.btn-export:hover {
+    background: #8e1412;
+}
+
+/* =========================
    CARD HEADER (BARU)
 ========================= */
 .card-header {
@@ -211,4 +247,233 @@
         flex-direction: column;
         align-items: flex-start;
     }
+}
+
+/* =========================
+   POPUP
+========================= */
+
+.popup-overlay {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0,0,0,0.75);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    opacity: 0;
+    visibility: hidden;
+
+    transition: 0.3s;
+
+    z-index: 9999;
+}
+
+.popup-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.popup-box {
+    width: 90%;
+    max-width: 1050px;
+
+    background: #fff;
+
+    border: 2px solid #b8201d;
+    border-radius: 10px;
+
+    padding: 25px;
+
+    position: relative;
+}
+
+/* close */
+.popup-close {
+    position: absolute;
+    top: -18px;
+    right: -18px;
+
+    width: 55px;
+    height: 55px;
+
+    border: none;
+
+    background: #b8201d;
+    color: #fff;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-size: 24px;
+}
+
+/* top */
+.popup-top {
+    display: flex;
+    gap: 10px;
+
+    margin-bottom: 20px;
+}
+
+.popup-user,
+.popup-date {
+    background: linear-gradient(#c71f1f, #8d0000);
+
+    color: #fff;
+
+    padding: 10px 18px;
+
+    border-radius: 10px 10px 0 0;
+
+    font-weight: 600;
+}
+
+/* content */
+.popup-title {
+    font-size: 28px;
+    font-weight: bold;
+
+    margin-bottom: 15px;
+}
+
+.popup-desc {
+    font-size: 18px;
+    line-height: 1.8;
+}
+
+/* line */
+.popup-divider {
+    height: 2px;
+    background: #b8201d;
+
+    margin: 30px 0;
+}
+
+/* bottom */
+.popup-bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.popup-legend {
+    min-width: 420px;
+}
+
+.popup-legend p {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin-bottom: 15px;
+
+    font-size: 18px;
+}
+
+.popup-result {
+    font-size: 18px;
+    line-height: 1.8;
+}
+
+/* popup actions */
+.popup-actions {
+    position: absolute;
+    top: -22px;
+    right: -22px;
+
+    display: flex;
+    gap: 12px;
+}
+
+/* delete */
+.popup-delete {
+    width: 55px;
+    height: 55px;
+
+    border: none;
+
+    background: #b8201d;
+    color: #fff;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-size: 22px;
+
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* close */
+.popup-close {
+    position: static;
+}
+
+/* =========================
+   DELETE POPUP
+========================= */
+
+.delete-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 99999;
+}
+
+.delete-overlay.active {
+    display: flex;
+}
+
+.delete-popup {
+    width: 360px;
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    text-align: center;
+
+    animation: popupShow .2s ease;
+}
+
+.delete-popup h3 {
+    font-size: 24px;
+    color: #b8201d;
+    margin-bottom: 10px;
+}
+
+.delete-popup p {
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.delete-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.btn-cancel,
+.btn-delete-confirm {
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-cancel {
+    background: #eee;
+}
+
+.btn-delete-confirm {
+    background: #b8201d;
+    color: white;
 }

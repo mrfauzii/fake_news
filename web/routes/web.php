@@ -14,6 +14,7 @@ use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ApiController;
 use App\Http\Controllers\DetectionController;
+use App\Http\Controllers\PopulerHistoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,11 +31,15 @@ Route::get('/', function () {
 Route::get('/pencarian', [PencarianController::class, 'index'])->name('beranda');
 Route::post('/telusuri', [PencarianController::class, 'telusuri'])->name('telusuri');
 Route::post('/telusuri-gambar', [PencarianController::class, 'telusuriGambar'])->name('telusuri.gambar');
+<<<<<<< main
 
 // Pencarian terpopuler
 Route::get('/pencarian/populer', function () {
     return view('user.pencarian-terpopuler');
 })->name('pencarian.populer');
+=======
+Route::get('/pencarian/populer', [PopulerHistoryController::class, 'index'])->name('pencarian.populer');
+>>>>>>> main
 
 // WhatsApp Page
 Route::get('/dapatkan-whatsapp', function () {
@@ -76,9 +81,9 @@ Route::prefix('auth/google')->group(function () {
 });
 
 Route::get('/pencarian', [PencarianController::class, 'index'])->name('beranda');
-Route::get('/pencarian-terpopuler', function () {
-    return view('user.pencarian-terpopuler');
-})->name('pencarian.populer');
+// Route::get('/pencarian-terpopuler', function () {
+//     return view('user.pencarian-terpopuler');
+// })->name('pencarian.populer');
 Route::post('/telusuri', [PencarianController::class, 'telusuri'])->name('telusuri');
 Route::post('/telusuri-gambar', [PencarianController::class, 'telusuriGambar'])->name('telusuri.gambar');
 
@@ -91,6 +96,7 @@ Route::post('/telusuri-gambar', [PencarianController::class, 'telusuriGambar'])-
 // Admin routes (kept unprotected here for later grouping) -- uncomment middleware when ready
 // Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
+<<<<<<< main
     // Dashboard
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
@@ -110,6 +116,28 @@ Route::post('/telusuri-gambar', [PencarianController::class, 'telusuriGambar'])-
         Route::get('/delete/{id}', [RiwayatController::class, 'delete']);
     });
 //});
+=======
+// Dashboard
+Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+
+// User Management
+Route::get('/user', [UserController::class, 'index']);
+Route::get('/user-data', [UserController::class, 'getUserData']);
+
+// Umpan Balik
+Route::get('/umpanbalik', [UmpanBalikController::class, 'index']);
+Route::get('/umpanbalik-data', [UmpanBalikController::class, 'getFeedbackData']);
+
+// Riwayat
+Route::prefix('riwayat')->group(function () {
+    Route::get('/', [RiwayatController::class, 'index']);
+    Route::get('/edit/{id}', [RiwayatController::class, 'edit']);
+    Route::post('/update/{id}', [RiwayatController::class, 'update']);
+    Route::get('/delete/{id}', [RiwayatController::class, 'delete']);
+});
+
+// });
+>>>>>>> main
 
 
 /*

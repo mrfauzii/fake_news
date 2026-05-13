@@ -54,7 +54,7 @@ class DatabaseSeeder extends Seeder
             ['file_path' => 'uploads/images/pengumuman_pln_palsu.jpeg', 'original_filename' => 'pengumuman_pln.jpeg'],
         ];
 
-        $imageData = array_map(function($img, $index) use ($now) {
+        $imageData = array_map(function ($img, $index) use ($now) {
             return array_merge($img, ['uploaded_by' => $index + 1, 'created_at' => $now]);
         }, $images, array_keys($images));
         DB::table('images')->insert($imageData);
@@ -73,7 +73,7 @@ class DatabaseSeeder extends Seeder
             ['input_text' => 'Akan ada pemadaman listrik total Jawa Timur 25-27 April.', 'final_label' => null, 'final_confidence' => null, 'status' => 'pending'], // Pending tidak punya hasil
         ];
 
-        $requestData = array_map(function($req, $index) use ($now) {
+        $requestData = array_map(function ($req, $index) use ($now) {
             return array_merge($req, ['image_id' => $index + 1, 'created_at' => $now]);
         }, $requests, array_keys($requests));
         DB::table('requests')->insert($requestData);
@@ -91,9 +91,9 @@ class DatabaseSeeder extends Seeder
             ['source_url' => 'https://web.pln.co.id/media/siaran-pers/klarifikasi-hoaks-pemadaman', 'similarity_score' => 0.77, 'mean_date_score' => 0.75],
         ];
 
-        $imgSearchResultData = array_map(function($res, $index) use ($now) {
+        $imgSearchResultData = array_map(function ($res, $index) use ($now) {
             return array_merge($res, [
-                'request_id' => $index + 1, 
+                'request_id' => $index + 1,
                 'source_url' => json_encode($res['source_url']), // Convert ke JSON sesuai skema
                 'created_at' => $now
             ]);
@@ -105,14 +105,14 @@ class DatabaseSeeder extends Seeder
         // 5. Seeder Stage 1 Results
         // ==========================================
         $stage1Results = [
-            ['similarity_score' => 0.95, 'nli_score' => 0.88,'is_stop' => true],
+            ['similarity_score' => 0.95, 'nli_score' => 0.88, 'is_stop' => true],
             ['similarity_score' => 0.99, 'nli_score' => 0.92, 'is_stop' => true],
             ['similarity_score' => 0.85, 'nli_score' => 0.80, 'is_stop' => false],
             ['similarity_score' => 0.70, 'nli_score' => 0.65, 'is_stop' => false],
             ['similarity_score' => 0.60, 'nli_score' => 0.55, 'is_stop' => false],
         ];
 
-        $stage1Data = array_map(function($res, $index) use ($now) {
+        $stage1Data = array_map(function ($res, $index) use ($now) {
             return array_merge($res, ['request_id' => $index + 1, 'knowledge_id' => $index + 1, 'created_at' => $now]);
         }, $stage1Results, array_keys($stage1Results));
         DB::table('stage1_results')->insert($stage1Data);
@@ -129,7 +129,7 @@ class DatabaseSeeder extends Seeder
             ['feedback' => 'Sistem masih ragu-ragu di bagian pemadaman listrik, mungkin perlu update database.'],
         ];
 
-        $feedbackData = array_map(function($fb, $index) use ($now) {
+        $feedbackData = array_map(function ($fb, $index) use ($now) {
             return array_merge($fb, ['user_id' => $index + 1, 'request_id' => $index + 1, 'created_at' => $now]);
         }, $feedbacks, array_keys($feedbacks));
         DB::table('feedbacks')->insert($feedbackData);
@@ -153,7 +153,7 @@ class DatabaseSeeder extends Seeder
             ]
         ];
 
-        $stage2Data = array_map(function($res, $index) use ($now) {
+        $stage2Data = array_map(function ($res, $index) use ($now) {
             return [
                 'request_id' => $index + 1,
                 'time_credibility' => 0.80 + ($index * 0.03),
@@ -173,34 +173,42 @@ class DatabaseSeeder extends Seeder
         // FIX ENUM source_channel: web | whatsapp
         // FIX ENUM interaction_type: new_detection | accepted_history | redetection
         // ==========================================
+        $now = now();
+
+        // 1. Siapkan 10 data (contoh)
         $userInteractions = [
             ['source_channel' => 'whatsapp', 'interaction_type' => 'new_detection'],
-            ['source_channel' => 'whatsapp', 'interaction_type' => 'redetection'], // ubah dari telegram & bot_command
-            ['source_channel' => 'web',      'interaction_type' => 'new_detection'], // ubah dari form_submit
-            ['source_channel' => 'whatsapp', 'interaction_type' => 'new_detection'], // ubah dari image_upload
-            ['source_channel' => 'web',      'interaction_type' => 'accepted_history'], // ubah dari feedback_submit
+            ['source_channel' => 'whatsapp', 'interaction_type' => 'redetection'],
+            ['source_channel' => 'web',      'interaction_type' => 'new_detection'],
+            ['source_channel' => 'whatsapp', 'interaction_type' => 'new_detection'],
+            ['source_channel' => 'web',      'interaction_type' => 'accepted_history'],
+            ['source_channel' => 'whatsapp', 'interaction_type' => 'new_detection'],
+            ['source_channel' => 'web',      'interaction_type' => 'redetection'],
+            ['source_channel' => 'whatsapp', 'interaction_type' => 'new_detection'],
+            ['source_channel' => 'web',      'interaction_type' => 'new_detection'],
+            ['source_channel' => 'whatsapp', 'interaction_type' => 'accepted_history'],
         ];
 
-        $interactionData = array_map(function($interact, $index) use ($now) {
-            return array_merge($interact, ['user_id' => $index + 1, 'request_id' => $index + 1, 'created_at' => $now]);
+        // 2. Buat "pool" ID yang memastikan angka 1-5 ada, sisanya sisipkan angka acak 1-5
+        $requestIds = [1, 2, 3, 4, 5]; // Pastikan 1-5 masuk dulu
+        for ($i = 0; $i < 5; $i++) {
+            $requestIds[] = rand(1, 5); // Tambah 5 angka lagi secara acak (total jadi 10)
+        }
+
+        // 3. Acak urutan pool tersebut agar tidak berurutan 1,2,3,4,5 di awal
+        shuffle($requestIds);
+
+        // 4. Masukkan ke dalam array_map
+        $interactionData = array_map(function ($interact, $index) use ($now, $requestIds) {
+            return array_merge($interact, [
+                'user_id'    => $index + 1,
+                'request_id' => $requestIds[$index], // Ambil dari pool yang sudah diacak
+                'created_at' => $now,
+                'updated_at' => $now
+            ]);
         }, $userInteractions, array_keys($userInteractions));
+
         DB::table('user_interactions')->insert($interactionData);
-
-
-        // ==========================================
-        // 9. Seeder Message Cache 
-        // ==========================================
-        $messageCaches = [
-            ['sender_number' => '+6281234567890', 'latest_message' => 'Min, tolong cek ini beneran gak bawang putih bisa ngobatin covid?'],
-            ['sender_number' => '+6281298765432', 'latest_message' => 'Cek link kuota gratis ini dong: http://bantuan-kuota-gratis.site'],
-            ['sender_number' => '+6281345678901', 'latest_message' => 'Apakah info pendaftaran CPNS VIP ini penipuan?'],
-            ['sender_number' => '+6285612345678', 'latest_message' => 'Wah ada uang pecahan baru 1 juta, beneran gak nih?'],
-            ['sender_number' => '+6287812349876', 'latest_message' => 'Cek berita mati lampu se-Jawa Timur.'],
-        ];
-
-        // Saya pakai nama DB Facade 'messageCache' sesuai nama tabel di DBML/Skema kamu
-        DB::table('messageCache')->insert($messageCaches);
-
 
         // ==========================================
         // 10. Seeder Image Results

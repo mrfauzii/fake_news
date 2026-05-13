@@ -23,24 +23,24 @@ class TextDetectionController extends Controller
     public function detectText(Request $request)
     {
         $request->validate([
-            'input_text' => 'required|string'
+            'query' => 'required|string'
         ]);
 
-        $inputText = $request->input('input_text');
+        $inputText = $request->input('query');
 
         // Simpan request awal di luar transaksi agar tetap terekam jika error
         $requestData = Requests::create([
-            'input_text' => $inputText,
+            'query' => $inputText,
             'status' => 'error'
         ]);
 
         $requestId = $requestData->id;
 
         DB::beginTransaction();
-
+        log::info("Memulai deteksi teks untuk Request ID: $requestId");
         try {
             // --- HIT API PYTHON ---
-            $response = Http::timeout(120)->post('http://127.0.0.1:8000/text-detection', [
+            $response = Http::timeout(120)->post('http://127.0.0.1:8004/text-detection', [
                 'query' => $inputText,
                 'id_request' => $requestId
             ]);
@@ -50,6 +50,7 @@ class TextDetectionController extends Controller
             }
 
             $aiApiResponse = $response->json();
+            Log::info('Response Asli Python: ', $aiApiResponse ?? []);
 
             if (!isset($aiApiResponse['status']) || $aiApiResponse['status'] !== 'success') {
                 throw new \Exception('Response AI gagal atau tidak valid');
@@ -100,21 +101,19 @@ class TextDetectionController extends Controller
         $aiData = $aiApiResponse['data'][0];
         $requestId = $requestData->id;
 
-        // Label & Confidence
+        // Label Database
         $finalLabel = strtolower($aiData['category'] ?? '') === 'hoaks' ? 'fake' : 'real';
         $similarityScore = $aiData['score'] ?? 1;
 
-        $finalConfidence = max(0, min(1, 1 - $similarityScore)); // Pastikan antara 0 dan 1
+        $finalConfidence = max(0, min(1, 1 - $similarityScore));
         $confidencePercentage = round($finalConfidence * 100, 2);
 
-        // Update Tabel Request
         $requestData->update([
             'final_label' => $finalLabel,
             'final_confidence' => $finalConfidence,
             'status' => 'stage1'
         ]);
 
-        // Simpan Knowledge Base & Stage 1 Result
         $knowledgeId = $aiData['id'] ?? null;
         if ($knowledgeId) {
             $knowledge = KnowledgeBase::find($knowledgeId);
@@ -138,16 +137,34 @@ class TextDetectionController extends Controller
             ]);
         }
 
+        // ==========================================
+        // FORMAT UNTUK FRONTEND
+        // ==========================================
+        $verdict = ($finalLabel === 'fake') ? 'fake' : 'valid';
+        $factText = $aiData['fact_text'] ?? '';
+
+        if (!empty($factText)) {
+            $summaryText = ltrim($factText, ', ');
+            $sources = [['title' => 'Database Knowledge Base Anti-Hoax', 'url' => '']];
+        } else {
+            $statusTeks = ($verdict === 'fake') ? 'HOAX' : 'FAKTA';
+            $summaryText = "Hasil analisis menemukan indikasi " . $statusTeks . " dengan tingkat keyakinan " . $confidencePercentage . "%.";
+            $sources = [];
+        }
+
         return [
-            'request_id' => $requestId,
-            'label' => $finalLabel,
+            'success'    => true,
+            'verdict'    => $verdict,
             'confidence' => $confidencePercentage,
-            'title' => $aiData['title'] ?? null,
-            'category' => $aiData['category'] ?? null,
-            'hoax_text' => $aiData['hoax_text'] ?? null,
-            'fact_text' => $aiData['fact_text'] ?? null,
-            'nli_score' => $aiData['nli_score'] ?? null,
-            'similarity_score' => $similarityScore
+            'summary'    => $summaryText,
+            'sources'    => $sources,
+            'link_counter' => $knowledge['link_counter'] ?? 0,
+            'raw_data'   => [
+                'stage' => 'stage1',
+                'request_id' => $requestId,
+                'title' => $aiData['title'] ?? null,
+                'category' => $aiData['category'] ?? null,
+            ]
         ];
     }
 
@@ -162,21 +179,18 @@ class TextDetectionController extends Controller
         $prediction = $aiApiResponse['prediction'] ?? 0;
         $finalLabel = $prediction == 1 ? 'fake' : 'real';
 
-        // Label & Confidence
         $rawConfidence = $aiApiResponse['confidence'] ?? 0;
-        $finalConfidence = max(0, min(1, $rawConfidence)); // Pastikan antara 0 dan 1
+        $finalConfidence = max(0, min(1, $rawConfidence));
         $confidencePercentage = round($finalConfidence * 100, 2);
 
         $featureVector = $aiApiResponse['feature_vector'] ?? [];
 
-        // Update Tabel Request
         $requestData->update([
             'final_label' => $finalLabel,
             'final_confidence' => $finalConfidence,
             'status' => 'stage2'
         ]);
 
-        // Simpan Stage 2 Result
         Stage2Result::create([
             'request_id' => $requestId,
             'time_credibility' => $featureVector['time_consistency_score'] ?? null,
@@ -187,12 +201,31 @@ class TextDetectionController extends Controller
             'url' => $aiApiResponse['urls'] ?? []
         ]);
 
+        // ==========================================
+        // FORMAT UNTUK FRONTEND
+        // ==========================================
+        $verdict = ($finalLabel === 'fake') ? 'fake' : 'valid';
+        $statusTeks = ($verdict === 'fake') ? 'HOAX' : 'FAKTA';
+        $summaryText = "Hasil analisis menemukan indikasi " . $statusTeks . " dengan tingkat keyakinan " . $confidencePercentage . "%.";
+
+        $sources = [];
+        if (!empty($aiApiResponse['urls'])) {
+            foreach ($aiApiResponse['urls'] as $url) {
+                $sources[] = ['title' => 'Sumber Referensi', 'url' => $url];
+            }
+        }
+
         return [
-            'request_id' => $requestId,
-            'label' => $finalLabel,
+            'success'    => true,
+            'verdict'    => $verdict,
             'confidence' => $confidencePercentage,
-            'urls' => $aiApiResponse['urls'] ?? [],
-            'feature_vector' => $featureVector
+            'summary'    => $summaryText,
+            'sources'    => $sources,
+            'raw_data'   => [
+                'stage' => 'stage2',
+                'request_id' => $requestId,
+                'feature_vector' => $featureVector
+            ]
         ];
     }
 }

@@ -13,17 +13,26 @@
 
     <h1>Riwayat Global</h1>
 
-    <div class="search-wrapper">
+    <div class="page-header-right">
 
-        <input 
-            type="text"
-            placeholder="Search..."
-            class="search-input"
-            id="searchInput"
-        >
+        <div class="search-wrapper">
 
-        <button class="search-btn">
-            <i class="fa fa-search"></i>
+            <input 
+                type="text"
+                placeholder="Search..."
+                class="search-input"
+                id="searchInput"
+            >
+
+            <button class="search-btn">
+                <i class="fa fa-search"></i>
+            </button>
+
+        </div>
+
+        <button class="btn-export">
+            <i class="fa fa-download"></i>
+            Export CSV
         </button>
 
     </div>
@@ -39,9 +48,11 @@
 
     @foreach($data as $item)
 
-    <div class="riwayat-card searchable-card 
-        {{ $item['gambar'] ? 'image-card' : '' }}"
-        data-title="{{ strtolower($item['judul']) }}">
+    <div 
+    class="riwayat-card searchable-card {{ $item['gambar'] ? 'image-card' : '' }}"
+    data-title="{{ strtolower($item['judul']) }}"
+    data-id="{{ $loop->index }}"
+    >
 
         {{-- JIKA ADA GAMBAR --}}
         @if($item['gambar'])
@@ -116,7 +127,14 @@
             </div>
 
             <!-- BUTTON -->
-            <button class="btn-detail">
+            <button 
+                class="btn-detail open-popup"
+
+                data-judul="{{ $item['judul'] }}"
+                data-deskripsi="{{ $item['deskripsi'] }}"
+                data-hoax="{{ $item['hoax'] }}"
+                data-benar="{{ $item['benar'] }}"
+            >
                 Selengkapnya
             </button>
 
@@ -125,6 +143,121 @@
     </div>
 
     @endforeach
+
+</div>
+
+<!-- POPUP -->
+<div class="popup-overlay" id="popupOverlay">
+
+    <div class="popup-box">
+
+        <!-- ACTION BUTTON -->
+        <div class="popup-actions">
+
+            <!-- DELETE -->
+            <button class="popup-delete" id="deletePopup">
+                <i class="fa fa-trash"></i>
+            </button>
+
+            <!-- CLOSE -->
+            <button class="popup-close" id="closePopup">
+                <i class="fa fa-times"></i>
+            </button>
+
+        </div>
+
+        <!-- HEADER -->
+        <div class="popup-top">
+
+            <div class="popup-user">
+                @Rini Wulandari
+            </div>
+
+            <div class="popup-date">
+                Minggu, 7 Juni 2025
+            </div>
+
+        </div>
+
+        <!-- CONTENT -->
+        <div class="popup-content">
+
+            <div class="popup-title" id="popupTitle">
+                Judul
+            </div>
+
+            <p class="popup-desc" id="popupDesc">
+                Isi berita
+            </p>
+
+        </div>
+
+        <!-- LINE -->
+        <div class="popup-divider"></div>
+
+        <!-- BOTTOM -->
+        <div class="popup-bottom">
+
+            <!-- LEFT -->
+            <div class="popup-legend">
+
+                <p>
+                    <span class="dot red"></span>
+                    Data terdeteksi hoax sebesar
+                    <strong id="popupHoax">70%</strong>
+                </p>
+
+                <p>
+                    <span class="dot green"></span>
+                    Data terdeteksi benar sebesar
+                    <strong id="popupBenar">30%</strong>
+                </p>
+
+            </div>
+
+            <!-- RIGHT -->
+            <div class="popup-result">
+
+                Hasil verifikasi menunjukkan bahwa sebagian besar informasi ini, yakni sekitar 70%, mengandung unsur hoaks atau ketidaksesuaian fakta. Mohon untuk memvalidasi kembali sumber informasi sebelum menyebarkannya.
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- DELETE POPUP -->
+<div class="delete-overlay" id="deleteOverlay">
+
+    <div class="delete-popup">
+
+        <h3>Hapus Riwayat</h3>
+
+        <p>
+            Apakah anda yakin ingin menghapus riwayat ini?
+        </p>
+
+        <div class="delete-actions">
+
+            <button
+                class="btn-delete-confirm"
+                onclick="confirmDelete()"
+            >
+                Hapus
+            </button>
+
+            <button
+                class="btn-cancel"
+                onclick="closeDeletePopup()"
+            >
+                Batal
+            </button>
+
+        </div>
+
+    </div>
 
 </div>
 
@@ -154,6 +287,100 @@ document.getElementById('searchInput').addEventListener('keyup', function () {
     });
 
 });
+
+</script>
+
+<script>
+
+const popupOverlay = document.getElementById('popupOverlay');
+const closePopup = document.getElementById('closePopup');
+const deletePopup = document.getElementById('deletePopup');
+
+let currentCard = null;
+
+const popupTitle = document.getElementById('popupTitle');
+const popupDesc = document.getElementById('popupDesc');
+const popupHoax = document.getElementById('popupHoax');
+const popupBenar = document.getElementById('popupBenar');
+
+document.querySelectorAll('.open-popup').forEach(button => {
+
+    button.addEventListener('click', function () {
+        currentCard = this.closest('.riwayat-card');
+
+        popupTitle.innerHTML =
+            `⚠️ ${this.dataset.judul} ⚠️`;
+
+        popupDesc.innerText =
+            this.dataset.deskripsi;
+
+        popupHoax.innerText =
+            this.dataset.hoax + '%';
+
+        popupBenar.innerText =
+            this.dataset.benar + '%';
+
+        popupOverlay.classList.add('active');
+
+    });
+
+});
+
+closePopup.addEventListener('click', function () {
+
+    popupOverlay.classList.remove('active');
+
+});
+
+popupOverlay.addEventListener('click', function (e) {
+
+    if (e.target === popupOverlay) {
+
+        popupOverlay.classList.remove('active');
+
+    }
+
+});
+
+deletePopup.addEventListener('click', function () {
+
+    if (!currentCard) return;
+
+    document
+        .getElementById('deleteOverlay')
+        .classList.add('active');
+
+});
+
+deletePopup.addEventListener('click', function () {
+
+    if (!currentCard) return;
+
+    document
+        .getElementById('deleteOverlay')
+        .classList.add('active');
+
+});
+
+function closeDeletePopup() {
+
+    document
+        .getElementById('deleteOverlay')
+        .classList.remove('active');
+
+}
+
+function confirmDelete() {
+
+    if (!currentCard) return;
+
+    currentCard.remove();
+
+    popupOverlay.classList.remove('active');
+
+    closeDeletePopup();
+
+}
 
 </script>
 

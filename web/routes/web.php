@@ -88,7 +88,6 @@ Route::post('/telusuri-gambar', [PencarianController::class, 'telusuriGambar'])-
 // Admin routes (kept unprotected here for later grouping) -- uncomment middleware when ready
 // Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
-<<<<<<< main
     // Dashboard
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
@@ -108,28 +107,6 @@ Route::post('/telusuri-gambar', [PencarianController::class, 'telusuriGambar'])-
         Route::get('/delete/{id}', [RiwayatController::class, 'delete']);
     });
 //});
-=======
-// Dashboard
-Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-
-// User Management
-Route::get('/user', [UserController::class, 'index']);
-Route::get('/user-data', [UserController::class, 'getUserData']);
-
-// Umpan Balik
-Route::get('/umpanbalik', [UmpanBalikController::class, 'index']);
-Route::get('/umpanbalik-data', [UmpanBalikController::class, 'getFeedbackData']);
-
-// Riwayat
-Route::prefix('riwayat')->group(function () {
-    Route::get('/', [RiwayatController::class, 'index']);
-    Route::get('/edit/{id}', [RiwayatController::class, 'edit']);
-    Route::post('/update/{id}', [RiwayatController::class, 'update']);
-    Route::get('/delete/{id}', [RiwayatController::class, 'delete']);
-});
-
-// });
->>>>>>> main
 
 
 /*

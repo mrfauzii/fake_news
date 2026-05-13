@@ -7,11 +7,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 use App\Models\Requests;
 use App\Models\KnowledgeBase;
 use App\Models\Stage1Results;
 use App\Models\Stage2Result;
+use App\Models\UserInteractions;
+use Illuminate\Foundation\Auth\User;
 
 class TextDetectionController extends Controller
 {
@@ -27,19 +30,70 @@ class TextDetectionController extends Controller
         ]);
 
         $inputText = $request->input('query');
+        $userId = Auth::check() ? Auth::id() : 2;
 
-        // Simpan request awal di luar transaksi agar tetap terekam jika error
-        $requestData = Requests::create([
-            'query' => $inputText,
-            'status' => 'error'
-        ]);
+        Log::info("Mengecek similarity API untuk teks: " . substr($inputText, 0, 50) . "...");
 
-        $requestId = $requestData->id;
-
-        DB::beginTransaction();
-        log::info("Memulai deteksi teks untuk Request ID: $requestId");
         try {
-            // --- HIT API PYTHON ---
+            // ========================================================
+            // A. CEK SIMILARITY SEARCH TERLEBIH DAHULU
+            // ========================================================
+            $simResponse = Http::timeout(60)->post('http://127.0.0.1:8004/similarity-search', [
+                'query' => $inputText
+            ]);
+            Log::info("Response Similarity API: " . ($simResponse->successful() ? 'Success' : 'Failed'));
+            Log::info("Response Similarity API Body: ", $simResponse->json() ?? []);
+            if ($simResponse->successful()) {
+                $simData = $simResponse->json();
+
+                // Cek jika status success dari Python API
+                if (isset($simData['status']) && $simData['status'] === 'success' && !empty($simData['request_id'])) {
+
+                    $matchedId = $simData['request_id'];
+                    $similarityScore = $simData['similarity'] ?? 0;
+
+                    Log::info("Similarity MATCH! Re-use Request ID Lama: $matchedId (Sim: $similarityScore)");
+
+                    $oldRequest = Requests::find($matchedId);
+
+                    if ($oldRequest) {
+                        // HANYA tambah UserInteraction baru yang mengarah ke request lama
+                        UserInteractions::create([
+                            'user_id'    => $userId,
+                            'request_id' => $matchedId,
+                        ]);
+
+                        // Format data lama agar persis dengan output frontend
+                        $responseData = $this->formatMatchedResponse($oldRequest, $matchedId);
+
+                        return response()->json([
+                            'status' => $oldRequest->status === 'stage1' ? 'stage1' : 'stage2',
+                            'data' => $responseData
+                        ]);
+                    }
+                }
+            }
+
+            // ========================================================
+            // B. JIKA TIDAK ADA MATCH, BUAT REQUEST BARU & HIT API DETEKSI
+            // ========================================================
+            Log::info("Tidak ada similarity, buat Request baru dan lanjut proses AI.");
+
+            DB::beginTransaction();
+
+            // Baru buat request database jika memang benar-benar tidak ada kemiripan
+            $requestData = Requests::create([
+                'input_text' => $inputText,
+                'status' => 'pending'
+            ]);
+
+            $requestId = $requestData->id;
+
+            UserInteractions::create([
+                'user_id'    => $userId,
+                'request_id' => $requestId,
+            ]);
+
             $response = Http::timeout(120)->post('http://127.0.0.1:8004/text-detection', [
                 'query' => $inputText,
                 'id_request' => $requestId
@@ -77,7 +131,16 @@ class TextDetectionController extends Controller
                 'data' => $responseData
             ]);
         } catch (\Exception $e) {
-            DB::rollBack();
+            // Rollback jika ada transaksi yang sedang berjalan
+            if (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
+
+            // Update status error jika requestData baru sudah sempat dibuat
+            if (isset($requestData)) {
+                Requests::where('id', $requestData->id)->update(['status' => 'error']);
+            }
+
             Log::error('Error deteksi teks: ' . $e->getMessage());
 
             return response()->json([
@@ -227,5 +290,85 @@ class TextDetectionController extends Controller
                 'feature_vector' => $featureVector
             ]
         ];
+    }
+
+    /**
+     * ========================================================
+     * 4. FUNGSI BANTUAN: FORMAT DATA SIMILARITY KE FRONTEND
+     * ========================================================
+     */
+    private function formatMatchedResponse($oldRequest, $usedRequestId): array
+    {
+        $status = $oldRequest->status; // 'stage1' atau 'stage2'
+        $verdict = strtolower($oldRequest->final_label) === 'fake' ? 'fake' : 'valid';
+        $confidencePercentage = round($oldRequest->final_confidence * 100, 2);
+
+        if ($status === 'stage1') {
+            $stage1Result = Stage1Results::where('request_id', $oldRequest->id)->first();
+            $knowledge = $stage1Result ? KnowledgeBase::find($stage1Result->knowledge_id) : null;
+
+            $factText = $knowledge ? $knowledge->fact_text : '';
+
+            if (!empty($factText)) {
+                $summaryText = ltrim($factText, ', ');
+                $sources = [['title' => 'Database Knowledge Base Anti-Hoax', 'url' => '']];
+            } else {
+                $statusTeks = ($verdict === 'fake') ? 'HOAX' : 'FAKTA';
+                $summaryText = "Hasil analisis menemukan indikasi " . $statusTeks . " dengan tingkat keyakinan " . $confidencePercentage . "%.";
+                $sources = [];
+            }
+
+            return [
+                'success'    => true,
+                'verdict'    => $verdict,
+                'confidence' => $confidencePercentage,
+                'summary'    => $summaryText,
+                'sources'    => $sources,
+                'link_counter' => $knowledge ? $knowledge->link_counter : 0,
+                'raw_data'   => [
+                    'stage' => 'stage1',
+                    'request_id' => $usedRequestId,
+                    'title' => $knowledge ? $knowledge->title : null,
+                    'category' => $knowledge ? $knowledge->category : null,
+                ]
+            ];
+        } else {
+            // Format untuk Stage 2
+            $stage2Result = Stage2Result::where('request_id', $oldRequest->id)->first();
+
+            $statusTeks = ($verdict === 'fake') ? 'HOAX' : 'FAKTA';
+            $summaryText = "Hasil analisis menemukan indikasi " . $statusTeks . " dengan tingkat keyakinan " . $confidencePercentage . "%.";
+
+            $sources = [];
+            if ($stage2Result && !empty($stage2Result->url)) {
+                $urls = is_string($stage2Result->url) ? json_decode($stage2Result->url, true) : $stage2Result->url;
+                if (is_array($urls)) {
+                    foreach ($urls as $url) {
+                        $sources[] = ['title' => 'Sumber Referensi', 'url' => $url];
+                    }
+                }
+            }
+
+            $featureVector = $stage2Result ? [
+                'time_consistency_score' => $stage2Result->time_credibility,
+                'message_similarity_score' => $stage2Result->title_credibility,
+                'mean_entailment' => $stage2Result->mean_entailment,
+                'mean_contradiction' => $stage2Result->mean_contradiction,
+                'std_contradiction' => $stage2Result->std_contradiction,
+            ] : [];
+
+            return [
+                'success'    => true,
+                'verdict'    => $verdict,
+                'confidence' => $confidencePercentage,
+                'summary'    => $summaryText,
+                'sources'    => $sources,
+                'raw_data'   => [
+                    'stage' => 'stage2',
+                    'request_id' => $usedRequestId,
+                    'feature_vector' => $featureVector
+                ]
+            ];
+        }
     }
 }

@@ -25,10 +25,6 @@ class PencarianController extends Controller
     public function telusuri(Request $request): JsonResponse
     {
         try {
-            Log::info('Menerima permintaan pencarian teks dari Web UI', [
-                'user_id' => Auth::id(),
-                'request_data' => $request->all()
-            ]);
 
             // 1. Validasi input dari frontend
             $validated = $request->validate([

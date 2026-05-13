@@ -15,6 +15,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ApiController;
 use App\Http\Controllers\DetectionController;
 use App\Http\Controllers\PopulerHistoryController;
+use App\Http\Controllers\CsvController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,6 +46,9 @@ Route::get('/uji-coba-deteksi', function () {
 
 // API detect endpoint (single consolidated route)
 Route::post('/api/detect', [DetectionController::class, 'detect'])->name('detect.hoax');
+
+// Unduh CSV
+Route::get('/riwayat/unduh-csv', [CsvController::class, 'unduhCsv'])->name('riwayat.unduh_csv');
 
 
 /*
@@ -105,6 +109,7 @@ Route::post('/telusuri-gambar', [PencarianController::class, 'telusuriGambar'])-
         Route::get('/edit/{id}', [RiwayatController::class, 'edit']);
         Route::post('/update/{id}', [RiwayatController::class, 'update']);
         Route::get('/delete/{id}', [RiwayatController::class, 'delete']);
+        Route::post('/filter', [RiwayatController::class, 'filterRiwayat'])->name('riwayat.filter');
     });
 //});
 

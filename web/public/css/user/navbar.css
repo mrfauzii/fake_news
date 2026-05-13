@@ -14,6 +14,17 @@
     padding: 0 clamp(18px, 2.6vw, 38px);
 }
 
+/* Mobile Search */
+.lh-mobile-search {
+    display: none;
+}
+
+.lh-mobile-search__text {
+    margin: 0;
+    padding: 0;
+    font-size: 0;
+}
+
 /* Logo */
 .lh-logo {
     display: flex;
@@ -164,7 +175,29 @@
     text-overflow: clip;
 }
 
-@media (max-width: 900px) {
+/* Active state for nav buttons (desktop/tablet) */
+@media (min-width: 561px) {
+    .lh-nav-btn--active {
+        width: min(240px, 33vw);
+        background: linear-gradient(90deg, #73070B 0%, #B8201D 100%);
+        justify-content: flex-start;
+        padding: 0 12px 0 10px;
+        box-shadow: 0 10px 18px rgba(115, 7, 11, 0.32);
+    }
+
+    .lh-nav-btn--active .lh-nav-tooltip {
+        opacity: 1;
+        margin-left: 8px;
+        max-width: 176px;
+        transform: translateX(0);
+    }
+
+    .lh-nav-btn--active:hover {
+        width: min(240px, 33vw);
+    }
+}
+
+@media (max-width: 900px) and (min-width: 561px) {
     .lh-navbar {
         padding: 0 12px;
         height: 68px;
@@ -207,49 +240,208 @@
 }
 
 @media (max-width: 560px) {
+    /* fixed bottom navbar */
     .lh-navbar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
         height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        gap: 0;
+        background: rgba(255,255,255,0.98);
+        box-shadow: 0 -6px 18px rgba(12,12,12,0.06);
+        z-index: 1100;
+    }
+
+    /* place logo at top-left of viewport */
+    .lh-logo {
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        width: auto;
+        justify-content: center;
+        padding: 0;
+        margin: 0;
+        gap: 0;
+        z-index: 1200;
+        background: transparent;
     }
 
     .lh-logo__img {
-        width: 100px;
+        width: 46px;
+        height: auto;
+        display: block;
     }
 
+    .lh-logo__text { display: none; }
+
+    /* hide the mobile search placeholder when using bottom nav */
+    .lh-mobile-search { display: none; }
+
     .lh-nav-icons {
-        gap: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        width: 100%;
+        max-width: 520px;
+        padding: 0 10px;
+        gap: 4px;
     }
 
     .lh-nav-btn {
-        width: 40px;
-        height: 40px;
+        width: 52px;
+        height: 52px;
         padding: 0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        box-shadow: none;
+        transition: 
+            transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+            background 0.25s ease,
+            color 0.25s ease,
+            box-shadow 0.25s ease,
+            width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+            height 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        border: none;
+        cursor: pointer;
+        color: #73070B;
     }
 
-    .lh-nav-btn--whatsapp-visible,
-    .lh-nav-btn--whatsapp-visible:hover,
-    .lh-nav-btn--whatsapp-visible:focus-visible {
-        width: min(230px, 66vw);
-        padding: 0 10px 0 8px;
-    }
+    .lh-nav-btn:active { transform: scale(0.92); }
 
     .lh-nav-btn:hover,
-    .lh-nav-btn:focus-visible {
-        width: min(178px, 48vw);
-        padding: 0 10px 0 8px;
+    .lh-nav-btn:focus-visible { 
+        background: rgba(115,7,11,0.08);
+        transform: scale(1.05);
     }
 
-    .lh-nav-tooltip {
-        display: inline-flex;
+    .lh-nav-btn > iconify-icon:first-child {
+        width: 26px !important;
+        height: 26px !important;
+        color: #73070B;
+        transition: color 0.3s ease;
     }
 
-    .lh-nav-btn:hover .lh-nav-tooltip,
-    .lh-nav-btn:focus-visible .lh-nav-tooltip {
-        margin-left: 6px;
-        max-width: 124px;
+    .lh-nav-tooltip,
+    .lh-nav-btn .lh-nav-tooltip { display: none !important; }
+
+    /* keep all mobile buttons circular (including whatsapp desktop-expanded style) */
+    .lh-nav-btn--whatsapp-visible,
+    .lh-nav-btn--whatsapp-visible:hover,
+    .lh-nav-btn--whatsapp-visible:focus-visible,
+    .wa-nav-btn--active,
+    .wa-nav-btn--whatsapp {
+        width: 52px !important;
+        height: 52px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        justify-content: center !important;
+        overflow: visible;
     }
 
-    .lh-nav-tooltip--always-visible {
-        margin-left: 6px;
-        max-width: 170px;
+    /* center search button on mobile, neutral by default */
+    .lh-nav-btn--search {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: transparent;
+        transform: none;
+        box-shadow: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #73070B;
+        transition: 
+            transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+            background 0.25s ease,
+            box-shadow 0.25s ease,
+            color 0.25s ease;
+    }
+
+    .lh-nav-btn--search > iconify-icon:first-child {
+        width: 28px !important;
+        height: 28px !important;
+        color: #73070B;
+        transition: color 0.3s ease;
+    }
+
+    /* Active state on mobile: red circular background and elevation */
+    .lh-nav-btn--active {
+        width: 56px;
+        height: 56px;
+        padding: 0;
+        border-radius: 50%;
+        justify-content: center;
+        background: linear-gradient(90deg,#73070B 0%,#B8201D 100%);
+        color: #ffffff;
+        transform: translateY(-10px) scale(1);
+        box-shadow: 0 10px 22px rgba(184,32,29,0.28);
+        transition: 
+            transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
+            background 0.3s ease-out,
+            box-shadow 0.3s cubic-bezier(0.4, 0.0, 0.2, 1),
+            color 0.3s ease,
+            width 0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
+            height 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .lh-nav-btn--active:hover {
+        transform: translateY(-12px) scale(1.08);
+        box-shadow: 0 14px 28px rgba(184,32,29,0.35);
+    }
+
+    .lh-nav-btn--active > iconify-icon:first-child {
+        color: #ffffff !important;
+        transition: color 0.3s ease;
+    }
+
+    /* Keep the center search slightly larger when active */
+    .lh-nav-btn--search.lh-nav-btn--active {
+        width: 64px;
+        height: 64px;
+        transform: translateY(-16px);
+        box-shadow: 0 12px 28px rgba(184,32,29,0.32);
+        transition: 
+            transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
+            box-shadow 0.3s cubic-bezier(0.4, 0.0, 0.2, 1),
+            background 0.3s ease-out,
+            color 0.3s ease;
+    }
+
+    .lh-nav-btn--search.lh-nav-btn--active:hover {
+        transform: translateY(-18px);
+        box-shadow: 0 16px 32px rgba(184,32,29,0.38);
+    }
+
+    .lh-nav-btn--user { width: 56px; height: 56px; }
+
+    .lh-nav-btn--active::after {
+        content: "";
+        position: absolute;
+        inset: -3px;
+        border-radius: 50%;
+        border: 1px solid rgba(184, 32, 29, 0.28);
+        pointer-events: none;
+        animation: pulse-ring 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes pulse-ring {
+        0% {
+            inset: -8px;
+            border-color: rgba(184, 32, 29, 0.6);
+            opacity: 1;
+        }
+        100% {
+            inset: -3px;
+            border-color: rgba(184, 32, 29, 0.28);
+            opacity: 1;
+        }
     }
 }

@@ -247,7 +247,7 @@ class TextDetectionController extends Controller
         $confidencePercentage = round($finalConfidence * 100, 2);
 
         $featureVector = $aiApiResponse['feature_vector'] ?? [];
-
+        Log::info('Feature Vector Stage 2: ', $featureVector);
         $requestData->update([
             'final_label' => $finalLabel,
             'final_confidence' => $finalConfidence,

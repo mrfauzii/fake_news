@@ -30,7 +30,7 @@
 
         <!-- Logout Button -->
         @auth
-            <form method="POST" action="{{ route('logout') }}" class="lh-profile-popup__logout-form">
+            <form method="POST" action="{{ route('logout') }}" class="lh-profile-popup__logout-form" id="lh-logout-form" data-redirect="{{ route('login') }}">
                 @csrf
                 <button type="submit" class="lh-profile-popup__logout">
                     <iconify-icon icon="mdi:logout"></iconify-icon>

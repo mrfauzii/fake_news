@@ -22,41 +22,41 @@
 # CEK DATA COLLECTION
 # ==========================================
 
-# from config.chroma_config import get_chroma_collection
+from config.chroma_config import get_chroma_collection
 
-# text_request = get_chroma_collection("text_request")
-# def check_collection_data(collection):
+text_request = get_chroma_collection("text_request")
+def check_collection_data(collection):
 
-#     try:
+    try:
 
-#         data = collection.get()
+        data = collection.get()
 
-#         return {
-#             "status": "success",
-#             "total_data": len(data.get("ids", [])),
-#             "ids": data.get("ids", [])
-#         }
+        return {
+            "status": "success",
+            "total_data": len(data.get("ids", [])),
+            "ids": data.get("ids", [])
+        }
 
-#     except Exception as e:
+    except Exception as e:
 
-#         return {
-#             "status": "error",
-#             "message": str(e)
-#         }
+        return {
+            "status": "error",
+            "message": str(e)
+        }
         
-# result = check_collection_data(text_request)
+result = check_collection_data(text_request)
 
-# print(result)
-
-
-from google import genai
-import os
-import dotenv
-dotenv.load_dotenv()
-API_KEY = os.getenv("API_KEY")
+print(result)
 
 
-client = genai.Client(api_key=API_KEY)
+# from google import genai
+# import os
+# import dotenv
+# dotenv.load_dotenv()
+# API_KEY = os.getenv("API_KEY")
 
-for model in client.models.list():
-    print(model.name)
+
+# client = genai.Client(api_key=API_KEY)
+
+# for model in client.models.list():
+#     print(model.name)

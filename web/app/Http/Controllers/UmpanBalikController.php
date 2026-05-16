@@ -45,9 +45,14 @@ class UmpanBalikController extends Controller
                 return [
                     'id' => $item->id,
                     'username' => $item->username,
+                    'request_id' => $item->request_id,
                     'feedback' => $item->feedback,
-                    'date' => Carbon::parse($item->created_at)
-                        ->translatedFormat('l, j F Y • H:i'),
+
+                    'date' => Carbon::parse(
+                        $item->created_at
+                    )->translatedFormat(
+                        'l, j F Y • H:i'
+                    ),
                 ];
             });
 

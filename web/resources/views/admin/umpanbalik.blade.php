@@ -41,24 +41,6 @@
         <p class="negative">Perlu perhatian segera!</p>
     </div>
 
-    <!-- RATING -->
-     {{--
-        <div class="stats-card">
-            <div class="stats-top">
-                <span>RATA-RATA RATING</span>
-                <div class="icon-box yellow">
-                    <i class="fa fa-star"></i>
-                </div>
-            </div>
-            <h2>4.8 <small>/ 5.0</small></h2>
-
-            <div class="rating-stars">
-                <span class="stars">★ ★ ★ ★ ☆</span>
-                <span class="total"> dari 840 total ulasan</span>
-            </div>
-        </div>
-    --}}
-
 </div>
 
 <div class="umpanbalik-title">
@@ -73,9 +55,7 @@
 </div>
 
 <!-- ===== LIST ===== -->
-<div class="umpanbalik-list">
-
-    <div class="umpanbalik-list" id="feedbackList">
+<div class="umpanbalik-list" id="feedbackList">
 
     <div style="padding:20px">
         Memuat data...
@@ -83,71 +63,112 @@
 
 </div>
 
+<!-- POPUP DETAIL -->
+<div id="feedbackPopup" class="popup-overlay" style="display:none;">
 
-    <!-- ITEM 2 (DIBACA) -->
-    <div class="umpanbalik-item read">
-        <div class="umpanbalik-left">
-            <img src="https://i.pravatar.cc/41" class="avatar">
+    <div class="popup-box">
 
-            <div>
-                <h4>Siti Pertiwi</h4>
-                <span>Rabu, 8 April 2027 • 09:15 WIB</span>
+        <button id="closePopup"
+        class="popup-close">
 
-                <p>
-                    Suka dengan tampilan barunya! Sangat minimalis dan tidak membingungkan.
-                </p>
+            ✕
 
-                <div class="umpanbalik-actions">
-                    <button class="btn-outline">Detail</button>
-                </div>
-            </div>
+        </button>
+
+
+        <div class="popup-header">
+
+            <h2>Detail Umpan Balik</h2>
+
+            <p>
+                Informasi lengkap masukan pengguna
+            </p>
+
         </div>
 
-        <span class="badge read-badge">Dibaca</span>
-    </div>
 
+        <div class="popup-info">
 
-    <!-- ITEM 3 (DIBALAS) -->
-    <div class="umpanbalik-item read">
-        <div class="umpanbalik-left">
-            <img src="https://i.pravatar.cc/42" class="avatar">
+            <div class="info-card">
 
-            <div>
-                <h4>Budi Wijaya</h4>
-                <span>Selasa, 7 April 2027 • 16:45 WIB</span>
-
-                <p>
-                    Ada kesalahan deteksi pada link situs berita resmi "Warta Ekonomi".
-                </p>
-
-                <div class="umpanbalik-actions">
-                    <button class="btn-outline">Detail</button>
+                <div class="info-title">
+                    Nama Pengguna
                 </div>
+
+                <div
+                class="info-value"
+                id="popupUser">
+                </div>
+
             </div>
+
+
+            <div class="info-card">
+
+                <div class="info-title">
+                    Tanggal
+                </div>
+
+                <div
+                class="info-value"
+                id="popupDate">
+                </div>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <div class="info-title">
+                    ID Request
+                </div>
+
+                <div
+                class="info-value"
+                id="popupRequest">
+                </div>
+
+            </div>
+
         </div>
-        <span class="badge read-badge">Dibaca</span>
+
+
+        <h3>Isi Feedback</h3>
+
+        <div
+        class="feedback-box"
+        id="popupFeedback">
+
+        </div>
+
     </div>
 
 </div>
 
 <script>
 
-document.addEventListener('DOMContentLoaded', function(){
+document.addEventListener('DOMContentLoaded',function(){
 
-    const container = document.querySelector('.umpanbalik-list');
+    const container=
+    document.getElementById('feedbackList');
+
+    const popup=
+    document.getElementById('feedbackPopup');
+
+    const closeBtn=
+    document.getElementById('closePopup');
 
     fetch('/umpanbalik-data')
 
-    .then(response => response.json())
+    .then(response=>response.json())
 
-    .then(result => {
+    .then(result=>{
 
-        container.innerHTML = '';
+        container.innerHTML='';
 
-        result.data.forEach(item => {
+        result.data.forEach(item=>{
 
             container.innerHTML += `
-
             <div class="umpanbalik-item new">
 
                 <div class="umpanbalik-left">
@@ -160,14 +181,21 @@ document.addEventListener('DOMContentLoaded', function(){
 
                         <span>${item.date}</span>
 
-                        <p>
-                            ${item.feedback}
-                        </p>
+                        <p>${item.feedback}</p>
 
                         <div class="umpanbalik-actions">
-                            <button class="btn-outline">
-                                Detail
+
+                            <button
+                            class="btn-outline btn-detail"
+                            data-username="${item.username}"
+                            data-date="${item.date}"
+                            data-feedback="${item.feedback}"
+                            data-request="${item.request_id ?? '-'}">
+
+                            Detail
+
                             </button>
+
                         </div>
 
                     </div>
@@ -179,24 +207,74 @@ document.addEventListener('DOMContentLoaded', function(){
                 </span>
 
             </div>
-
             `;
 
         });
 
     })
 
-    .catch(error => {
+    .catch(error=>{
 
         console.log(error);
 
-        container.innerHTML = `
+        container.innerHTML=`
             <p style="color:red">
                 Gagal memuat data
             </p>
         `;
 
     });
+
+
+    document.addEventListener('click',function(e){
+
+        if(e.target.classList.contains('btn-detail')){
+
+            document.getElementById(
+                'popupUser'
+            ).innerText =
+            e.target.dataset.username;
+
+            document.getElementById(
+                'popupDate'
+            ).innerText =
+            e.target.dataset.date;
+
+            document.getElementById(
+                'popupRequest'
+            ).innerText =
+            e.target.dataset.request;
+
+            document.getElementById(
+                'popupFeedback'
+            ).innerText =
+            e.target.dataset.feedback;
+
+            popup.style.display='flex';
+
+        }
+
+    });
+
+
+    closeBtn.addEventListener(
+        'click',
+        ()=> popup.style.display='none'
+    );
+
+
+    popup.addEventListener(
+        'click',
+        function(e){
+
+            if(e.target===popup){
+
+                popup.style.display='none';
+
+            }
+
+        }
+    );
 
 });
 

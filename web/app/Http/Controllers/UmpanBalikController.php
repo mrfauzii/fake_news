@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class UmpanBalikController extends Controller
 {
@@ -14,6 +15,8 @@ class UmpanBalikController extends Controller
 
     public function getFeedbackData()
     {
+        Carbon::setLocale('id');
+
         $feedbacks = DB::table('feedbacks')
             ->join('users', 'feedbacks.user_id', '=', 'users.id')
             ->select(
@@ -24,7 +27,17 @@ class UmpanBalikController extends Controller
                 'feedbacks.created_at'
             )
             ->orderBy('feedbacks.created_at', 'desc')
-            ->get();
+            ->get()
+            ->map(function($item){
+
+                return [
+                    'id' => $item->id,
+                    'username' => $item->username,
+                    'feedback' => $item->feedback,
+                    'date' => Carbon::parse($item->created_at)
+                        ->translatedFormat('l, j F Y • H:i'),
+                ];
+            });
 
         return response()->json([
             'status' => 'success',

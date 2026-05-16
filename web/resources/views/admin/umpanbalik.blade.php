@@ -75,28 +75,13 @@
 <!-- ===== LIST ===== -->
 <div class="umpanbalik-list">
 
-    <!-- ITEM 1 (BARU) -->
-    <div class="umpanbalik-item new">
-        <div class="umpanbalik-left">
-            <img src="https://i.pravatar.cc/40" class="avatar">
+    <div class="umpanbalik-list" id="feedbackList">
 
-            <div>
-                <h4>Andi Maulana</h4>
-                <span>Kamis, 9 April 2027 • 14:20 WIB</span>
-
-                <p>
-                    Aplikasi sangat membantu untuk memverifikasi link yang beredar di grup WhatsApp keluarga.
-                    Namun, proses loading saat deteksi link berita internasional terasa sedikit lambat dibanding link lokal.
-                </p>
-
-                <div class="umpanbalik-actions">
-                    <button class="btn-outline">Detail</button>
-                </div>
-            </div>
-        </div>
-
-        <span class="badge new-badge">Baru</span>
+    <div style="padding:20px">
+        Memuat data...
     </div>
+
+</div>
 
 
     <!-- ITEM 2 (DIBACA) -->
@@ -144,5 +129,77 @@
     </div>
 
 </div>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function(){
+
+    const container = document.querySelector('.umpanbalik-list');
+
+    fetch('/umpanbalik-data')
+
+    .then(response => response.json())
+
+    .then(result => {
+
+        container.innerHTML = '';
+
+        result.data.forEach(item => {
+
+            container.innerHTML += `
+
+            <div class="umpanbalik-item new">
+
+                <div class="umpanbalik-left">
+
+                    <img src="https://i.pravatar.cc/40?u=${item.id}" class="avatar">
+
+                    <div>
+
+                        <h4>${item.username}</h4>
+
+                        <span>${item.date}</span>
+
+                        <p>
+                            ${item.feedback}
+                        </p>
+
+                        <div class="umpanbalik-actions">
+                            <button class="btn-outline">
+                                Detail
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <span class="badge new-badge">
+                    Baru
+                </span>
+
+            </div>
+
+            `;
+
+        });
+
+    })
+
+    .catch(error => {
+
+        console.log(error);
+
+        container.innerHTML = `
+            <p style="color:red">
+                Gagal memuat data
+            </p>
+        `;
+
+    });
+
+});
+
+</script>
 
 @endsection

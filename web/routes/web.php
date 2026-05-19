@@ -132,6 +132,9 @@ Route::post('/telusuri-gambar', [PencarianController::class, 'telusuriGambar'])-
 Route::any('/wa-webhook', [WaController::class, 'webhook']);
 Route::post('/detect-hoax', [ApiController::class, 'detectHoax']);
 
+// API untuk menyimpan jadwal scrape
+Route::post('/scrape-schedule', [ApiController::class, 'setScrapeSchedule']);
+
 
 // Login using WhatsApp (web)
 Route::get('/login-wa', [AuthController::class, 'showPhoneForm'])->name('login.wa');

@@ -16,6 +16,7 @@ use App\Http\Controllers\ApiController;
 use App\Http\Controllers\DetectionController;
 use App\Http\Controllers\PopulerHistoryController;
 use App\Http\Controllers\CsvController;
+use App\Http\Controllers\HistoryManagementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -111,6 +112,14 @@ Route::post('/telusuri-gambar', [PencarianController::class, 'telusuriGambar'])-
         Route::get('/delete/{id}', [RiwayatController::class, 'delete']);
         Route::post('/filter', [RiwayatController::class, 'filterRiwayat'])->name('riwayat.filter');
     });
+
+    // Manajemen Riwayat
+    Route::get('/history-management', [HistoryManagementController::class, 'index']);
+    Route::get('/history-management/trash', [HistoryManagementController::class, 'trash']);
+    
+    Route::post('/history-management/soft-delete/{id}', [HistoryManagementController::class, 'softDelete']);
+    Route::post('/history-management/restore/{id}', [HistoryManagementController::class, 'restore']);
+    Route::delete('/history-management/hard-delete/{id}', [HistoryManagementController::class, 'hardDelete']);
 //});
 
 

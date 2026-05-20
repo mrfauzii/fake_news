@@ -12,32 +12,11 @@
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
 
     <link rel="stylesheet" href="{{ asset('css/login-token.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/user/navbar.css') }}">
 </head>
 <body>
 
-    <header class="lh-navbar">
-        <a href="{{ route('landing') }}" class="lh-logo" aria-label="Lensa Hoax">
-            <img src="{{ asset('img/logo-lensa.png') }}" alt="Logo Lensa Hoax" class="lh-logo__img">
-        </a>
-
-        <nav class="lh-nav-icons" aria-label="Aksi pengguna">
-            <a href="#" class="lh-nav-btn" aria-label="Tren" title="Trending">
-                <iconify-icon icon="iconamoon:trend-up-fill" width="26" height="26"></iconify-icon>
-                <span class="lh-nav-tooltip" role="tooltip">
-                    <iconify-icon icon="iconamoon:trend-up-fill" width="18" height="18"></iconify-icon>
-                    <span>Pencarian Terpopuler</span>
-                </span>
-            </a>
-
-            <a href="{{ route('whatsapp.page') }}" class="lh-nav-btn" aria-label="WhatsApp" title="WhatsApp">
-                <iconify-icon icon="garden:whatsapp-fill-16" width="24" height="24"></iconify-icon>
-                <span class="lh-nav-tooltip" role="tooltip">
-                    <iconify-icon icon="garden:whatsapp-fill-16" width="18" height="18"></iconify-icon>
-                    <span>Hubungkan via WhatsApp</span>
-                </span>
-            </a>
-        </nav>
-    </header>
+    @include('user.partials.navbar')
 
     <main class="otp-page">
         <div class="otp-page__hero" aria-hidden="true">

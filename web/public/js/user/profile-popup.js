@@ -54,6 +54,15 @@ document.addEventListener('DOMContentLoaded', function () {
             restoreMobileActiveState(navbar);
         }
 
+        function closeProfilePopup(popup) {
+            if (!popup) return;
+            popup.setAttribute('hidden', '');
+            document.querySelectorAll('[data-profile-toggle="' + popup.id + '"]').forEach(btn => {
+                btn.setAttribute('aria-expanded', 'false');
+                syncNavbarActiveState(btn, false);
+            });
+        }
+
         // Delegated toggle handler
         document.addEventListener('click', function (e) {
             const toggle = e.target.closest('.js-profile-toggle');
@@ -73,50 +82,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     syncNavbarActiveState(toggle, true);
                     // mark all toggles for this popup
                     document.querySelectorAll('[data-profile-toggle="' + targetId + '"]').forEach(btn => btn.setAttribute('aria-expanded', 'true'));
-                    // add overlay
-                    if (!document.getElementById('profile-popup-overlay')) {
-                        const overlay = document.createElement('div');
-                        overlay.id = 'profile-popup-overlay';
-                        overlay.className = 'lh-profile-popup-overlay';
-                        // Ensure overlay covers viewport but stays behind the popup
-                        overlay.style.position = 'fixed';
-                        overlay.style.top = '0';
-                        overlay.style.left = '0';
-                        overlay.style.width = '100%';
-                        overlay.style.height = '100%';
-                        overlay.style.background = 'transparent';
-                        overlay.style.zIndex = '10000';
-                        overlay.addEventListener('click', function () {
-                            popup.setAttribute('hidden', '');
-                            document.querySelectorAll('[data-profile-toggle="' + targetId + '"]').forEach(btn => btn.setAttribute('aria-expanded', 'false'));
-                            overlay.remove();
-                        });
-                        document.body.appendChild(overlay);
-                        // Position popup near toggle and bring above overlay (use fixed to avoid stacking context issues)
-                        try {
-                            const rect = toggle.getBoundingClientRect();
-                            popup.style.position = 'fixed';
-                            // Prefer placing below the toggle; adjust if near bottom
-                            const top = Math.min(window.innerHeight - 16, rect.bottom + 8);
-                            const left = Math.min(window.innerWidth - 16, rect.left);
-                            popup.style.top = (top) + 'px';
-                            popup.style.left = (left) + 'px';
-                            popup.style.zIndex = '10001';
-                            const card = popup.querySelector('.lh-profile-popup__card');
-                            if (card) {
-                                card.style.zIndex = '10002';
-                                card.style.position = 'relative';
-                            }
-                        } catch (e) {
-                            // ignore
-                        }
-                    }
                 } else {
-                    popup.setAttribute('hidden', '');
-                    document.querySelectorAll('[data-profile-toggle="' + targetId + '"]').forEach(btn => btn.setAttribute('aria-expanded', 'false'));
-                    syncNavbarActiveState(toggle, false);
-                    const ov = document.getElementById('profile-popup-overlay'); if (ov) ov.remove();
+                    closeProfilePopup(popup);
                 }
+                return;
+            }
+
+            const closeButton = e.target.closest('[data-profile-close]');
+            if (closeButton) {
+                e.preventDefault();
+                e.stopPropagation();
+                const popup = closeButton.closest('.lh-profile-popup');
+                closeProfilePopup(popup);
                 return;
             }
 
@@ -127,13 +104,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 openPopups.forEach(popup => { if (popup.contains(e.target)) clickedInside = true; });
                 if (!clickedInside) {
                     openPopups.forEach(popup => {
-                        popup.setAttribute('hidden', '');
-                        document.querySelectorAll('[data-profile-toggle="' + popup.id + '"]').forEach(btn => {
-                            btn.setAttribute('aria-expanded', 'false');
-                            syncNavbarActiveState(btn, false);
-                        });
+                        closeProfilePopup(popup);
                     });
-                    const ov = document.getElementById('profile-popup-overlay'); if (ov) ov.remove();
                 }
             }
         });
@@ -142,13 +114,8 @@ document.addEventListener('DOMContentLoaded', function () {
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
                 document.querySelectorAll('.lh-profile-popup:not([hidden])').forEach(popup => {
-                    popup.setAttribute('hidden', '');
-                    document.querySelectorAll('[data-profile-toggle="' + popup.id + '"]').forEach(btn => {
-                        btn.setAttribute('aria-expanded', 'false');
-                        syncNavbarActiveState(btn, false);
-                    });
+                    closeProfilePopup(popup);
                 });
-                const ov = document.getElementById('profile-popup-overlay'); if (ov) ov.remove();
                 // close edit modal if open
                 const editModal = document.getElementById('field-edit-modal'); if (editModal && !editModal.hasAttribute('hidden')) editModal.setAttribute('hidden', '');
             }
@@ -165,33 +132,27 @@ document.addEventListener('DOMContentLoaded', function () {
                     ev.stopPropagation();
                     // close popup overlay so submit can proceed visually
                     const popup = logoutBtn.closest('.lh-profile-popup');
-                    if (popup) {
-                        popup.setAttribute('hidden', '');
-                        document.querySelectorAll('[data-profile-toggle="' + popup.id + '"]').forEach(btn => btn.setAttribute('aria-expanded', 'false'));
-                    }
-                    const ov = document.getElementById('profile-popup-overlay'); if (ov) ov.remove();
-                    // Programmatically submit the form to avoid other handlers blocking the native submit
-                    try {
-                        // if the form has an onsubmit handler that prevents submission, use a cloned form
-                        if (typeof logoutForm.submit === 'function') {
-                            // small delay to allow UI update
-                            setTimeout(function () { logoutForm.submit(); }, 50);
+                    if (popup) closeProfilePopup(popup);
+
+                    // Attempt an AJAX logout then redirect to the login page on success.
+                    const token = logoutForm.querySelector('input[name="_token"]')?.value || document.querySelector('meta[name="csrf-token"]')?.content || '';
+                    fetch(logoutForm.action, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': token,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({})
+                    }).then(function (resp) {
+                        if (resp.ok) {
+                            window.location.href = logoutForm.dataset.redirect || '/login';
                         } else {
-                            // fallback: create a new form and submit
-                            const f = document.createElement('form');
-                            f.method = 'POST';
-                            f.action = logoutForm.action;
-                            const token = logoutForm.querySelector('input[name="_token"]')?.value || document.querySelector('meta[name="csrf-token"]')?.content || '';
-                            const inp = document.createElement('input');
-                            inp.type = 'hidden'; inp.name = '_token'; inp.value = token;
-                            f.appendChild(inp);
-                            document.body.appendChild(f);
-                            setTimeout(function () { f.submit(); }, 50);
+                            try { logoutForm.submit(); } catch (e) { window.location.href = logoutForm.dataset.redirect || '/login'; }
                         }
-                    } catch (err) {
-                        // As a last resort, redirect to login (may not log out server-side)
-                        window.location.href = logoutForm.dataset.redirect || '/login';
-                    }
+                    }).catch(function () {
+                        try { logoutForm.submit(); } catch (e) { window.location.href = logoutForm.dataset.redirect || '/login'; }
+                    });
                 });
             }
         }
@@ -212,8 +173,18 @@ document.addEventListener('DOMContentLoaded', function () {
             return labels[fieldType] || 'Informasi';
         }
 
+        function isFieldEditable(fieldElement) {
+            return fieldElement && fieldElement.dataset.editable === 'true';
+        }
+
         function openEditModal(fieldElement) {
             if (!editModal) return;
+            if (!isFieldEditable(fieldElement)) return;
+            const popupRoot = fieldElement.closest('.lh-profile-popup');
+            if (popupRoot) {
+                closeProfilePopup(popupRoot);
+            }
+
             const fieldType = fieldElement.getAttribute('data-field');
             const fieldSpan = fieldElement.querySelector('span');
             const currentValue = fieldSpan?.textContent?.trim();
@@ -228,7 +199,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         function closeEditModal() { if (editModal) { editModal.setAttribute('hidden', ''); if (editForm) editForm.reset(); } }
 
-        editableFields.forEach(field => { field.addEventListener('click', function () { if (document.getElementById('profile-popup-overlay')) openEditModal(this); }); });
+        editableFields.forEach(field => {
+            field.addEventListener('click', function (e) {
+                // Open editor when the profile popup is visible so users can add missing data
+                const popupRoot = this.closest('.lh-profile-popup');
+                if (popupRoot && !popupRoot.hasAttribute('hidden') && isFieldEditable(this)) {
+                    e.stopPropagation();
+                    openEditModal(this);
+                }
+            });
+        });
         if (closeModalBtn) closeModalBtn.addEventListener('click', closeEditModal);
         if (cancelBtn) cancelBtn.addEventListener('click', closeEditModal);
         if (editModal) editModal.addEventListener('click', function (e) { if (e.target === this || e.target.className === 'lh-field-edit-modal__overlay') closeEditModal(); });

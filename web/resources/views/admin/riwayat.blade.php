@@ -7,7 +7,7 @@
 @endpush
 
 @section('content')
-@dd($data)
+
 <!-- HEADER -->
 <div class="page-header">
 
@@ -49,11 +49,11 @@
 <!-- GRID -->
 <div class="riwayat-grid">
     @foreach($data as $item)
+
     <div 
     class="riwayat-card searchable-card {{ $item['gambar'] ? 'image-card' : '' }}"
     data-title="{{ strtolower($item['judul']) }}"
-    data-id="{{ $item['request_id'] }}"
-    data-deleted="{{ $item['deleted_at'] }}"
+    data-id="{{ $loop->index }}"
     >
 
         {{-- JIKA ADA GAMBAR --}}
@@ -162,11 +162,7 @@
 
             <!-- DELETE -->
             <button class="popup-delete" id="deletePopup">
-
-                <i id="deleteIcon"
-                class="fa fa-trash">
-                </i>
-
+                <i class="fa fa-trash"></i>
             </button>
 
             <!-- CLOSE -->
@@ -184,10 +180,10 @@
             <p class="popup-date" id="popupDate"></p>
 
             <div 
-                class="popup-delete-status"
+                class="popup-delete-status" 
                 id="popupDeleteStatus"
-                style="display:none">
-            </div>
+                style="display: none;"
+            ></div>
 
         </div>
 
@@ -308,309 +304,151 @@ const popupOverlay = document.getElementById('popupOverlay');
 const closePopup = document.getElementById('closePopup');
 const deletePopup = document.getElementById('deletePopup');
 
+let currentCard = null;
+
 const popupTitle = document.getElementById('popupTitle');
 const popupDesc = document.getElementById('popupDesc');
 const popupHoax = document.getElementById('popupHoax');
 const popupBenar = document.getElementById('popupBenar');
+const popupDeleteStatus = document.getElementById('popupDeleteStatus');
+
+let deletedCards = {};
 const popupUser = document.getElementById('popupUser');
 const popupDate = document.getElementById('popupDate');
-const popupPenjelasan = document.getElementById('popupPenjelasan');
 
-const popupDeleteStatus =
-document.getElementById('popupDeleteStatus');
+document.querySelectorAll('.open-popup').forEach(button => {
 
-const deleteIcon =
-document.getElementById('deleteIcon');
+    button.addEventListener('click', function () {
+        currentCard = this.closest('.riwayat-card');
+        popupTitle.innerHTML =
+            `⚠️ ${this.dataset.judul} ⚠️`;
 
-let currentCard = null;
-let isDeleted = false;
+        popupDesc.innerText =
+            this.dataset.deskripsi;
 
+        popupPenjelasan.innerText =
+            this.dataset.penjelasan;
 
-// =========================
-// BUKA POPUP
-// =========================
-document.querySelectorAll('.open-popup')
-.forEach(button=>{
+        popupUser.innerText =
+            this.dataset.user;
 
-    button.addEventListener(
-    'click',
-    function(){
+        popupDate.innerText =
+            this.dataset.date;
 
-        currentCard =
-        this.closest(
-        '.riwayat-card'
-        );
+        popupHoax.innerText =
+            this.dataset.hoax + '%';
 
-        const deletedDate =
-        currentCard.dataset.deleted;
+        popupBenar.innerText =
+            this.dataset.benar + '%';
 
-        isDeleted =
-        !!deletedDate;
+        if (currentCard.dataset.deleted === "true") {
 
+             popupDeleteStatus.style.display = 'flex';
 
-        // status delete
-        if(deletedDate){
+            popupDeleteStatus.textContent =
+                `Dihapus • ${currentCard.dataset.deletedDate}`;
 
-            popupDeleteStatus
-            .style.display=
-            'inline-flex';
+            deletePopup.innerHTML =
+                '<i class="fa fa-undo"></i>';
 
-            popupDeleteStatus
-            .innerHTML=
-            `Dihapus | ${
-                new Date(
-                deletedDate
-                )
-                .toLocaleDateString(
-                'id-ID',{
-                    day:'numeric',
-                    month:'long',
-                    year:'numeric'
-                })
-            }`;
+        } else {
 
-            deleteIcon.className =
-            'fa fa-undo';
+            popupDeleteStatus.style.display = 'none';
 
-        }else{
+            popupDeleteStatus.innerHTML = '';
 
-            popupDeleteStatus
-            .style.display=
-            'none';
-
-            deleteIcon.className =
-            'fa fa-trash';
+            deletePopup.innerHTML =
+                '<i class="fa fa-trash"></i>';
 
         }
 
-
-        popupTitle.innerHTML =
-        `⚠️ ${this.dataset.judul} ⚠️`;
-
-        popupDesc.innerText =
-        this.dataset.deskripsi;
-
-        popupPenjelasan.innerText =
-        this.dataset.penjelasan;
-
-        popupUser.innerText =
-        this.dataset.user;
-
-        popupDate.innerText =
-        this.dataset.date;
-
-        popupHoax.innerText =
-        this.dataset.hoax + '%';
-
-        popupBenar.innerText =
-        this.dataset.benar + '%';
-
-        popupOverlay.classList
-        .add('active');
+        popupOverlay.classList.add('active');
 
     });
 
 });
 
+closePopup.addEventListener('click', function () {
 
-// =========================
-// TUTUP POPUP
-// =========================
-closePopup.addEventListener(
-'click',
-function(){
-
-popupOverlay.classList
-.remove('active');
+    popupOverlay.classList.remove('active');
 
 });
 
-popupOverlay.addEventListener(
-'click',
-function(e){
+popupOverlay.addEventListener('click', function (e) {
 
-if(
-e.target===popupOverlay
-){
+    if (e.target === popupOverlay) {
 
-popupOverlay.classList
-.remove('active');
+        popupOverlay.classList.remove('active');
 
-}
-
-});
-
-
-// =========================
-// TUTUP POPUP HAPUS
-// =========================
-function closeDeletePopup(){
-
-document
-.getElementById(
-'deleteOverlay'
-)
-.classList.remove(
-'active'
-);
-
-}
-
-
-// =========================
-// TOMBOL DELETE / RESTORE
-// =========================
-deletePopup.addEventListener(
-'click',
-function(){
-
-if(!currentCard) return;
-
-const id=
-currentCard.dataset.id;
-
-
-// RESTORE
-if(isDeleted){
-
-fetch(
-`/admin/history-management/restore/${id}`,
-{
-
-method:'POST',
-
-headers:{
-'X-CSRF-TOKEN':
-document.querySelector(
-'meta[name="csrf-token"]'
-).content
-
-}
-
-})
-
-.then(
-response=>
-response.json()
-)
-
-.then(data=>{
-
-if(
-data.status=="success"
-){
-
-isDeleted=false;
-
-currentCard
-.dataset.deleted='';
-
-popupDeleteStatus
-.style.display=
-'none';
-
-deleteIcon.className=
-'fa fa-trash';
-
-}
-
-});
-
-}
-
-
-// HAPUS
-else{
-
-document
-.getElementById(
-'deleteOverlay'
-)
-.classList.add(
-'active'
-);
-
-}
-
-});
-
-
-
-
-// =========================
-// CONFIRM HAPUS
-// =========================
-function confirmDelete(){
-
-if(!currentCard)
-return;
-
-const id=
-currentCard.dataset.id;
-
-
-fetch(
-`/admin/history-management/soft-delete/${id}`,
-{
-
-method:'POST',
-
-headers:{
-
-'X-CSRF-TOKEN':
-document.querySelector(
-'meta[name="csrf-token"]'
-).content
-
-}
-
-})
-
-.then(
-response=>
-response.json()
-)
-
-.then(data=>{
-
-    console.log("Response soft delete:", data);
-
-    if(data.status=="success"){
-
-        isDeleted=true;
-
-        currentCard.dataset.deleted=
-        new Date().toISOString();
-
-        let today=
-        new Date()
-        .toLocaleDateString(
-        'id-ID',{
-            day:'numeric',
-            month:'long',
-            year:'numeric'
-        });
-
-        popupDeleteStatus.innerHTML=
-        `Dihapus | ${today}`;
-
-        popupDeleteStatus.style.display=
-        'inline-flex';
-
-        deleteIcon.className=
-        'fa fa-undo';
-
-        closeDeletePopup();
     }
 
-})
-.catch(error=>{
+});
 
-console.log(error);
+deletePopup.addEventListener('click', function () {
+
+    if (!currentCard) return;
+
+    if (currentCard.dataset.deleted === "true") {
+
+        currentCard.dataset.deleted = "false";
+        currentCard.dataset.deletedDate = "";
+
+        popupDeleteStatus.style.display = 'none';
+        popupDeleteStatus.innerHTML = '';
+
+        deletePopup.innerHTML =
+            '<i class="fa fa-trash"></i>';
+
+        return;
+
+    }
+
+    document
+        .getElementById('deleteOverlay')
+        .classList.add('active');
 
 });
+
+function closeDeletePopup() {
+
+    document
+        .getElementById('deleteOverlay')
+        .classList.remove('active');
+
+}
+
+function confirmDelete() {
+
+    if (!currentCard) return;
+
+    const now = new Date();
+
+    const formattedDate =
+        now.toLocaleDateString('id-ID', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+
+    currentCard.dataset.deleted = "true";
+
+    currentCard.dataset.deletedDate =
+        formattedDate;
+
+     // MUNCULKAN BOX
+    popupDeleteStatus.style.display = 'flex';
+
+    popupDeleteStatus.innerHTML =
+        `Dihapus • ${formattedDate}`;
+
+    deletePopup.innerHTML =
+        '<i class="fa fa-undo"></i>';
+
+    closeDeletePopup();
 
 }
 
 </script>
+
 @endsection

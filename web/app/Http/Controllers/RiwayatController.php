@@ -13,16 +13,9 @@ class RiwayatController extends Controller
     public function index()
     {
          Carbon::setLocale('id');
-<<<<<<< Updated upstream
 
         $histories = history_view::with('request.image')->orderBy('created_at', 'desc')->paginate(10);
         $data = $histories->through(function ($history) {
-=======
-        
-        $histories = history_view::orderBy('created_at', 'desc')->get();
-        dd($histories->count(), $histories);
-        $data = $histories->map(function ($history) {
->>>>>>> Stashed changes
             
             $isImageSearch = $history->request && $history->request->image_id != null;
             $isHoax = strtolower($history->final_label) === 'hoax';

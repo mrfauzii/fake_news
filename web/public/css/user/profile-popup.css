@@ -2,13 +2,17 @@
 
 .lh-profile-popup {
     position: fixed;
-    top: 74px;
-    right: 0;
+    inset: 0;
     z-index: 1000;
-    width: 100%;
-    max-width: 320px;
-    background: transparent;
-    pointer-events: none;
+    width: 100vw;
+    height: 100vh;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(12, 12, 12, 0.42);
+    backdrop-filter: blur(4px);
+    pointer-events: auto;
 }
 
 .lh-profile-popup[hidden] {
@@ -19,29 +23,78 @@
     pointer-events: auto;
 }
 
-.lh-profile-popup__card {
-    position: relative;
-    background: linear-gradient(135deg, #73070B 0%, #B8201D 100%);
-    border-radius: 16px;
-    padding: 20px 16px;
-    margin: 12px 12px 0 0;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    animation: slideInDown 0.2s ease-out;
-    min-width: 280px;
-    max-width: 320px;
+.lh-profile-popup__backdrop {
+    position: absolute;
+    inset: 0;
+    border: none;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    cursor: default;
 }
 
-@keyframes slideInDown {
+.lh-profile-popup__card {
+    position: relative;
+    z-index: 1;
+    background: linear-gradient(135deg, #73070B 0%, #B8201D 100%);
+    border-radius: 16px;
+    padding: clamp(14px, 3vw, 20px) clamp(12px, 2.5vw, 16px);
+    margin: 0;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.32);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 1.5vw, 12px);
+    animation: slideInCenter 0.22s ease-out;
+    min-width: min(280px, 90vw);
+    width: min(92vw, 360px);
+    max-width: min(92vw, 360px);
+    max-height: min(84vh, 640px);
+    overflow-y: auto;
+}
+
+.lh-profile-popup__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.16);
+    color: #ffffff;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+    z-index: 2;
+}
+
+.lh-profile-popup__close:hover,
+.lh-profile-popup__close:focus-visible {
+    background: rgba(255, 255, 255, 0.24);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.22);
+    outline: none;
+}
+
+.lh-profile-popup__close:active {
+    transform: translateY(0);
+}
+
+.lh-profile-popup__close iconify-icon {
+    display: block;
+}
+
+@keyframes slideInCenter {
     from {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: translateY(10px) scale(0.98);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
     }
 }
 
@@ -49,8 +102,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 70px;
-    height: 70px;
+    width: clamp(56px, 14vw, 70px);
+    height: clamp(56px, 14vw, 70px);
     background: #ffffff;
     border-radius: 50%;
     margin: 0 auto 4px;
@@ -61,12 +114,12 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 14px;
+    padding: clamp(8px, 2vw, 10px) clamp(10px, 2.5vw, 14px);
     background: transparent;
     border: 2px solid rgba(255, 255, 255, 0.6);
     border-radius: 10px;
     color: #ffffff;
-    font-size: 13px;
+    font-size: clamp(11px, 2.5vw, 13px);
     font-weight: 500;
     cursor: pointer;
     transition: background 0.2s ease, border-color 0.2s ease;
@@ -77,11 +130,21 @@
     border-color: rgba(255, 255, 255, 0.8);
 }
 
+.lh-profile-popup__field--locked {
+    cursor: default;
+    opacity: 0.96;
+}
+
+.lh-profile-popup__field--locked:hover {
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
 .lh-profile-popup__field iconify-icon {
     flex-shrink: 0;
     color: rgba(255, 255, 255, 0.9);
-    width: 18px;
-    height: 18px;
+    width: clamp(14px, 3vw, 18px);
+    height: clamp(14px, 3vw, 18px);
 }
 
 .lh-profile-popup__field span {
@@ -101,12 +164,12 @@
     justify-content: center;
     gap: 10px;
     width: 100%;
-    padding: 12px 16px;
+    padding: clamp(10px, 2vw, 12px) clamp(12px, 2.5vw, 16px);
     background: #ffffff;
     border: none;
     border-radius: 10px;
     color: #73070B;
-    font-size: 14px;
+    font-size: clamp(12px, 2.5vw, 14px);
     font-weight: 700;
     cursor: pointer;
     text-decoration: none;
@@ -126,24 +189,13 @@
 
 .lh-profile-popup__logout iconify-icon {
     flex-shrink: 0;
-    width: 20px;
-    height: 20px;
+    width: clamp(16px, 3.5vw, 20px);
+    height: clamp(16px, 3.5vw, 20px);
 }
 
 .lh-profile-popup__logout span {
     flex: 1;
     text-align: center;
-}
-
-/* Overlay untuk menutup popup saat klik di luar */
-.lh-profile-popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 999;
-    background: transparent;
 }
 
 /* Field Edit Modal */
@@ -153,7 +205,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 2000;
+    z-index: 11000;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -169,18 +221,19 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(12, 12, 12, 0.58);
 }
 
 .lh-field-edit-modal__card {
     position: relative;
-    z-index: 2001;
-    background: #ffffff;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-    animation: slideUp 0.3s ease-out;
+    z-index: 11001;
+    width: min(92vw, 460px);
+    max-width: min(92vw, 460px);
+    border-radius: 20px;
+    background: linear-gradient(180deg, #ffffff 0%, #fff7f7 100%);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+    animation: slideUp 0.28s ease-out;
 }
 
 @keyframes slideUp {
@@ -198,15 +251,16 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 20px;
-    border-bottom: 1px solid #f0f0f0;
+    padding: 18px 22px;
+    border-bottom: 1px solid rgba(115, 7, 11, 0.08);
+    background: linear-gradient(135deg, rgba(115, 7, 11, 0.05) 0%, rgba(184, 32, 29, 0.03) 100%);
 }
 
 .lh-field-edit-modal__header h3 {
     margin: 0;
-    font-size: 16px;
-    font-weight: 600;
-    color: #2b1517;
+    font-size: 18px;
+    font-weight: 700;
+    color: #73070B;
 }
 
 .lh-field-edit-modal__close {
@@ -214,7 +268,7 @@
     border: none;
     padding: 0;
     cursor: pointer;
-    color: #999;
+    color: #8f1f1f;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -222,11 +276,11 @@
 }
 
 .lh-field-edit-modal__close:hover {
-    color: #333;
+    color: #4d1010;
 }
 
 .lh-field-edit-modal__form {
-    padding: 20px;
+    padding: 22px;
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -234,34 +288,37 @@
 
 .lh-field-edit-modal__input {
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #d0d0d0;
-    border-radius: 8px;
-    font-size: 14px;
+    min-height: 52px;
+    padding: 12px 14px;
+    border: 1px solid rgba(115, 7, 11, 0.18);
+    border-radius: 14px;
+    font-size: 15px;
     font-family: inherit;
-    transition: border-color 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .lh-field-edit-modal__input:focus {
     outline: none;
     border-color: #73070B;
-    box-shadow: 0 0 0 2px rgba(115, 7, 11, 0.1);
+    box-shadow: 0 0 0 4px rgba(115, 7, 11, 0.12);
 }
 
 .lh-field-edit-modal__actions {
     display: flex;
     gap: 10px;
     justify-content: flex-end;
+    flex-wrap: wrap;
 }
 
 .lh-field-edit-modal__btn-cancel,
 .lh-field-edit-modal__btn-save {
-    padding: 10px 16px;
-    border-radius: 8px;
+    min-height: 46px;
+    padding: 10px 18px;
+    border-radius: 12px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s ease;
+    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
     border: none;
 }
 
@@ -271,7 +328,8 @@
 }
 
 .lh-field-edit-modal__btn-cancel:hover {
-    background: #e0e0e0;
+    background: #e8e8e8;
+    transform: translateY(-1px);
 }
 
 .lh-field-edit-modal__btn-save {
@@ -280,26 +338,63 @@
 }
 
 .lh-field-edit-modal__btn-save:hover {
-    opacity: 0.9;
+    opacity: 0.96;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px rgba(115, 7, 11, 0.2);
+}
+
+@media (max-width: 480px) {
+    .lh-field-edit-modal__card {
+        width: min(94vw, 420px);
+        max-width: min(94vw, 420px);
+        border-radius: 18px;
+    }
+
+    .lh-field-edit-modal__header,
+    .lh-field-edit-modal__form {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .lh-field-edit-modal__actions {
+        justify-content: stretch;
+    }
+
+    .lh-field-edit-modal__btn-cancel,
+    .lh-field-edit-modal__btn-save {
+        flex: 1 1 100%;
+        width: 100%;
+    }
 }
 
 /* Responsive */
 @media (max-width: 640px) {
     .lh-profile-popup {
-        top: 64px;
-        max-width: calc(100% - 20px);
+        padding: 16px;
     }
 
     .lh-profile-popup__card {
-        margin: 8px 10px 0 auto;
-        min-width: auto;
+        width: min(100%, 360px);
+        max-width: none;
+        max-height: min(78vh, 560px);
+    }
+}
+
+@media (max-width: 420px) {
+    .lh-profile-popup {
+        padding: 12px;
     }
 
-    .lh-profile-popup__field {
-        font-size: 13px;
+    .lh-profile-popup__close {
+        top: 10px;
+        right: 10px;
+        width: 34px;
+        height: 34px;
     }
 
-    .lh-profile-popup__logout {
-        font-size: 13px;
+    .lh-profile-popup__card {
+        min-width: 0;
+        width: 100%;
+        max-height: min(76vh, 520px);
     }
 }

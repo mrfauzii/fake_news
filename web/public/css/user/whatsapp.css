@@ -757,6 +757,122 @@ body {
         box-shadow: 0 16px 32px rgba(184,32,29,0.38) !important;
     }
 
+    /* Normalize WhatsApp mobile navbar to match global mobile navbar layout. */
+    .wa-page .lh-navbar--desktop {
+        display: none !important;
+    }
+
+    .wa-page .lh-navbar--mobile-top {
+        position: fixed !important;
+        top: 0 !important;
+        bottom: auto !important;
+        left: 0 !important;
+        right: 0 !important;
+        height: 70px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 0 10px 0 8px !important;
+        background: #fff !important;
+        box-shadow: 0 3px 12px rgba(33, 44, 67, 0.12) !important;
+        z-index: 1200 !important;
+        border: none !important;
+    }
+
+    .wa-page .lh-navbar--mobile {
+        position: fixed !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        top: auto !important;
+        height: 70px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        background: rgba(255,255,255,0.98) !important;
+        box-shadow: 0 -4px 14px rgba(12,12,12,0.05) !important;
+        z-index: 1100 !important;
+        border: none !important;
+    }
+
+    .wa-page .lh-navbar--mobile-top .lh-logo,
+    .wa-page .lh-navbar--mobile-top .lh-logo--mobile-top {
+        position: static !important;
+        top: auto !important;
+        left: auto !important;
+        display: flex !important;
+        width: auto !important;
+        margin: 0 !important;
+        padding: 4px 10px 4px 8px !important;
+        background: #fff !important;
+        border: 1px solid rgba(115, 7, 11, 0.08) !important;
+        border-radius: 8px !important;
+        box-shadow: 0 2px 8px rgba(115, 7, 11, 0.04) !important;
+        gap: 0 !important;
+    }
+
+    .wa-page .lh-navbar--mobile-top .lh-logo__img {
+        width: 52px !important;
+        height: auto !important;
+    }
+
+    .wa-page .lh-navbar--mobile-top .lh-nav-icons--mobile-top {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        margin-left: auto !important;
+        width: auto !important;
+        padding: 0 !important;
+        gap: 0 !important;
+    }
+
+    .wa-page .lh-navbar--mobile-top .lh-nav-btn--user-top {
+        width: 42px !important;
+        height: 42px !important;
+        min-width: 42px !important;
+        max-width: 42px !important;
+        border-radius: 8px !important;
+        background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,242,242,0.96) 100%) !important;
+        border: 1px solid rgba(115, 7, 11, 0.08) !important;
+        box-shadow: 0 2px 8px rgba(115, 7, 11, 0.06) !important;
+        color: #73070B !important;
+        transform: none !important;
+    }
+
+    .wa-page .lh-navbar--mobile .lh-nav-icons,
+    .wa-page .lh-navbar--mobile .lh-nav-icons--mobile {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-evenly !important;
+        width: 100% !important;
+        max-width: 520px !important;
+        gap: 6px !important;
+        padding: 0 8px !important;
+    }
+
+    .wa-page .lh-navbar--mobile .lh-nav-btn {
+        width: 50px !important;
+        height: 50px !important;
+        min-width: 50px !important;
+        max-width: 50px !important;
+        border-radius: 50% !important;
+        background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,242,242,0.96) 100%) !important;
+        border: 1px solid rgba(115, 7, 11, 0.08) !important;
+        box-shadow: 0 6px 14px rgba(115, 7, 11, 0.08) !important;
+        color: #73070B !important;
+        transform: none !important;
+    }
+
+    .wa-page .lh-navbar--mobile .lh-nav-btn--active {
+        background: linear-gradient(180deg, #b61a1c 0%, #73070b 100%) !important;
+        color: #fff !important;
+        box-shadow: 0 8px 16px rgba(184, 32, 29, 0.18) !important;
+        transform: translateY(-1px) !important;
+    }
+
     .wa-content {
         width: 100% !important;
         padding: 0 16px 90px 16px !important;

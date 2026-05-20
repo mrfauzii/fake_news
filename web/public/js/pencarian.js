@@ -248,6 +248,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let sources = data.sources;
         const isSimilar = data.is_similar === true;
 
+        let requestId = data.raw_data.request_id || null;
         // Normalize and map verdict label
         const normalizedVerdict = String(verdict || '').toLowerCase();
         const verdictMap = {
@@ -434,7 +435,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     },
                     body: JSON.stringify({
                         feedback: text,
-                        verdict: verdictInfo.label || normalizedVerdict || null,
+                        request_id: requestId, // Sertakan request_id untuk referensi jika tersedia
                     }),
                 })
                     .then(resp => resp.json())

@@ -22,25 +22,29 @@ class GoogleAuthController extends Controller
     public function callback()
     {
         try {
-            $googleUser = Socialite::driver('google')->user();
+            $googleUser = Socialite::driver('google')
+            ->setHttpClient(new \GuzzleHttp\Client(['verify' => false]))
+            ->user();
 
             // Cek apakah email dari Google udah ada di database kita?
             $user = Users::where('email', $googleUser->getEmail())->first();
 
             if (!$user) {
-                // JALAN NINJA: Kalau belum ada, kita buatin akunnya otomatis!
-                // Karena DB lu wajibin ada 'password', kita kasih password acak aja yang kuat.
+                // Kalo belum ada, kita buat user baru
                 $user = Users::create([
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
-                    'password' => Hash::make(Str::random(24)), // Password dummy biar DB seneng
+                    'password' => Hash::make(Str::random(24)),
+                    'role' => 'user'
                 ]);
             }
-
-            // Langsung login-in usernya
+            // Langsung login in usernya
             Auth::login($user);
 
-            // Arahin ke halaman dashboard (ganti 'dashboard' sama route tujuan lu)
+            if ($user->role === 'user') {
+                return redirect('pencarian');
+            }
+
             return redirect('/dashboard');
 
         } catch (\Exception $e) {

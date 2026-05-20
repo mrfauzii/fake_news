@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Dom\Text;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Requests extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'input_text',
         'clean_text',

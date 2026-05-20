@@ -1,29 +1,38 @@
 @php
     $popupId = $popupId ?? 'user-profile-popup';
     $user = auth()->user();
+    $nameLocked = filled($user?->name);
+    $emailLocked = filled($user?->email);
+    $phoneLocked = filled($user?->phone_number);
 @endphp
 
 <div id="{{ $popupId }}" class="lh-profile-popup" hidden>
+    <button type="button" class="lh-profile-popup__backdrop" aria-label="Tutup profil" data-profile-close tabindex="-1"></button>
+
     <div class="lh-profile-popup__card" role="dialog" aria-modal="false" aria-label="Profil pengguna">
+        <button type="button" class="lh-profile-popup__close" aria-label="Tutup profil" data-profile-close>
+            <iconify-icon icon="mdi:close" width="20" height="20"></iconify-icon>
+        </button>
+
         <!-- Avatar -->
         <div class="lh-profile-popup__avatar" aria-hidden="true">
             <iconify-icon icon="mdi:user" width="40" height="40"></iconify-icon>
         </div>
 
         <!-- Name Field -->
-        <div class="lh-profile-popup__field js-editable-field" data-field="name" title="Klik untuk mengedit">
+        <div class="lh-profile-popup__field js-editable-field {{ $nameLocked ? 'lh-profile-popup__field--locked' : '' }}" data-field="name" data-editable="{{ $nameLocked ? 'false' : 'true' }}" title="{{ $nameLocked ? 'Data sudah terisi' : 'Klik untuk menambahkan' }}" @if($nameLocked) aria-disabled="true" @endif>
             <iconify-icon icon="mdi:account"></iconify-icon>
             <span>{{ $user?->name ?? 'Tambahkan nama' }}</span>
         </div>
 
         <!-- Email Field -->
-        <div class="lh-profile-popup__field js-editable-field" data-field="email" title="Klik untuk mengedit">
+        <div class="lh-profile-popup__field js-editable-field {{ $emailLocked ? 'lh-profile-popup__field--locked' : '' }}" data-field="email" data-editable="{{ $emailLocked ? 'false' : 'true' }}" title="{{ $emailLocked ? 'Data sudah terisi' : 'Klik untuk menambahkan' }}" @if($emailLocked) aria-disabled="true" @endif>
             <iconify-icon icon="mdi:email"></iconify-icon>
             <span>{{ $user?->email ?? 'Tambahkan email' }}</span>
         </div>
 
         <!-- Phone Field -->
-        <div class="lh-profile-popup__field js-editable-field" data-field="phone" title="Klik untuk mengedit">
+        <div class="lh-profile-popup__field js-editable-field {{ $phoneLocked ? 'lh-profile-popup__field--locked' : '' }}" data-field="phone" data-editable="{{ $phoneLocked ? 'false' : 'true' }}" title="{{ $phoneLocked ? 'Data sudah terisi' : 'Klik untuk menambahkan' }}" @if($phoneLocked) aria-disabled="true" @endif>
             <iconify-icon icon="mdi:whatsapp"></iconify-icon>
             <span>{{ $user?->phone_number ?: 'Tambahkan nomor' }}</span>
         </div>

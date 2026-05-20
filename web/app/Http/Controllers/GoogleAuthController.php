@@ -28,8 +28,7 @@ class GoogleAuthController extends Controller
             $user = Users::where('email', $googleUser->getEmail())->first();
 
             if (!$user) {
-                // JALAN NINJA: Kalau belum ada, kita buatin akunnya otomatis!
-                // Karena DB lu wajibin ada 'password', kita kasih password acak aja yang kuat.
+                // Kalo belum ada, kita buat user baru
                 $user = Users::create([
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
@@ -37,11 +36,14 @@ class GoogleAuthController extends Controller
                     'role' => 'user'
                 ]);
             }
-
             // Langsung login in usernya
             Auth::login($user);
 
-            return redirect('/pencarian');
+            if ($user->role === 'user') {
+                return redirect('pencarian');
+            }
+
+            return redirect('/dashboard');
 
         } catch (\Exception $e) {
             dd($e->getMessage());

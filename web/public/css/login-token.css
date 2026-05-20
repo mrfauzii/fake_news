@@ -118,7 +118,7 @@ a {
 .otp-page {
     min-height: calc(100vh - var(--otp-nav-height));
     height: auto;
-    margin-top: var(--otp-nav-height);
+    margin-top: 0;
     display: grid;
     grid-template-columns: minmax(420px, 56%) minmax(340px, 44%);
     background: #F7F7F7;
@@ -333,7 +333,7 @@ a {
     }
 
     .otp-page {
-        margin-top: 68px;
+        margin-top: 0;
         min-height: calc(100vh - 68px);
         height: auto;
         grid-template-columns: 1fr;
@@ -386,7 +386,7 @@ a {
     }
 
     .otp-page {
-        margin-top: 70px;
+        margin-top: 0;
         min-height: calc(100vh - 70px);
         height: auto;
     }

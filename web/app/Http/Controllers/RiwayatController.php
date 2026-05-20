@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\history_view;
 use App\Models\UserInteractions;
+use App\Models\Requests;
 use Illuminate\Support\Facades\Response;
 use Carbon\Carbon;
 
@@ -14,7 +15,9 @@ class RiwayatController extends Controller
     {
          Carbon::setLocale('id');
 
-        $histories = history_view::with('request.image')->orderBy('created_at', 'desc')->paginate(10);
+        $histories = history_view::with(['request' => function($query){$query->withTrashed();}, 'request.image'])
+        ->orderBy('created_at', 'desc')
+        ->paginate(10);
         $data = $histories->through(function ($history) {
             
             $isImageSearch = $history->request && $history->request->image_id != null;
@@ -27,6 +30,7 @@ class RiwayatController extends Controller
             return [
                 'request_id' => $history->request_id,
                 'deleted_at' => $history->request? $history->request->deleted_at: null,
+                 'is_deleted' => $history->request? $history->request->deleted_at != null: false,
                 'judul'      => $isImageSearch ? '[GAMBAR] Pencarian oleh: ' . $history->username : '[TEKS] Pencarian oleh: ' . $history->username,
                 'penjelasan' => $isHoax ? "Hasil verifikasi menunjukkan bahwa sebagian besar informasi ini, yakni sekitar " . round($persenHoax) . "%, mengandung unsur hoaks atau ketidaksesuaian fakta. Mohon untuk memvalidasi kembali sumber informasi sebelum menyebarkannya." : "Hasil verifikasi menunjukkan bahwa informasi ini memiliki tingkat kebenaran sekitar " . round($persenBenar) . "% dan termasuk informasi yang valid berdasarkan hasil analisis sistem.",
                 'user'       => $history->username,
@@ -82,6 +86,29 @@ class RiwayatController extends Controller
         return response()->json([
             'status' => 'success',
             'data'   => $data
+        ]);
+    }
+
+    public function destroy($id)
+    {
+        $request = Requests::findOrFail($id);
+
+        $request->delete();
+
+        return response()->json([
+            'success'=>true
+        ]);
+    }
+
+    public function restore($id)
+    {
+        $request = Requests::withTrashed()
+            ->findOrFail($id);
+
+        $request->restore();
+
+        return response()->json([
+            'success'=>true
         ]);
     }
 }

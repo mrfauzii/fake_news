@@ -17,7 +17,7 @@ use App\Http\Controllers\DetectionController;
 use App\Http\Controllers\ImageDetectionController;
 use App\Http\Controllers\PopulerHistoryController;
 use App\Http\Controllers\CsvController;
-use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\HistoryManagementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -116,9 +116,23 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
         Route::get('/delete/{id}', [RiwayatController::class, 'delete']);
         Route::post('/filter', [RiwayatController::class, 'filterRiwayat'])->name('riwayat.filter');
     });
+
+    // Manajemen Riwayat
+    Route::get('/history-management', [HistoryManagementController::class, 'index']);
+    Route::get('/history-management/trash', [HistoryManagementController::class, 'trash']);
+    
+    Route::post('/history-management/soft-delete/{id}', [HistoryManagementController::class, 'softDelete']);
+    Route::post('/history-management/restore/{id}', [HistoryManagementController::class, 'restore']);
+    Route::delete('/history-management/hard-delete/{id}', [HistoryManagementController::class, 'hardDelete']);
 });
 
+    // Admin - Cek Berita
+    Route::get('/admin/cekberita', [PencarianController::class, 'adminIndex']);
 
+    });
+
+    // Admin logout 
+    Route::post('/logout', [AuthController::class,'logout'])->name('logout');
 /*
 |--------------------------------------------------------------------------
 | WHATSAPP WEBHOOK & API (NO AUTH)
@@ -127,6 +141,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
 Route::any('/wa-webhook', [WaController::class, 'webhook']);
 Route::post('/detect-hoax', [ApiController::class, 'detectHoax']);
+
+// API untuk menyimpan jadwal scrape
+Route::post('/scrape-schedule', [ApiController::class, 'setScrapeSchedule']);
 
 
 // Login using WhatsApp (web)

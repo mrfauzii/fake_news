@@ -35,7 +35,7 @@ class RiwayatController extends Controller
                 'benar'      => round($persenBenar),
             ];
             
-        })->toArray(); 
+        }); 
         return view('admin.riwayat', compact('data'));
     }
 

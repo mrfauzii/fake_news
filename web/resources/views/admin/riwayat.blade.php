@@ -56,10 +56,13 @@
     @foreach($data as $item)
 
     <div 
-    class="riwayat-card searchable-card {{ $item['gambar'] ? 'image-card' : '' }}"
-    data-title="{{ strtolower($item['judul']) }}"
-    data-id="{{ $loop->index }}"
-    >
+        class="riwayat-card searchable-card {{ $item['gambar'] ? 'image-card' : '' }}"
+        data-title="{{ strtolower($item['judul']) }}"
+        data-id="{{ $loop->index }}"
+        data-request-id="{{ $item['request_id'] }}"
+        data-deleted="{{ $item['is_deleted'] ? 'true' : 'false' }}"
+        data-deleted-date="{{ $item['deleted_at'] ?? '' }}"
+        >
 
         {{-- JIKA ADA GAMBAR --}}
         @if($item['gambar'])
@@ -166,12 +169,16 @@
         <div class="popup-actions">
 
             <!-- DELETE -->
-            <button class="popup-delete" id="deletePopup">
+            <button id="deletePopup">
                 <i class="fa fa-trash"></i>
             </button>
 
-            <!-- CLOSE -->
-            <button class="popup-close" id="closePopup">
+            <button id="permanentDeletePopup"
+                    style="display:none;">
+                <i class="fa fa-trash-can"></i>
+            </button>
+
+            <button id="closePopup">
                 <i class="fa fa-times"></i>
             </button>
 
@@ -184,11 +191,9 @@
 
             <p class="popup-date" id="popupDate"></p>
 
-            <div 
-                class="popup-delete-status" 
-                id="popupDeleteStatus"
-                style="display: none;"
-            ></div>
+            <div id="popupDeleteStatus"
+                class="popup-delete-status popup-tag">
+            </div>
 
         </div>
 
@@ -242,29 +247,26 @@
 </div>
 
 <!-- DELETE POPUP -->
-<div class="delete-overlay" id="deleteOverlay">
+<div class="permanent-overlay" id="permanentOverlay">
 
-    <div class="delete-popup">
+    <div class="permanent-popup">
 
-        <h3>Hapus Riwayat</h3>
+        <h2>Hapus Riwayat</h2>
 
         <p>
-            Apakah anda yakin ingin menghapus riwayat ini?
+            Apakah anda yakin ingin menghapus
+            riwayat ini?
         </p>
 
-        <div class="delete-actions">
+        <div class="permanent-actions">
 
-            <button
-                class="btn-delete-confirm"
-                onclick="confirmDelete()"
-            >
+            <button id="confirmPermanentDelete"
+                    class="btn-permanent-delete">
                 Hapus
             </button>
 
-            <button
-                class="btn-cancel"
-                onclick="closeDeletePopup()"
-            >
+            <button id="cancelPermanentDelete"
+                    class="btn-permanent-cancel">
                 Batal
             </button>
 
@@ -305,154 +307,277 @@ document.getElementById('searchInput').addEventListener('keyup', function () {
 
 <script>
 
-const popupOverlay = document.getElementById('popupOverlay');
-const closePopup = document.getElementById('closePopup');
-const deletePopup = document.getElementById('deletePopup');
+const popupOverlay=document.getElementById('popupOverlay');
+const closePopup=document.getElementById('closePopup');
 
-let currentCard = null;
+const deletePopup=document.getElementById('deletePopup');
+const permanentDeletePopup=document.getElementById('permanentDeletePopup');
 
-const popupTitle = document.getElementById('popupTitle');
-const popupDesc = document.getElementById('popupDesc');
-const popupHoax = document.getElementById('popupHoax');
-const popupBenar = document.getElementById('popupBenar');
-const popupDeleteStatus = document.getElementById('popupDeleteStatus');
+const permanentOverlay=
+document.getElementById('permanentOverlay');
 
-let deletedCards = {};
-const popupUser = document.getElementById('popupUser');
-const popupDate = document.getElementById('popupDate');
+const confirmPermanentDelete=
+document.getElementById('confirmPermanentDelete');
 
-document.querySelectorAll('.open-popup').forEach(button => {
+const cancelPermanentDelete=
+document.getElementById('cancelPermanentDelete');
 
-    button.addEventListener('click', function () {
-        currentCard = this.closest('.riwayat-card');
-        popupTitle.innerHTML =
-            `⚠️ ${this.dataset.judul} ⚠️`;
+let currentCard=null;
 
-        popupDesc.innerText =
-            this.dataset.deskripsi;
+const popupTitle=document.getElementById('popupTitle');
+const popupDesc=document.getElementById('popupDesc');
+const popupHoax=document.getElementById('popupHoax');
+const popupBenar=document.getElementById('popupBenar');
+const popupDeleteStatus=
+document.getElementById('popupDeleteStatus');
 
-        popupPenjelasan.innerText =
-            this.dataset.penjelasan;
+const popupUser=
+document.getElementById('popupUser');
 
-        popupUser.innerText =
-            this.dataset.user;
+const popupDate=
+document.getElementById('popupDate');
 
-        popupDate.innerText =
-            this.dataset.date;
+const popupPenjelasan=
+document.getElementById('popupPenjelasan');
 
-        popupHoax.innerText =
-            this.dataset.hoax + '%';
 
-        popupBenar.innerText =
-            this.dataset.benar + '%';
+// BUKA DETAIL
+document.querySelectorAll('.open-popup')
+.forEach(button=>{
 
-        if (currentCard.dataset.deleted === "true") {
+button.addEventListener(
+'click',
+function(){
 
-             popupDeleteStatus.style.display = 'flex';
+currentCard=
+this.closest('.riwayat-card');
 
-            popupDeleteStatus.textContent =
-                `Dihapus • ${currentCard.dataset.deletedDate}`;
+popupTitle.innerHTML=
+`⚠️ ${this.dataset.judul} ⚠️`;
 
-            deletePopup.innerHTML =
-                '<i class="fa fa-undo"></i>';
+popupDesc.innerText=
+this.dataset.deskripsi;
 
-        } else {
+popupPenjelasan.innerText=
+this.dataset.penjelasan;
 
-            popupDeleteStatus.style.display = 'none';
+popupUser.innerText=
+this.dataset.user;
 
-            popupDeleteStatus.innerHTML = '';
+popupDate.innerText=
+this.dataset.date;
 
-            deletePopup.innerHTML =
-                '<i class="fa fa-trash"></i>';
+popupHoax.innerText=
+this.dataset.hoax+'%';
 
-        }
+popupBenar.innerText=
+this.dataset.benar+'%';
 
-        popupOverlay.classList.add('active');
 
-    });
+// STATUS DELETE
+if(currentCard.dataset.deleted==="true"){
 
-});
+popupDeleteStatus.style.display='flex';
 
-closePopup.addEventListener('click', function () {
+const deletedDate=
+new Date(
+currentCard.dataset.deletedDate
+);
 
-    popupOverlay.classList.remove('active');
+popupDeleteStatus.textContent=
+`Dihapus • ${
+deletedDate.toLocaleDateString(
+'id-ID',
+{
+day:'numeric',
+month:'long',
+year:'numeric'
+}
+)
+}`;
 
-});
+deletePopup.innerHTML=
+'<i class="fa fa-undo"></i>';
 
-popupOverlay.addEventListener('click', function (e) {
+permanentDeletePopup.style.display=
+'block';
 
-    if (e.target === popupOverlay) {
+}else{
 
-        popupOverlay.classList.remove('active');
+popupDeleteStatus.style.display=
+'none';
 
-    }
+deletePopup.innerHTML=
+'<i class="fa fa-trash"></i>';
 
-});
-
-deletePopup.addEventListener('click', function () {
-
-    if (!currentCard) return;
-
-    if (currentCard.dataset.deleted === "true") {
-
-        currentCard.dataset.deleted = "false";
-        currentCard.dataset.deletedDate = "";
-
-        popupDeleteStatus.style.display = 'none';
-        popupDeleteStatus.innerHTML = '';
-
-        deletePopup.innerHTML =
-            '<i class="fa fa-trash"></i>';
-
-        return;
-
-    }
-
-    document
-        .getElementById('deleteOverlay')
-        .classList.add('active');
-
-});
-
-function closeDeletePopup() {
-
-    document
-        .getElementById('deleteOverlay')
-        .classList.remove('active');
+permanentDeletePopup.style.display=
+'none';
 
 }
 
-function confirmDelete() {
+popupOverlay.classList.add(
+'active'
+);
 
-    if (!currentCard) return;
+});
 
-    const now = new Date();
+});
 
-    const formattedDate =
-        now.toLocaleDateString('id-ID', {
-            weekday: 'long',
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
-        });
 
-    currentCard.dataset.deleted = "true";
+// TUTUP POPUP
+closePopup.addEventListener(
+'click',
+()=>popupOverlay.classList.remove(
+'active'
+)
+);
 
-    currentCard.dataset.deletedDate =
-        formattedDate;
+popupOverlay.addEventListener(
+'click',
+function(e){
 
-     // MUNCULKAN BOX
-    popupDeleteStatus.style.display = 'flex';
+if(e.target===popupOverlay){
 
-    popupDeleteStatus.innerHTML =
-        `Dihapus • ${formattedDate}`;
-
-    deletePopup.innerHTML =
-        '<i class="fa fa-undo"></i>';
-
-    closeDeletePopup();
+popupOverlay.classList.remove(
+'active'
+);
 
 }
+
+});
+
+
+// HAPUS / RESTORE
+deletePopup.addEventListener(
+'click',
+function(){
+
+if(!currentCard) return;
+
+const requestId=
+currentCard.dataset.requestId;
+
+
+// RESTORE
+if(
+currentCard.dataset.deleted==="true"
+){
+
+fetch(
+`/admin/history-management/restore/${requestId}`,
+{
+
+method:'POST',
+
+headers:{
+'X-CSRF-TOKEN':
+document.querySelector(
+'meta[name="csrf-token"]'
+).content
+}
+
+}
+)
+.then(r=>r.json())
+.then(()=>{
+
+location.reload();
+
+});
+
+return;
+
+}
+
+
+// HAPUS PERTAMA
+permanentOverlay.classList.add(
+'active'
+);
+
+});
+
+
+
+// BATAL HAPUS
+cancelPermanentDelete
+.addEventListener(
+'click',
+function(){
+
+permanentOverlay.classList.remove(
+'active'
+);
+
+});
+
+
+
+// KONFIRMASI HAPUS
+confirmPermanentDelete
+.addEventListener(
+'click',
+function(){
+
+if(!currentCard) return;
+
+const requestId=
+currentCard.dataset.requestId;
+
+let url=
+`/admin/history-management/soft-delete/${requestId}`;
+
+let method='POST';
+
+
+// JIKA SUDAH DIHAPUS
+if(
+currentCard.dataset.deleted==="true"
+){
+
+url=
+`/admin/history-management/hard-delete/${requestId}`;
+
+method='DELETE';
+
+}
+
+fetch(
+url,
+{
+
+method:method,
+
+headers:{
+'X-CSRF-TOKEN':
+document.querySelector(
+'meta[name="csrf-token"]'
+).content
+}
+
+}
+)
+.then(r=>r.json())
+.then(()=>{
+
+location.reload();
+
+});
+
+});
+
+
+// BUKA HAPUS PERMANEN
+permanentDeletePopup
+.addEventListener(
+'click',
+function(){
+
+permanentOverlay.classList.add(
+'active'
+);
+
+});
 
 </script>
 

@@ -58,7 +58,7 @@ class HistoryManagementController extends Controller
 
         $request->delete(); 
 
-        return response()->json(['status' => 'success', 'message' => 'Data berhasil dipindah ke tempat sampah mek!']);
+        return response()->json(['status' => 'success', 'message' => 'Data berhasil dipindah ke tempat sampah.']);
     }
 
     /**
@@ -66,7 +66,6 @@ class HistoryManagementController extends Controller
      */
     public function restore($requestId)
     {
-        // Harus pake withTrashed() buat nyari data yang udah di-soft delete
         $request = Requests::withTrashed()->find($requestId);
 
         if (!$request) {
@@ -75,7 +74,7 @@ class HistoryManagementController extends Controller
 
         $request->restore(); 
 
-        return response()->json(['status' => 'success', 'message' => 'Data berhasil dikembalikan ke history mek!']);
+        return response()->json(['status' => 'success', 'message' => 'Data berhasil dikembalikan ke history.']);
     }
 
     /**
@@ -91,15 +90,17 @@ class HistoryManagementController extends Controller
 
         DB::beginTransaction();
         try {
-            // Hapus relasi dulu biar nggak nyangkut (Kalau di DB nggak pake Cascade)
-            // $request->imageSearchResults()->delete();
-            // $request->stage1Results()->delete();
+            $request->imageSearchResults()->delete();
+            $request->stage1Results()->delete();
+            $request->stage2Results()->delete();
+            $request->feedbacks()->delete();
+            $request->interactions()->delete();
             
             // Hapus permanen data utamanya
             $request->forceDelete(); 
 
             DB::commit();
-            return response()->json(['status' => 'success', 'message' => 'Data berhasil dimusnahkan permanen mek!']);
+            return response()->json(['status' => 'success', 'message' => 'Data berhasil dihapus permanen.']);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['status' => 'error', 'message' => 'Gagal hapus permanen: ' . $e->getMessage()], 500);

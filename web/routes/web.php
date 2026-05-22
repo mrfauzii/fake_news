@@ -124,6 +124,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::post('/history-management/soft-delete/{id}', [HistoryManagementController::class, 'softDelete']);
     Route::post('/history-management/restore/{id}', [HistoryManagementController::class, 'restore']);
     Route::delete('/history-management/hard-delete/{id}', [HistoryManagementController::class, 'hardDelete']);
+
+    Route::get('/pencarian', [AdminController::class, 'pencarian'])->name('admin.pencarian');
 });
 
 // Admin - Cek Berita

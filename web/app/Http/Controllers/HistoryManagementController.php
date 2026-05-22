@@ -83,13 +83,13 @@ class HistoryManagementController extends Controller
     public function hardDelete($requestId)
     {
         $request = Requests::withTrashed()->find($requestId);
-
         if (!$request) {
             return response()->json(['status' => 'error', 'message' => 'Data tidak ditemukan'], 404);
         }
 
         DB::beginTransaction();
         try {
+            
             $request->imageSearchResults()->delete();
             $request->stage1Results()->delete();
             $request->stage2Results()->delete();
@@ -103,6 +103,7 @@ class HistoryManagementController extends Controller
             return response()->json(['status' => 'success', 'message' => 'Data berhasil dihapus permanen.']);
         } catch (\Exception $e) {
             DB::rollBack();
+                Log::error("Error during hard delete for request ID: $requestId", ['error' => $e->getMessage()]);
             return response()->json(['status' => 'error', 'message' => 'Gagal hapus permanen: ' . $e->getMessage()], 500);
         }
     }

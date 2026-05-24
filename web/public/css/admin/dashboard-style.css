@@ -88,21 +88,46 @@
     box-shadow:0 8px 24px rgba(0,0,0,0.06);
 }
 
+/* default */
 .dashboard-popular-rank{
     position:absolute;
     top:8px;
     left:12px;
     z-index:5;
+
     display:inline-flex;
     align-items:center;
     gap:8px;
+
     padding:6px 10px;
+
     border-radius:12px;
+
     font-weight:800;
     font-size:12px;
+
     color:#fff;
     text-transform:uppercase;
-    background:linear-gradient(90deg,#1d7f45,#145a31);
+}
+
+/* HOAX = merah */
+.dashboard-popular-rank.hoax{
+
+    background:linear-gradient(
+        90deg,
+        #c9221c,
+        #8b1112
+    );
+}
+
+/* FAKTA = hijau */
+.dashboard-popular-rank.fakta{
+
+    background:linear-gradient(
+        90deg,
+        #1d7f45,
+        #145a31
+    );
 }
 
 .dashboard-popular-rank::before{

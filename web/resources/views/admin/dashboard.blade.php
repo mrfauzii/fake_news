@@ -69,9 +69,12 @@
 
             <div class="dashboard-popular-card">
 
-                <div class="dashboard-popular-rank">
-                    #{{ $item['rank'] }} {{ $item['badge'] }}
-                </div>
+                <div class="dashboard-popular-rank 
+                    {{ strtolower($item['badge']) == 'hoax' ? 'hoax' : 'fakta' }}">
+
+                        #{{ $item['rank'] }} {{ $item['badge'] }}
+
+                    </div>
 
                 <div class="dashboard-popular-excerpt">
                     {{ $item['title'] }}

@@ -34,12 +34,22 @@ class UmpanBalikController extends Controller
 
         $feedbacks = DB::table('feedbacks')
             ->join('users', 'feedbacks.user_id', '=', 'users.id')
+            
+             // TAMBAHAN
+            ->leftJoin(
+                'requests',
+                'feedbacks.request_id',
+                '=',
+                'requests.id'
+            )
+
             ->select(
                 'feedbacks.id',
                 'users.name as username',
-                'feedbacks.request_id',
                 'feedbacks.feedback',
-                'feedbacks.created_at'
+                'feedbacks.created_at',
+                'requests.input_text as link',
+                'requests.final_label'
             )
             ->orderBy('feedbacks.created_at', 'desc')
             ->get()
@@ -47,18 +57,16 @@ class UmpanBalikController extends Controller
 
                 return [
                     'id' => $item->id,
-
                     'username' => $item->username,
-
-                    'request_id' => $item->request_id,
-
                     'feedback' => $item->feedback,
-
+                    'link' => $item->link ?? '-',
+                    'result' => ucfirst($item->final_label ?? '-'),
                     'date' => Carbon::parse(
                         $item->created_at
                     )->translatedFormat(
-                        'l, j F Y • H:i'
+                        'l, j F Y'
                     ),
+
                 ];
             });
 

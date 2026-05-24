@@ -29,6 +29,7 @@
     </div>
 </div>
 
+{{--
 <!-- ===== STATS ===== -->
 <div class="stats-container">
 
@@ -44,11 +45,10 @@
         <p class="positive">↑ Data dari database</p>
     </div>
 
-    {{-- =========================
+    =========================
      CARD BELUM DIBACA
-    ========================= --}}
+    ========================= 
 
-    {{--
     <div class="stats-card active">
         <div class="stats-top">
             <span>BELUM DIBACA</span>
@@ -59,26 +59,24 @@
         <h2>{{ $belumDibaca }}</h2>
         <p class="negative">Perlu perhatian segera!</p>
     </div>
-    --}}
 
 </div>
 
 <div class="umpanbalik-title">
 
-    <h2>Umpan Balik Terbaru</h2>
+  <h2>Umpan Balik Terbaru</h2>
 
-    {{-- =========================
+    =========================
      FILTER
-    ========================= --}}
-
-    {{--
+    ========================= 
+    
     <div class="umpanbalik-tools">
         <button class="btn-tool">
             <i class="fa fa-filter"></i> Filter
         </button>
     </div>
-    --}}
 </div>
+--}}
 
 <!-- ===== LIST ===== -->
 <div class="umpanbalik-list" id="feedbackList">

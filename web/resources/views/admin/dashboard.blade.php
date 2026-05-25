@@ -10,7 +10,7 @@
 
 <div class="feedback-title">
     <h1>Dashboard Utama</h1>
-    <p>Data terakhir diperbarui pukul 00.00, 20 April 2026</p>
+    <p>Data terakhir diperbarui: {{ $dashboardStats['last_updated'] }}</p>
 </div>
 
 <!-- STATS -->
@@ -24,8 +24,8 @@
                 <i class="fa fa-user"></i>
             </div>
         </div>
-        <h2>7.543</h2>
-        <p class="positive">↗ +12.5% dari bulan lalu</p>
+        <h2>{{ number_format($dashboardStats['total_pengguna']) }}</h2>
+        <p class="positive">Total pengguna aktif di sistem</p>
     </div>
 
     <!-- BERITA -->
@@ -36,8 +36,8 @@
                 <i class="fa fa-newspaper"></i>
             </div>
         </div>
-        <h2>2.306</h2>
-        <p class="negative">⚠ +5.2% kasus hoax baru</p>
+        <h2>{{ number_format($dashboardStats['total_berita']) }}</h2>
+        <p class="negative">Total berita yang telah dianalisis</p>
     </div>
 
     <!-- UMPAN BALIK -->
@@ -48,8 +48,8 @@
                 <i class="fa fa-comment"></i>
             </div>
         </div>
-        <h2>8</h2>
-        <p class="neutral">— Stabil hari ini</p>
+        <h2>{{ number_format($dashboardStats['total_umpan_balik']) }}</h2>
+        <p class="neutral">Total masukan dari pengguna</p>
     </div>
 
 </div>
@@ -69,9 +69,12 @@
 
             <div class="dashboard-popular-card">
 
-                <div class="dashboard-popular-rank">
-                    #{{ $item['rank'] }} {{ $item['badge'] }}
-                </div>
+                <div class="dashboard-popular-rank 
+                    {{ strtolower($item['badge']) == 'hoax' ? 'hoax' : 'fakta' }}">
+
+                        #{{ $item['rank'] }} {{ $item['badge'] }}
+
+                    </div>
 
                 <div class="dashboard-popular-excerpt">
                     {{ $item['title'] }}

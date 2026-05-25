@@ -171,17 +171,18 @@
 .btn-outline {
     margin-top: 10px;
     border: 1px solid #b8201d;
-    color: #b8201d;
+    background: #b8201d;
+    color: #ffffff !important;
     padding: 6px 14px;
     border-radius: 8px;
-    background: #fff;
     cursor: pointer;
     transition: 0.2s;
+    font-weight: 600;
 }
 
 .btn-outline:hover {
-    background: #b8201d;
-    color: #fff;
+    background: #990f0c;
+    color: #fff !important;
 }
 
 /* =========================
@@ -297,11 +298,10 @@
 
 
 /* info */
-
 .popup-info{
 
     display:grid;
-    grid-template-columns:repeat(3,1fr);
+    grid-template-columns:1fr 2fr;
     gap:15px;
     margin-bottom:24px;
 }
@@ -326,6 +326,7 @@
     font-size:16px;
     font-weight:700;
     color:#222;
+    margin-bottom:14px;
 }
 
 
@@ -359,4 +360,12 @@
 .feedback-title{
 
     flex:1;
+}
+
+.user-card{
+    min-height:140px;
+}
+
+.info-card:last-child{
+    min-height:140px;
 }

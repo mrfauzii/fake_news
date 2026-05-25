@@ -29,6 +29,7 @@
     </div>
 </div>
 
+{{--
 <!-- ===== STATS ===== -->
 <div class="stats-container">
 
@@ -44,11 +45,10 @@
         <p class="positive">↑ Data dari database</p>
     </div>
 
-    {{-- =========================
+    =========================
      CARD BELUM DIBACA
-    ========================= --}}
+    ========================= 
 
-    {{--
     <div class="stats-card active">
         <div class="stats-top">
             <span>BELUM DIBACA</span>
@@ -59,26 +59,24 @@
         <h2>{{ $belumDibaca }}</h2>
         <p class="negative">Perlu perhatian segera!</p>
     </div>
-    --}}
 
 </div>
 
 <div class="umpanbalik-title">
 
-    <h2>Umpan Balik Terbaru</h2>
+  <h2>Umpan Balik Terbaru</h2>
 
-    {{-- =========================
+    =========================
      FILTER
-    ========================= --}}
-
-    {{--
+    ========================= 
+    
     <div class="umpanbalik-tools">
         <button class="btn-tool">
             <i class="fa fa-filter"></i> Filter
         </button>
     </div>
-    --}}
 </div>
+--}}
 
 <!-- ===== LIST ===== -->
 <div class="umpanbalik-list" id="feedbackList">
@@ -115,43 +113,44 @@
 
         <div class="popup-info">
 
-            <div class="info-card">
+            <div class="info-card user-card">
 
                 <div class="info-title">
                     Nama Pengguna
                 </div>
 
-                <div
-                class="info-value"
+                <div class="info-value"
                 id="popupUser">
                 </div>
 
-            </div>
-
-
-            <div class="info-card">
-
-                <div class="info-title">
+                <div class="info-title"
+                style="margin-top:12px">
                     Tanggal
                 </div>
 
-                <div
-                class="info-value"
+                <div class="info-value"
                 id="popupDate">
                 </div>
 
             </div>
 
-
             <div class="info-card">
 
                 <div class="info-title">
-                    ID Request
+                    Berita yang dicari
                 </div>
 
                 <div
                 class="info-value"
-                id="popupRequest">
+                id="popupLink">
+                </div>
+
+                <div class="info-title">
+                    Hasil Deteksi
+                </div>
+
+                <div class="info-value"
+                id="popupResult">
                 </div>
 
             </div>
@@ -218,11 +217,11 @@ document.addEventListener('DOMContentLoaded',function(){
                             class="btn-outline btn-detail"
                             data-username="${item.username}"
                             data-date="${item.date}"
-                            data-feedback="${item.feedback}"
-                            data-request="${item.request_id ?? '-'}">
-
+                            data-feedback="${encodeURIComponent(item.feedback)}"
+                            data-link="${encodeURIComponent(item.link ?? '-')}"
+                            data-result="${item.result}"
+                            >
                             Detail
-
                             </button>
 
                         </div>
@@ -296,34 +295,41 @@ document.addEventListener('DOMContentLoaded',function(){
 
     document.addEventListener('click',function(e){
 
-        if(e.target.classList.contains('btn-detail')){
+    if(e.target.classList.contains('btn-detail')){
 
-            document.getElementById(
-                'popupUser'
-            ).innerText =
-            e.target.dataset.username;
+        document.getElementById(
+            'popupUser'
+        ).innerText =
+        e.target.dataset.username;
 
-            document.getElementById(
-                'popupDate'
-            ).innerText =
-            e.target.dataset.date;
+        document.getElementById(
+            'popupDate'
+        ).innerText =
+        e.target.dataset.date;
 
-            document.getElementById(
-                'popupRequest'
-            ).innerText =
-            e.target.dataset.request;
+        document.getElementById(
+            'popupFeedback'
+        ).innerText =
+        decodeURIComponent(
+            e.target.dataset.feedback
+        );
 
-            document.getElementById(
-                'popupFeedback'
-            ).innerText =
-            e.target.dataset.feedback;
+        document.getElementById(
+            'popupLink'
+        ).innerText =
+        decodeURIComponent(
+            e.target.dataset.link
+        );
 
-            popup.style.display='flex';
+        document.getElementById(
+        'popupResult'
+        ).innerText =
+        e.target.dataset.result;
 
-        }
+        popup.style.display='flex';
+    }
 
-    });
-
+});
 
     closeBtn.addEventListener(
         'click',

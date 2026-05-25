@@ -24,17 +24,37 @@ class FeedbackController extends Controller
         try {
             $userId = Auth::check() ? Auth::id() : 2;
 
-            Feedbacks::create([
+            // Pastikan hanya 1 umpan balik per user untuk tiap request
+            $existing = Feedbacks::where('user_id', $userId)
+                ->where('request_id', $validated['request_id'])
+                ->first();
+
+            if ($existing) {
+                // Jika sudah ada, kembalikan data yang ada (tidak membuat duplikat)
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Anda sudah mengirim umpan balik untuk pencarian ini.',
+                    'data' => [
+                        'feedback' => $existing->feedback,
+                        'created_at' => $existing->created_at,
+                    ]
+                ]);
+            }
+
+            $fb = Feedbacks::create([
                 'user_id'    => $userId,
                 'feedback'   => $validated['feedback'],
                 'request_id' => $validated['request_id'] // Simpan ke database
             ]);
-            // ... (lanjutannya sama)
 
-            // 4. Kirim respons sukses agar tulisan di layar berubah
+            // Kembalikan juga isi umpan balik agar frontend dapat langsung menampilkannya
             return response()->json([
                 'success' => true,
-                'message' => 'Umpan balik berhasil disimpan'
+                'message' => 'Umpan balik berhasil disimpan',
+                'data' => [
+                    'feedback' => $fb->feedback,
+                    'created_at' => $fb->created_at,
+                ]
             ]);
         } catch (\Exception $e) {
             // Jika gagal (misal database error), catat di log
@@ -43,6 +63,42 @@ class FeedbackController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal mengirim umpan balik, terjadi kesalahan di server.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Hapus umpan balik milik user untuk request tertentu.
+     */
+    public function destroy(Request $request)
+    {
+        $validated = $request->validate([
+            'request_id' => 'required|integer'
+        ]);
+
+        try {
+            $userId = Auth::check() ? Auth::id() : 2;
+
+            $deleted = Feedbacks::where('user_id', $userId)
+                ->where('request_id', $validated['request_id'])
+                ->delete();
+
+            if ($deleted) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Umpan balik berhasil dihapus.'
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Umpan balik tidak ditemukan.'
+            ], 404);
+        } catch (\Exception $e) {
+            Log::error('Gagal menghapus feedback: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus umpan balik, terjadi kesalahan di server.'
             ], 500);
         }
     }

@@ -149,13 +149,29 @@ class RiwayatController extends Controller
                 }
             }
 
+            // Ambil umpan balik jika ada (hanya feedback milik user ini untuk request)
+            $feedback = null;
+            if (Auth::check()) {
+                $fb = \App\Models\Feedbacks::where('user_id', Auth::id())
+                    ->where('request_id', $history->request_id)
+                    ->first();
+                if ($fb) {
+                    $feedback = [
+                        'id' => $fb->id,
+                        'feedback' => $fb->feedback,
+                        'created_at' => $fb->created_at,
+                    ];
+                }
+            }
+
             return [
                 'id'          => $history->request_id,
                 'query'       => $isImageSearch ? '[Pencarian Berupa Gambar]' : $history->input_text,
                 'status'      => $statusStr,
                 'description' => $description,
                 'date'        => $history->created_at, // Format Y-m-d H:i:s
-                'confidence'  => round($confidence)
+                'confidence'  => round($confidence),
+                'feedback'    => $feedback
             ];
         })->toArray();
 

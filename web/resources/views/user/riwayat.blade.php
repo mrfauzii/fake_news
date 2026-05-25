@@ -3,7 +3,7 @@
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/user/background.css') }}">
 <link rel="stylesheet" href="{{ asset('css/user/navbar.css') }}">
-<link rel="stylesheet" href="{{ asset('css/user/riwayat.css') }}?v=3">
+<link rel="stylesheet" href="{{ asset('css/user/riwayat.css') }}?v=4">
 <link rel="stylesheet" href="{{ asset('css/user/profile-popup.css') }}">
 @endpush
 
@@ -45,7 +45,7 @@
 
 @push('scripts')
 <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-<script src="{{ asset('js/user/riwayat.js') }}?v=2"></script>
+<script src="{{ asset('js/user/riwayat.js') }}?v=3"></script>
 <script src="{{ asset('js/user/profile-popup.js') }}"></script>
 
 <script>

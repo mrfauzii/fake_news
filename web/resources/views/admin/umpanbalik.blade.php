@@ -201,7 +201,6 @@ document.addEventListener('DOMContentLoaded',function(){
 
                 <div class="umpanbalik-left">
 
-                    <img src="https://i.pravatar.cc/40?u=${item.id}" class="avatar">
 
                     <div>
 

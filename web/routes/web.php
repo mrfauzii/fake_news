@@ -55,6 +55,7 @@ Route::get('/riwayat/unduh-csv', [CsvController::class, 'unduhCsv'])->name('riwa
 
 
 Route::post('/feedback', [FeedbackController::class, 'store'])->name('feedback.form');
+Route::delete('/feedback', [FeedbackController::class, 'destroy'])->name('feedback.delete');
 
 
 /*

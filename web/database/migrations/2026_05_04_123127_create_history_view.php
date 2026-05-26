@@ -16,7 +16,8 @@ return new class extends Migration
             SELECT 
                 ui.id AS interaction_id,
                 u.id AS user_id,
-                r.id AS request_id, 
+                r.id AS request_id,
+                r.image_id AS image_id,
                 u.name AS username,
                 r.input_text,
                 r.created_at,

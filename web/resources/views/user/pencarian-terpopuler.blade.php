@@ -48,6 +48,38 @@
             <div class="lh-filter-modal__options" id="filterModalOptions"></div>
         </div>
     </div>
+
+    <div class="lh-popular-detail-modal" id="popularDetailModal" hidden>
+        <div class="lh-popular-detail-modal__overlay" data-popular-detail-close></div>
+        <div class="lh-popular-detail-modal__card" role="dialog" aria-modal="true" aria-labelledby="popularDetailHeadline">
+            <button type="button" class="lh-popular-detail-modal__close" aria-label="Tutup detail" data-popular-detail-close>
+                <iconify-icon icon="mdi:close" width="24" height="24"></iconify-icon>
+            </button>
+
+            <p class="lh-popular-detail-modal__date" id="popularDetailDate"></p>
+
+            <div class="lh-popular-detail-modal__content">
+                <p class="lh-popular-detail-modal__headline" id="popularDetailHeadline"></p>
+                <p class="lh-popular-detail-modal__body" id="popularDetailBody"></p>
+            </div>
+
+            <div class="lh-popular-detail-modal__footer">
+                <div class="lh-popular-detail-modal__scores">
+                    <div class="lh-popular-detail-modal__score-row">
+                        <span class="lh-popular-detail-modal__dot lh-popular-detail-modal__dot--hoax"></span>
+                        <span>Data terdeteksi hoax sebesar</span>
+                        <strong id="popularDetailHoaxPct">0%</strong>
+                    </div>
+                    <div class="lh-popular-detail-modal__score-row">
+                        <span class="lh-popular-detail-modal__dot lh-popular-detail-modal__dot--fact"></span>
+                        <span>Data terdeteksi benar sebesar</span>
+                        <strong id="popularDetailFactPct">0%</strong>
+                    </div>
+                </div>
+                <p class="lh-popular-detail-modal__summary" id="popularDetailSummary"></p>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 

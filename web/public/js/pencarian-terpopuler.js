@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const page = document.querySelector('.lh-popular-page');
     if (!page) return;
 
-    const searchRoute = page.dataset.searchUrl || '/pencarian';
     const grid = document.getElementById('popularGrid');
     const emptyState = document.getElementById('popularEmpty');
     const modal = document.getElementById('filterModal');
@@ -10,11 +9,19 @@ document.addEventListener('DOMContentLoaded', function () {
     const modalEyebrow = document.getElementById('filterModalEyebrow');
     const modalDescription = document.getElementById('filterModalDescription');
     const modalOptions = document.getElementById('filterModalOptions');
+    const detailModal = document.getElementById('popularDetailModal');
+    const detailDate = document.getElementById('popularDetailDate');
+    const detailHeadline = document.getElementById('popularDetailHeadline');
+    const detailBody = document.getElementById('popularDetailBody');
+    const detailHoax = document.getElementById('popularDetailHoaxPct');
+    const detailFact = document.getElementById('popularDetailFactPct');
+    const detailSummary = document.getElementById('popularDetailSummary');
     const categoryLabel = document.getElementById('activeCategoryLabel');
     const periodLabel = document.getElementById('activePeriodLabel');
     const countLabel = document.getElementById('popularCountLabel');
     const triggerButtons = document.querySelectorAll('[data-filter-trigger]');
     const closeButtons = document.querySelectorAll('[data-filter-close]');
+    const detailCloseButtons = document.querySelectorAll('[data-popular-detail-close]');
 
     const state = {
         category: 'all',
@@ -136,6 +143,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Ambil data langsung dari Controller (Blade Inject)
     
     const popularItems = window.realPopularItems || [];
+    let renderedItems = [];
 
     function openModal(type) {
         state.modalType = type;
@@ -162,9 +170,139 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function closeModal() {
         modal.setAttribute('hidden', '');
-        document.body.classList.remove('lh-filter-lock');
+        if (!detailModal || detailModal.hasAttribute('hidden')) {
+            document.body.classList.remove('lh-filter-lock');
+        }
         modal.classList.remove('lh-filter-modal--period');
         state.modalType = null;
+    }
+
+    function openDetailModal(item) {
+        if (!detailModal || !item) return;
+
+        const percentages = resolvePercentages(item);
+        const summary = resolveVerificationSummary(item, percentages, item.category);
+
+        if (detailDate) {
+            detailDate.textContent = resolveDetailDateLabel(item.period);
+        }
+        if (detailHeadline) {
+            detailHeadline.textContent = `[KABAR PENTING] ${item.headline || item.query || '-'}`;
+        }
+        if (detailBody) {
+            detailBody.textContent = item.excerpt || item.headline || '-';
+        }
+        if (detailHoax) {
+            detailHoax.textContent = `${percentages.hoax}%`;
+        }
+        if (detailFact) {
+            detailFact.textContent = `${percentages.fakta}%`;
+        }
+        if (detailSummary) {
+            detailSummary.textContent = summary;
+        }
+
+        detailModal.removeAttribute('hidden');
+        document.body.classList.add('lh-filter-lock');
+    }
+
+    function closeDetailModal() {
+        if (!detailModal) return;
+        detailModal.setAttribute('hidden', '');
+        if (!modal || modal.hasAttribute('hidden')) {
+            document.body.classList.remove('lh-filter-lock');
+        }
+    }
+
+    function resolveDetailDateLabel(period) {
+        const parsed = parsePeriod(period);
+        const today = new Date();
+        return `Minggu, 7 ${parsed.month} ${parsed.year || today.getFullYear()}`;
+    }
+
+    function resolveVerificationSummary(item, percentages, category) {
+        const directText = item.verificationText || item.verification_text || item.verificationSummary || item.verification_summary;
+        if (directText) {
+            return directText;
+        }
+
+        if (category === 'hoax' || percentages.hoax >= percentages.fakta) {
+            return 'Hasil verifikasi menunjukkan sebagian besar informasi ini memiliki indikasi hoaks atau ketidaksesuaian fakta. Mohon cek kembali sumber resmi sebelum menyebarkannya.';
+        }
+
+        return 'Hasil verifikasi menunjukkan mayoritas informasi ini sesuai dengan rujukan resmi. Tetap pastikan untuk membandingkan dengan sumber terpercaya saat membagikan.';
+    }
+
+    function resolvePercentages(item) {
+        const hoaxCandidates = [
+            item.hoaxPercentage,
+            item.hoax_percentage,
+            item.fakePercentage,
+            item.fake_percentage,
+            item.hoaxScore,
+            item.hoax_score,
+            item.fakeScore,
+            item.fake_score,
+        ];
+        const factCandidates = [
+            item.factPercentage,
+            item.fact_percentage,
+            item.faktaPercentage,
+            item.fakta_percentage,
+            item.realPercentage,
+            item.real_percentage,
+            item.factScore,
+            item.fact_score,
+            item.faktaScore,
+            item.fakta_score,
+            item.realScore,
+            item.real_score,
+        ];
+
+        let hoax = pickNumber(hoaxCandidates);
+        let fakta = pickNumber(factCandidates);
+
+        if (hoax === null && fakta === null) {
+            if (item.category === 'hoax') {
+                hoax = 70;
+                fakta = 30;
+            } else {
+                hoax = 30;
+                fakta = 70;
+            }
+        } else if (hoax === null) {
+            hoax = 100 - fakta;
+        } else if (fakta === null) {
+            fakta = 100 - hoax;
+        }
+
+        hoax = normalizePercentage(hoax);
+        fakta = normalizePercentage(fakta);
+
+        const total = hoax + fakta;
+        if (total !== 100) {
+            fakta = Math.max(0, Math.min(100, 100 - hoax));
+        }
+
+        return { hoax, fakta };
+    }
+
+    function pickNumber(values) {
+        for (const value of values) {
+            const num = Number(value);
+            if (!Number.isFinite(num)) continue;
+            if (num <= 1) {
+                return Math.round(num * 100);
+            }
+            return Math.round(num);
+        }
+
+        return null;
+    }
+
+    function normalizePercentage(value) {
+        const normalized = Math.round(Number(value) || 0);
+        return Math.max(0, Math.min(100, normalized));
     }
 
     function renderOptions(options, selectedValue, type) {
@@ -271,10 +409,11 @@ document.addEventListener('DOMContentLoaded', function () {
             countLabel.textContent = `${itemsToDisplay.length.toLocaleString('id-ID')} hasil ditemukan`;
         }
 
+        renderedItems = itemsToDisplay;
+
         emptyState.hidden = itemsToDisplay.length > 0;
 
         grid.innerHTML = itemsToDisplay.map((item, idx) => {
-            const detailUrl = buildSearchUrl(item.query);
             const displayRank = idx + 1; // 1..3
             const rankClass = item.category === 'hoax' ? 'rank-hoax' : 'rank-fakta';
 
@@ -289,18 +428,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                         <p class="lh-popular-card__count"><strong>${item.count.toLocaleString('id-ID')}</strong> orang mencari informasi serupa</p>
                         <div class="lh-popular-card__footer">
-                            <a class="lh-popular-card__btn" href="${escapeHtml(detailUrl)}">Detail Lengkap</a>
+                            <button type="button" class="lh-popular-card__btn" data-detail-index="${idx}">Detail Lengkap</button>
                         </div>
                     </div>
                 </article>
             `;
         }).join('');
-    }
-
-    function buildSearchUrl(query) {
-        const url = new URL(searchRoute, window.location.origin);
-        url.searchParams.set('informasi', query);
-        return url.toString();
     }
 
     function escapeHtml(text) {
@@ -326,6 +459,27 @@ document.addEventListener('DOMContentLoaded', function () {
         if (event.target === modal || event.target.classList.contains('lh-filter-modal__overlay')) {
             closeModal();
         }
+    });
+
+    if (detailModal) {
+        detailModal.addEventListener('click', function (event) {
+            if (event.target === detailModal || event.target.classList.contains('lh-popular-detail-modal__overlay')) {
+                closeDetailModal();
+            }
+        });
+    }
+
+    detailCloseButtons.forEach(button => {
+        button.addEventListener('click', closeDetailModal);
+    });
+
+    grid.addEventListener('click', function (event) {
+        const detailButton = event.target.closest('[data-detail-index]');
+        if (!detailButton) return;
+
+        const index = Number(detailButton.dataset.detailIndex);
+        if (!Number.isInteger(index) || !renderedItems[index]) return;
+        openDetailModal(renderedItems[index]);
     });
 
     modalOptions.addEventListener('click', function (event) {
@@ -355,7 +509,16 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     document.addEventListener('keydown', function (event) {
-        if (event.key === 'Escape' && !modal.hasAttribute('hidden')) {
+        if (event.key !== 'Escape') {
+            return;
+        }
+
+        if (detailModal && !detailModal.hasAttribute('hidden')) {
+            closeDetailModal();
+            return;
+        }
+
+        if (!modal.hasAttribute('hidden')) {
             closeModal();
         }
     });

@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const imagePreview = document.getElementById('imagePreview');
     const searchParams = new URLSearchParams(window.location.search);
     const prefilledInformasi = (searchParams.get('informasi') || searchParams.get('q') || '').trim();
-
     // Get CSRF token from meta tag
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
 

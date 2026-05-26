@@ -93,9 +93,7 @@
     </div>
 
 </div> <!-- Sekarang div penutup ini punya pasangannya -->
-@endsection
-
-@push('scripts')
 <script src="{{ asset('js/pencarian.js') }}"></script>
 <script src="{{ asset('js/user/profile-popup.js') }}"></script>
-@endpush
+
+@endsection

@@ -81,8 +81,6 @@ def search_similar_input(embedding,text_request,THRESHOLD = 0.90):
         query_embeddings=[embedding],
         n_results=1
     )
-    print(results)
-
     ids = results.get("ids", [[]])[0]
     distances = results.get("distances", [[]])[0]
 

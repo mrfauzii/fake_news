@@ -115,4 +115,9 @@ class AdminController extends Controller
         $persen = (($bulanIni - $bulanLalu) / $bulanLalu) * 100;
         return round($persen, 1); 
     }
+
+    public function pencarian(Request $request)
+    {
+        return view('admin.pencarian');
+    }
 }

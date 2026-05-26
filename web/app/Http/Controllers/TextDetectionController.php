@@ -89,6 +89,7 @@ class TextDetectionController extends Controller
                 'query' => $inputText,
                 'id_request' => $requestId
             ]);
+            Log::info('AI API Response: ' . $response->body());
 
             if (!$response->successful()) {
                 throw new \Exception('Gagal terhubung ke AI API');

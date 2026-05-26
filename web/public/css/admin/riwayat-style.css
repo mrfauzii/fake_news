@@ -380,37 +380,71 @@
 }
 
 /* popup actions */
-.popup-actions {
-    position: absolute;
-    top: -22px;
-    right: -22px;
+.popup-actions{
+    position:absolute;
 
-    display: flex;
-    gap: 12px;
+    top:-28px;
+    right:-28px;
+
+    display:flex;
+    align-items:center;
+
+    gap:10px;
+
+    z-index:10000;
 }
 
-/* delete */
-.popup-delete {
-    width: 55px;
-    height: 55px;
+/* Semua tombol kanan atas popup */
+.popup-actions button{
 
-    border: none;
+    width:55px;
+    height:55px;
 
-    background: #b8201d;
-    color: #fff;
+    border:none;
 
-    border-radius: 8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 
-    cursor: pointer;
+    border-radius:8px;
 
-    font-size: 22px;
+    cursor:pointer;
 
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    color:white;
+
+    font-size:22px;
+
+    box-shadow:0 4px 10px rgba(0,0,0,.2);
+
+    flex-shrink:0;
+}
+
+/* restore */
+#deletePopup{
+    background:#b8201d;
+}
+
+/* delete permanen */
+#permanentDeletePopup{
+    background:#b8201d;
 }
 
 /* close */
-.popup-close {
-    position: static;
+#closePopup{
+    background:#b8201d;
+}
+
+/* hover */
+#deletePopup:hover{
+    background:#8e1412;
+}
+
+#permanentDeletePopup:hover{
+    background:#8b0000;
+}
+
+#closePopup:hover{
+    background:#8e1412;
 }
 
 /* =========================
@@ -503,20 +537,176 @@
 .popup-delete-status{
     display:inline-flex;
     align-items:center;
-    gap:8px;
+    justify-content:center;
 
-    background:#ffe5e5;
-    color:#c62828;
+    background: linear-gradient(to bottom,#d71919,#a50000);
+    color:white;
 
-    padding:8px 14px;
-    border-radius:20px;
+    padding:15px 25px;
+    border-radius:10px;
 
     font-size:14px;
-    font-weight:600;
+    font-weight:bold;
 
-    margin-top:10px;
+    min-height:50px;
 }
 
 .popup-delete-status i{
-    font-size:13px;
+    display:none;
+}
+
+.popup-tag{
+    background: linear-gradient(to bottom,#d71919,#a50000);
+    color:white;
+    border-radius:10px;
+    padding:15px 25px;
+    font-weight:bold;
+}
+
+#permanentDeletePopup{
+
+width:55px;
+height:55px;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+border:none;
+
+background:#b8201d;
+color:white;
+
+border-radius:8px;
+
+cursor:pointer;
+
+font-size:22px;
+
+box-shadow:0 4px 10px rgba(0,0,0,0.2);
+
+flex-shrink:0;
+}
+
+#permanentDeletePopup:hover{
+    background:#8b0000;
+}
+
+#permanentDeletePopup:hover{
+
+background:#8b0000;
+
+}
+
+#deletePopup,
+#closePopup{
+
+width:55px;
+height:55px;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+flex-shrink:0;
+}
+
+/* =====================
+   PERMANENT DELETE
+===================== */
+
+.permanent-overlay{
+
+    position:fixed;
+    inset:0;
+
+    background:rgba(0,0,0,.55);
+
+    display:none;
+
+    justify-content:center;
+    align-items:center;
+
+    z-index:100000;
+}
+
+.permanent-overlay.active{
+    display:flex;
+}
+
+.permanent-popup{
+
+    width:480px;
+
+    background:white;
+
+    border-radius:20px;
+
+    padding:35px;
+
+    text-align:center;
+
+    animation:popupShow .2s ease;
+}
+
+.permanent-popup h2{
+
+    color:#c71f1f;
+
+    font-size:28px;
+
+    margin-bottom:18px;
+}
+
+.permanent-popup p{
+
+    color:#666;
+
+    font-size:18px;
+
+    line-height:1.5;
+
+    margin-bottom:30px;
+}
+
+.permanent-actions{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:15px;
+}
+
+.btn-permanent-delete{
+
+    background:#c71f1f;
+    color:white;
+
+    border:none;
+
+    padding:14px 35px;
+
+    border-radius:12px;
+
+    font-size:18px;
+    font-weight:bold;
+
+    cursor:pointer;
+}
+
+.btn-permanent-cancel{
+
+    background:#eee;
+
+    border:none;
+
+    padding:14px 35px;
+
+    border-radius:12px;
+
+    font-size:18px;
+    font-weight:bold;
+
+    cursor:pointer;
 }

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Images;
 use App\Models\ImageSearchResults;
 use App\Models\Requests;
+use App\Models\UserInteractions;
 use Illuminate\Support\Facades\Http;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Support\Facades\Log;
@@ -48,13 +49,17 @@ class ImageDetectionController extends Controller
             $imgRecord = Images::create([
                 'file_path' => $url,    
                 'original_filename' => $file->getClientOriginalName(),
-                'uploaded_by' => auth()->id() ?? 1
+                'uploaded_by' => auth()->id() ?? 2
             ]);
 
             // 3. Inisialisasi awal di tabel 'requests'
             $newReq = Requests::create([
                 'image_id' => $imgRecord->id,
                 'status' => 'processing'
+            ]);
+            UserInteractions::create([
+                'user_id'    => auth()->id() ?? 2,
+                'request_id' => $newReq->id,
             ]);
             log::info('Request baru dibuat dengan ID: ' . $url);
             // 4. Panggil API Python

@@ -14,10 +14,17 @@ return new class extends Migration
         DB::statement("
             CREATE OR REPLACE VIEW history_view AS
             SELECT 
-                ui.id AS interaction_id,
-                u.id AS user_id,
+                (SELECT ui.id FROM user_interactions ui WHERE ui.request_id = r.id ORDER BY ui.created_at ASC LIMIT 1) AS interaction_id,
+                (SELECT ui.user_id FROM user_interactions ui WHERE ui.request_id = r.id ORDER BY ui.created_at ASC LIMIT 1) AS user_id,
                 r.id AS request_id, 
-                u.name AS username,
+                (
+                    SELECT u.name 
+                    FROM user_interactions ui 
+                    JOIN users u ON ui.user_id = u.id 
+                    WHERE ui.request_id = r.id 
+                    ORDER BY ui.created_at ASC 
+                    LIMIT 1
+                ) AS username,
                 r.input_text,
                 r.created_at,
                 r.deleted_at,
@@ -26,10 +33,6 @@ return new class extends Migration
                 r.status
             FROM 
                 requests r
-            JOIN 
-                user_interactions ui ON r.id = ui.request_id
-            JOIN 
-                users u ON ui.user_id = u.id
         ");
     }
 

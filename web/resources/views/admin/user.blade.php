@@ -61,7 +61,7 @@
 
                 <tr>
 
-                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $users->firstItem() + $index }}</td>
 
                     <td>{{ $user['nama'] }}</td>
 
@@ -76,6 +76,58 @@
             </tbody>
 
         </table>
+
+    </div>
+
+    <div class="pagination-wrapper">
+
+        @if ($users->lastPage() > 1)
+
+            {{-- Previous --}}
+            @if($users->currentPage() > 1)
+
+                <a href="{{ $users->previousPageUrl() }}">
+                    Previous
+                </a>
+
+            @else
+
+                <a class="disabled">
+                    Previous
+                </a>
+
+            @endif
+
+
+            {{-- Nomor halaman --}}
+            @for ($i = 1; $i <= $users->lastPage(); $i++)
+
+                <a href="{{ $users->url($i) }}"
+                class="page-number {{ $users->currentPage() == $i ? 'active' : '' }}">
+
+                    {{ $i }}
+
+                </a>
+
+            @endfor
+
+
+            {{-- Next --}}
+            @if($users->hasMorePages())
+
+                <a href="{{ $users->nextPageUrl() }}">
+                    Next
+                </a>
+
+            @else
+
+                <a class="disabled">
+                    Next
+                </a>
+
+            @endif
+
+        @endif
 
     </div>
 

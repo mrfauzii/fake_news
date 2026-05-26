@@ -14,12 +14,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const imagePreview = document.getElementById('imagePreview');
     const searchParams = new URLSearchParams(window.location.search);
     const prefilledInformasi = (searchParams.get('informasi') || searchParams.get('q') || '').trim();
-
     // Get CSRF token from meta tag
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
 
     // State: store uploaded file for later processing
     let uploadedFile = null;
+    let currentRequestId = null;
 
     // ==================== Event Listeners ====================
 
@@ -241,218 +241,226 @@ document.addEventListener('DOMContentLoaded', function () {
      * Display search result
      */
     function displayResult(data) {
-        // Handle image detection response format (with nested 'data' key)
-        let verdict = data.verdict || data.indication;
-        let confidence = data.confidence || data.confidence_score?.hoax || 50;
-        let summary = data.summary;
-        let sources = data.sources;
-        const isSimilar = data.is_similar === true;
+    // Selalu update ID request terbaru ke variabel global
+    currentRequestId = data.raw_data?.request_id || null;
 
-        let requestId = data.raw_data.request_id || null;
-        // Normalize and map verdict label
-        const normalizedVerdict = String(verdict || '').toLowerCase();
-        const verdictMap = {
-            fake: { label: 'HOAX', className: 'lh-verdict--hoax' },
-            valid: { label: 'FAKTA', className: 'lh-verdict--valid' },
-            unclear: { label: 'PERLU VERIFIKASI', className: 'lh-verdict--unclear' },
-            fakta: { label: 'FAKTA', className: 'lh-verdict--valid' },
-        };
+    let verdict = data.verdict || data.indication;
+    let confidence = data.confidence || data.confidence_score?.hoax || 50;
+    let summary = data.summary;
+    let sources = data.sources;
+    const isSimilar = data.is_similar === true;
 
-        const verdictInfo = verdictMap[normalizedVerdict] || verdictMap.unclear;
+    // Normalize and map verdict label
+    const normalizedVerdict = String(verdict || '').toLowerCase();
+    const verdictMap = {
+        fake: { label: 'HOAX', className: 'lh-verdict--hoax' },
+        valid: { label: 'FAKTA', className: 'lh-verdict--valid' },
+        unclear: { label: 'PERLU VERIFIKASI', className: 'lh-verdict--unclear' },
+        fakta: { label: 'FAKTA', className: 'lh-verdict--valid' },
+    };
 
-        const safeConfidence = Number.isFinite(Number(confidence))
-            ? Math.max(0, Math.min(100, Math.round(Number(confidence))))
-            : 50;
+    const verdictInfo = verdictMap[normalizedVerdict] || verdictMap.unclear;
 
-        let hoaxPercent = safeConfidence;
-        if (normalizedVerdict === 'valid') {
-            hoaxPercent = 100 - safeConfidence;
-        } else if (normalizedVerdict === 'unclear') {
-            hoaxPercent = 50;
-        }
-        const faktaPercent = 100 - hoaxPercent;
+    const safeConfidence = Number.isFinite(Number(confidence))
+        ? Math.max(0, Math.min(100, Math.round(Number(confidence))))
+        : 50;
 
-        // Build sources HTML
-        // ========================================================
-        // Build sources HTML menggunakan link_counter
-        // ========================================================
-        let sourcesHtml = '<li>Belum ada sumber yang terdeteksi.</li>';
-        let linkCounterArray = [];
+    let hoaxPercent = safeConfidence;
+    if (normalizedVerdict === 'valid') {
+        hoaxPercent = 100 - safeConfidence;
+    } else if (normalizedVerdict === 'unclear') {
+        hoaxPercent = 50;
+    }
+    const faktaPercent = 100 - hoaxPercent;
 
-        // 1. Cek dan ubah teks string JSON menjadi Array JavaScript
-        if (data.link_counter) {
-            try {
-                linkCounterArray = typeof data.link_counter === 'string' 
-                    ? JSON.parse(data.link_counter) 
-                    : data.link_counter;
-            } catch (e) {
-                console.error("Gagal memproses data link_counter:", e);
-            }
-        }
+    // Build sources HTML
+    let sourcesHtml = '<li>Belum ada sumber yang terdeteksi.</li>';
+    let linkCounterArray = [];
 
-        // 2. Buat list HTML jika array URL berhasil didapatkan
-        if (Array.isArray(linkCounterArray) && linkCounterArray.length > 0) {
-            sourcesHtml = linkCounterArray.map((url, index) => {
-                const safeUrl = escapeHtml(url || '#');
-                // Tambahkan style word-break agar URL yang panjang tidak merusak tampilan desain web
-                return `<li>Sumber ${index + 1}: <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" style="word-break: break-all; color: #B71C1C;">${safeUrl}</a></li>`;
-            }).join('');
-        } 
-        // 3. Fallback (cadangan) jika link_counter kosong, pakai struktur 'sources' yang lama
-        else if (Array.isArray(sources) && sources.length > 0) {
-    sourcesHtml = sources.map((url, index) => {
-        const safeUrl = escapeHtml(url);
-
-        return `<li>
-            Sumber ${index + 1}:
-            <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" style="word-break: break-all;">
-                ${safeUrl}
-            </a>
-        </li>`;
-    }).join('');
-}
-
-        const safeSummary = escapeHtml(summary || 'Belum ada penjelasan detail untuk hasil pencarian ini.');
-        const badgeLeftPercent = Math.max(8, Math.min(92, hoaxPercent));
-
-        hasilPenelusuran.innerHTML = `
-            <article class="lh-result-view">
-                <div class="lh-result-view__head">
-                    <p class="lh-result-view__lead">Informasi tersebut terindikasi :</p>
-                    <h3 class="lh-result-view__verdict ${verdictInfo.className}">${verdictInfo.label}</h3>
-                    <p class="lh-result-view__subtitle">Dengan presentase hoax sebagai berikut :</p>
-                </div>
-
-                <div class="lh-result-meter">
-                    <div class="lh-result-meter__track" aria-label="Visualisasi persentase hoax dan fakta">
-                        <div class="lh-result-meter__hoax" style="width: ${hoaxPercent}%;"></div>
-                        <div class="lh-result-meter__fakta" style="width: ${faktaPercent}%;"></div>
-                        <div class="lh-result-meter__badge" style="left: ${badgeLeftPercent}%;">${hoaxPercent}% | ${faktaPercent}%</div>
-                    </div>
-                    <div class="lh-result-meter__labels">
-                        <span>Hoax</span>
-                        <span>Fakta</span>
-                    </div>
-                </div>
-
-                <section class="lh-result-view__explain">
-                    <p class="lh-result-view__explain-title">Penjelasan Hasil:</p>
-                    <p class="lh-result-view__explain-text">${safeSummary}</p>
-                </section>
-
-                <hr class="lh-result-view__divider">
-
-                <section class="lh-result-view__sources">
-                    <p>Berikut tautan sumber terkait verifikasi informasi anda :</p>
-                    <ul>${sourcesHtml}</ul>
-                </section>
-
-                <hr class="lh-result-view__divider">
-
-                <section class="lh-result-view__footer">
-                    ${isSimilar ? `
-                    <p>
-                        Informasi ini telah ditelusuri beberapa orang dengan hasil yang sama sebelumnya.
-                        Ingin memulai penelusuran kembali untuk informasi yang lebih baru?
-                    </p>
-                    ` : ''}
-                    <div style="display:flex; gap:12px; align-items:center;">
-                        ${isSimilar ? `
-                        <button class="lh-btn lh-btn--search lh-result-action" id="btnTelusuriUlang" type="button">
-                        <iconify-icon icon="ic:outline-search" width="22" height="22"></iconify-icon>
-                        Telusuri Ulang
-                    </button>
-                        ` : ''}
-                        <button class="lh-btn lh-btn--upload lh-result-action" id="btnFeedback" type="button">
-                            <iconify-icon icon="ic:outline-feedback" width="20" height="20"></iconify-icon>
-                            Umpan Balik
-                        </button>
-                    </div>
-                </section>
-            </article>
-        `;
-
-        const btnTelusuriUlang = document.getElementById('btnTelusuriUlang');
-        if (btnTelusuriUlang) {
-            btnTelusuriUlang.addEventListener('click', function () {
-                inputInformasi.focus();
-                inputInformasi.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            });
-        }
-
-        // Feedback button handler: open modal
-        const btnFeedback = document.getElementById('btnFeedback');
-        if (btnFeedback) {
-            btnFeedback.addEventListener('click', function () {
-                const feedbackModal = document.getElementById('feedbackModal');
-                const feedbackText = document.getElementById('feedbackText');
-                if (feedbackModal) {
-                    feedbackModal.style.display = 'block';
-                    feedbackText.value = '';
-                    feedbackText.focus();
-                }
-            });
-        }
-
-        // Modal actions (submit / cancel)
-        const btnSubmitFeedback = document.getElementById('btnSubmitFeedback');
-        const btnCancelFeedback = document.getElementById('btnCancelFeedback');
-        const feedbackOverlay = document.getElementById('feedbackOverlay');
-
-        function closeFeedbackModal() {
-            const feedbackModal = document.getElementById('feedbackModal');
-            if (feedbackModal) feedbackModal.style.display = 'none';
-        }
-
-        if (btnCancelFeedback) {
-            btnCancelFeedback.addEventListener('click', closeFeedbackModal);
-        }
-        if (feedbackOverlay) {
-            feedbackOverlay.addEventListener('click', closeFeedbackModal);
-        }
-
-        if (btnSubmitFeedback) {
-            btnSubmitFeedback.addEventListener('click', function () {
-                const feedbackTextEl = document.getElementById('feedbackText');
-                const statusEl = document.getElementById('feedbackStatus');
-                const text = (feedbackTextEl && feedbackTextEl.value || '').trim();
-
-                if (!text) {
-                    if (statusEl) statusEl.textContent = 'Silakan masukkan umpan balik sebelum mengirim.';
-                    return;
-                }
-
-                // Disable button while sending
-                btnSubmitFeedback.disabled = true;
-                if (statusEl) statusEl.textContent = 'Mengirim...';
-
-                // Send feedback to server (POST /feedback)
-                fetch('/feedback', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken,
-                    },
-                    body: JSON.stringify({
-                        feedback: text,
-                        request_id: requestId, // Sertakan request_id untuk referensi jika tersedia
-                    }),
-                })
-                    .then(resp => resp.json())
-                    .then(resdata => {
-                        if (statusEl) statusEl.textContent = (resdata.success || resdata.status === 'success') ? 'Terima kasih, umpan balik berhasil dikirim.' : (resdata.message || 'Gagal mengirim umpan balik.');
-                        setTimeout(() => { closeFeedbackModal(); if (statusEl) statusEl.textContent = ''; }, 1400);
-                    })
-                    .catch(err => {
-                        console.error('Feedback error:', err);
-                        if (statusEl) statusEl.textContent = 'Terjadi kesalahan saat mengirim umpan balik.';
-                    })
-                    .finally(() => { btnSubmitFeedback.disabled = false; });
-            });
+    // 1. Cek dan ubah teks string JSON menjadi Array JavaScript
+    if (data.link_counter) {
+        try {
+            linkCounterArray = typeof data.link_counter === 'string' 
+                ? JSON.parse(data.link_counter) 
+                : data.link_counter;
+        } catch (e) {
+            console.error("Gagal memproses data link_counter:", e);
         }
     }
 
-    /**
+    // 2. Buat list HTML jika array URL berhasil didapatkan
+    if (Array.isArray(linkCounterArray) && linkCounterArray.length > 0) {
+        sourcesHtml = linkCounterArray.map((url, index) => {
+            const safeUrl = escapeHtml(url || '#');
+            return `<li>Sumber ${index + 1}: <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" style="word-break: break-all; color: #B71C1C;">${safeUrl}</a></li>`;
+        }).join('');
+    } 
+    // 3. Fallback (cadangan) jika link_counter kosong
+    else if (Array.isArray(sources) && sources.length > 0) {
+        sourcesHtml = sources.map((url, index) => {
+            const safeUrl = escapeHtml(url);
+            return `<li>
+                Sumber ${index + 1}:
+                <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" style="word-break: break-all;">
+                    ${safeUrl}
+                </a>
+            </li>`;
+        }).join('');
+    }
+
+    const safeSummary = escapeHtml(summary || 'Belum ada penjelasan detail untuk hasil pencarian ini.');
+    const badgeLeftPercent = Math.max(8, Math.min(92, hoaxPercent));
+
+    hasilPenelusuran.innerHTML = `
+        <article class="lh-result-view">
+            <div class="lh-result-view__head">
+                <p class="lh-result-view__lead">Informasi tersebut terindikasi :</p>
+                <h3 class="lh-result-view__verdict ${verdictInfo.className}">${verdictInfo.label}</h3>
+                <p class="lh-result-view__subtitle">Dengan presentase hoax sebagai berikut :</p>
+            </div>
+
+            <div class="lh-result-meter">
+                <div class="lh-result-meter__track" aria-label="Visualisasi persentase hoax dan fakta">
+                    <div class="lh-result-meter__hoax" style="width: ${hoaxPercent}%;"></div>
+                    <div class="lh-result-meter__fakta" style="width: ${faktaPercent}%;"></div>
+                    <div class="lh-result-meter__badge" style="left: ${badgeLeftPercent}%;">${hoaxPercent}% | ${faktaPercent}%</div>
+                </div>
+                <div class="lh-result-meter__labels">
+                    <span>Hoax</span>
+                    <span>Fakta</span>
+                </div>
+            </div>
+
+            <section class="lh-result-view__explain">
+                <p class="lh-result-view__explain-title">Penjelasan Hasil:</p>
+                <p class="lh-result-view__explain-text">${safeSummary}</p>
+            </section>
+
+            <hr class="lh-result-view__divider">
+
+            <section class="lh-result-view__sources">
+                <p>Berikut tautan sumber terkait verifikasi informasi anda :</p>
+                <ul>${sourcesHtml}</ul>
+            </section>
+
+            <hr class="lh-result-view__divider">
+
+            <section class="lh-result-view__footer">
+                ${isSimilar ? `
+                <p>
+                    Informasi ini telah ditelusuri beberapa orang dengan hasil yang sama sebelumnya.
+                    Ingin memulai penelusuran kembali untuk informasi yang lebih baru?
+                </p>
+                ` : ''}
+                <div style="display:flex; gap:12px; align-items:center;">
+                    ${isSimilar ? `
+                    <button class="lh-btn lh-btn--search lh-result-action" id="btnTelusuriUlang" type="button">
+                        <iconify-icon icon="ic:outline-search" width="22" height="22"></iconify-icon>
+                        Telusuri Ulang
+                    </button>
+                    ` : ''}
+                    <button class="lh-btn lh-btn--upload lh-result-action" id="btnFeedback" type="button">
+                        <iconify-icon icon="ic:outline-feedback" width="20" height="20"></iconify-icon>
+                        Umpan Balik
+                    </button>
+                </div>
+            </section>
+        </article>
+    `;
+
+    // Tombol Telusuri Ulang
+    const btnTelusuriUlang = document.getElementById('btnTelusuriUlang');
+    if (btnTelusuriUlang) {
+        btnTelusuriUlang.addEventListener('click', function () {
+            inputInformasi.focus();
+            inputInformasi.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    }
+
+    // Feedback button handler: open modal
+    const btnFeedback = document.getElementById('btnFeedback');
+    if (btnFeedback) {
+        btnFeedback.addEventListener('click', function () {
+            const feedbackModal = document.getElementById('feedbackModal');
+            const feedbackText = document.getElementById('feedbackText');
+            if (feedbackModal) {
+                feedbackModal.style.display = 'block';
+                feedbackText.value = '';
+                feedbackText.focus();
+            }
+        });
+    }
+}
+// ==================== Modal Feedback Actions ====================
+
+const btnSubmitFeedback = document.getElementById('btnSubmitFeedback');
+const btnCancelFeedback = document.getElementById('btnCancelFeedback');
+const feedbackOverlay = document.getElementById('feedbackOverlay');
+
+function closeFeedbackModal() {
+    const feedbackModal = document.getElementById('feedbackModal');
+    const statusEl = document.getElementById('feedbackStatus');
+    if (feedbackModal) feedbackModal.style.display = 'none';
+    if (statusEl) statusEl.textContent = ''; // Bersihkan pesan status saat tutup modal
+}
+
+// Tutup modal jika klik tombol batal atau area luar modal
+if (btnCancelFeedback) {
+    btnCancelFeedback.addEventListener('click', closeFeedbackModal);
+}
+if (feedbackOverlay) {
+    feedbackOverlay.addEventListener('click', closeFeedbackModal);
+}
+
+// Fungsi Submit - Hanya diikat 1x ke DOM
+if (btnSubmitFeedback) {
+    btnSubmitFeedback.addEventListener('click', function () {
+        const feedbackTextEl = document.getElementById('feedbackText');
+        const statusEl = document.getElementById('feedbackStatus');
+        const text = (feedbackTextEl && feedbackTextEl.value || '').trim();
+
+        if (!text) {
+            if (statusEl) statusEl.textContent = 'Silakan masukkan umpan balik sebelum mengirim.';
+            return;
+        }
+
+        // Matikan tombol sementara agar tidak diklik berkali-kali
+        btnSubmitFeedback.disabled = true;
+        if (statusEl) statusEl.textContent = 'Mengirim...';
+
+        // Kirim API feedback dengan currentRequestId yang paling baru
+        fetch('/feedback', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+            body: JSON.stringify({
+                feedback: text,
+                request_id: currentRequestId, // Pastikan memanggil variabel global
+            }),
+        })
+            .then(resp => resp.json())
+            .then(resdata => {
+                if (statusEl) {
+                    statusEl.textContent = (resdata.success || resdata.status === 'success') 
+                        ? 'Terima kasih, umpan balik berhasil dikirim.' 
+                        : (resdata.message || 'Gagal mengirim umpan balik.');
+                }
+                setTimeout(() => { 
+                    closeFeedbackModal(); 
+                }, 1400);
+            })
+            .catch(err => {
+                console.error('Feedback error:', err);
+                if (statusEl) statusEl.textContent = 'Terjadi kesalahan saat mengirim umpan balik.';
+            })
+            .finally(() => { 
+                btnSubmitFeedback.disabled = false; 
+            });
+    });
+} 
+/**
      * Escape HTML to prevent XSS
      */
     function escapeHtml(text) {

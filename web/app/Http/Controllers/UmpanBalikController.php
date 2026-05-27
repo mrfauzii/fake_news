@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class UmpanBalikController extends Controller
 {
@@ -42,14 +43,21 @@ class UmpanBalikController extends Controller
                 '=',
                 'requests.id'
             )
+            ->leftJoin(
+                'images',
+                'requests.image_id',
+                '=',
+                'images.id'
+            )
 
             ->select(
                 'feedbacks.id',
                 'users.name as username',
                 'feedbacks.feedback',
                 'feedbacks.created_at',
-                'requests.input_text as link',
-                'requests.final_label'
+                'requests.input_text as input_text',
+                'requests.final_label',
+                'images.file_path as images'
             )
             ->orderBy('feedbacks.created_at', 'desc')
             ->get()
@@ -59,8 +67,9 @@ class UmpanBalikController extends Controller
                     'id' => $item->id,
                     'username' => $item->username,
                     'feedback' => $item->feedback,
-                    'link' => $item->link ?? '-',
+                    'input_text' => $item->input_text,
                     'result' => ucfirst($item->final_label ?? '-'),
+                    'images' => $item->images,
                     'date' => Carbon::parse(
                         $item->created_at
                     )->translatedFormat(

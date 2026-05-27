@@ -10,7 +10,7 @@
 
 <div class="feedback-title">
     <h1>Dashboard Utama</h1>
-    <p>Data terakhir diperbarui: {{ $dashboardStats['last_updated'] }}</p>
+    <p>Data terakhir diperbarui: {{ now()->translatedFormat('d F Y') }}, {{ \Cache::get('knowledge_base_update_time', '14:45') }} WIB</p>
 </div>
 
 <!-- STATS -->

@@ -142,7 +142,7 @@
 
                 <div
                 class="info-value"
-                id="popupLink">
+                id="popupinput">
                 </div>
 
                 <div class="info-title">
@@ -190,6 +190,7 @@ document.addEventListener('DOMContentLoaded',function(){
     .then(result=>{
 
         container.innerHTML='';
+        console.log(result);
 
         result.data.forEach(item=>{
 
@@ -217,7 +218,8 @@ document.addEventListener('DOMContentLoaded',function(){
                             data-username="${item.username}"
                             data-date="${item.date}"
                             data-feedback="${encodeURIComponent(item.feedback)}"
-                            data-link="${encodeURIComponent(item.link ?? '-')}"
+                            data-input_text="${encodeURIComponent(item.input_text)}"
+                            data-images="${item.images}"
                             data-result="${item.result}"
                             >
                             Detail
@@ -295,7 +297,6 @@ document.addEventListener('DOMContentLoaded',function(){
     document.addEventListener('click',function(e){
 
     if(e.target.classList.contains('btn-detail')){
-
         document.getElementById(
             'popupUser'
         ).innerText =
@@ -312,13 +313,38 @@ document.addEventListener('DOMContentLoaded',function(){
         decodeURIComponent(
             e.target.dataset.feedback
         );
+        //img or text
+        const el = document.getElementById('popupinput');
+        const data = e.target.dataset;
 
-        document.getElementById(
-            'popupLink'
-        ).innerText =
-        decodeURIComponent(
-            e.target.dataset.link
-        );
+        const inputText =
+            data.input_text && data.input_text !== "null"
+                ? decodeURIComponent(data.input_text)
+                : null;
+
+        const image =
+            data.images && data.images !== "null"
+                ? data.images
+                : null;
+
+        // RESET mode
+        el.classList.remove('image-mode');
+        el.innerHTML = "";
+
+        // TEXT MODE
+        if (inputText) {
+            el.innerText = inputText;
+
+        // IMAGE MODE
+        } else if (image) {
+            el.classList.add('image-mode');
+            el.innerHTML = `<img src="${image}">`;
+
+        // EMPTY
+        } else {
+            el.innerText = "-";
+        }
+
 
         document.getElementById(
         'popupResult'
@@ -352,5 +378,28 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 
 </script>
+<style>
+#popupinput {
+    max-height: 150px;
+    overflow-y: auto;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
 
+/* mode gambar */
+#popupinput.image-mode {
+    max-height: none;
+    overflow: visible;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#popupinput.image-mode img {
+    max-width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+</style>
 @endsection

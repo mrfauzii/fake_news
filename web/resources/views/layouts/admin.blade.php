@@ -119,8 +119,8 @@
                 </a>
             </li>
 
-            <li>
-                <a href="#">
+            <li class="{{ request()->is('admin/setting') ? 'active' : '' }}">
+                <a href="/admin/setting">
                     <i class="fa fa-cog"></i>
                     <span>Setting</span>
                 </a>

@@ -261,8 +261,13 @@ class TextDetectionController extends Controller
         // FORMAT UNTUK FRONTEND
         // ==========================================
         $verdict = ($finalLabel === 'fake') ? 'fake' : 'valid';
-        $statusTeks = ($verdict === 'fake') ? 'HOAX' : 'FAKTA';
-        $summaryText = "Hasil analisis menemukan indikasi " . $statusTeks . " dengan tingkat keyakinan " . $confidencePercentage . "%.";
+
+        $summaryText = $this->generateSummaryText(
+            $featureVector['mean_entailment'] ?? null,
+            $featureVector['mean_contradiction'] ?? null
+        );
+
+        // Anda bisa melempar $summaryText ini ke view atau menyimpannya ke database
 
         $sources = [];
         if (!empty($aiApiResponse['urls'])) {
@@ -332,7 +337,6 @@ class TextDetectionController extends Controller
             $stage2Result = Stage2Result::where('request_id', $oldRequest->id)->first();
 
             $statusTeks = ($verdict === 'fake') ? 'HOAX' : 'FAKTA';
-            $summaryText = "Hasil analisis menemukan indikasi " . $statusTeks . " dengan tingkat keyakinan " . $confidencePercentage . "%.";
 
             $sources = [];
             if ($stage2Result && !empty($stage2Result->url)) {
@@ -353,6 +357,11 @@ class TextDetectionController extends Controller
                 'std_contradiction' => $stage2Result->std_contradiction,
             ] : [];
 
+            $summaryText = $this->generateSummaryText(
+                $featureVector['mean_entailment'] ?? null,
+                $featureVector['mean_contradiction'] ?? null
+            );
+
             return [
                 'success'    => true,
                 'is_similar' => true,
@@ -369,4 +378,30 @@ class TextDetectionController extends Controller
         }
     }
 
+    private function generateSummaryText(?float $meanEntailment, ?float $meanContradiction): string
+    {
+        // Berikan nilai default 0 jika datanya null
+        $entailment = $meanEntailment ?? 0.0;
+        $contradiction = $meanContradiction ?? 0.0;
+
+        if ($entailment >= 0.6 && $contradiction <= 0.3) {
+            $statusTeks = "Fakta";
+            $confidence = round($entailment * 100);
+            $alasan = "tingginya keselarasan informasi dengan sumber referensi";
+        } elseif ($contradiction >= 0.5) {
+            $statusTeks = "Hoaks";
+            $confidence = round($contradiction * 100);
+            $alasan = "ditemukannya kontradiksi yang kuat antara klaim dengan sumber berita";
+        } elseif ($contradiction > $entailment && $contradiction >= 0.2) {
+            $statusTeks = "Misinformasi";
+            $confidence = round($contradiction * 100);
+            $alasan = "adanya beberapa ketidaksesuaian fakta dari sumber yang ditemukan";
+        } else {
+            $statusTeks = "Tidak Terverifikasi";
+            $confidence = round(max($entailment, $contradiction) * 100) ?: 50;
+            $alasan = "minimnya bukti untuk membenarkan atau menyanggah klaim tersebut";
+        }
+
+        return "Hasil penelusuran menyimpulkan informasi ini sebagai {$statusTeks} dengan tingkat keyakinan {$confidence}%. Kesimpulan ini diambil berdasarkan {$alasan}.";
+    }
 }

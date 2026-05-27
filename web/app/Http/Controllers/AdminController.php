@@ -7,10 +7,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache; // TAMBAHAN: Import Cache untuk simpan data tanpa tabel database
 use Carbon\Carbon;
-use App\Models\Users; 
-use App\Models\Requests; 
+use App\Models\Users;
+use App\Models\Requests;
 use App\Models\history_view;
-use App\Models\Feedbacks; 
+use App\Models\Feedbacks;
 
 class AdminController extends Controller
 {
@@ -64,7 +64,7 @@ class AdminController extends Controller
                                   ->whereYear('created_at', $now->year)->count();
         $pengguna_lalu = Users::whereMonth('created_at', $lastMonth->month)
                               ->whereYear('created_at', $lastMonth->year)->count();
-        
+
         // 2. STATISTIK BERITA (Diambil dari tabel requests)
         $total_berita = Requests::count();
         $berita_sekarang = Requests::whereMonth('created_at', $now->month)
@@ -116,9 +116,9 @@ class AdminController extends Controller
         if ($bulanLalu == 0) {
             return $bulanIni > 0 ? 100 : 0;
         }
-        
+
         $persen = (($bulanIni - $bulanLalu) / $bulanLalu) * 100;
-        return round($persen, 1); 
+        return round($persen, 1);
     }
 
     public function pencarian(Request $request)

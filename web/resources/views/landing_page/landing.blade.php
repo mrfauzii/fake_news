@@ -130,11 +130,6 @@
             </div>
         </div>
     </section>
-
-    <footer>
-        lensa_hoax@2026
-    </footer>
-
 @endsection
 
 @push('scripts')

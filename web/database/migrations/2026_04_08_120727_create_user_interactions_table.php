@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('source_channel')->nullable();
             $table->string('interaction_type')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

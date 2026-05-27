@@ -31,14 +31,16 @@ class TextDetectionController extends Controller
 
         $inputText = $request->input('query');
         $userId = Auth::check() ? Auth::id() : 2;
-
+        
         try {
             // ========================================================
             // A. CEK SIMILARITY SEARCH TERLEBIH DAHULU
             // ========================================================
+            if ($request->input('skip_similarity') === 0) {
             $simResponse = Http::timeout(60)->post('http://127.0.0.1:8004/similarity-search', [
                 'query' => $inputText
             ]);
+            
             if ($simResponse->successful()) {
                 $simData = $simResponse->json();
 
@@ -67,6 +69,7 @@ class TextDetectionController extends Controller
                     }
                 }
             }
+            }
 
             // ========================================================
             // B. JIKA TIDAK ADA MATCH, BUAT REQUEST BARU & HIT API DETEKSI
@@ -89,6 +92,7 @@ class TextDetectionController extends Controller
                 'query' => $inputText,
                 'id_request' => $requestId
             ]);
+            Log::info('AI API Response: ' . $response->body());
 
             if (!$response->successful()) {
                 throw new \Exception('Gagal terhubung ke AI API');
@@ -137,6 +141,7 @@ class TextDetectionController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
+    
     }
 
     /**
@@ -363,4 +368,5 @@ class TextDetectionController extends Controller
             ];
         }
     }
+
 }

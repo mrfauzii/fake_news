@@ -41,6 +41,7 @@
                 <span>Pencarian Terpopuler</span>
             </span>
         </a>
+        @if(Auth::check())
         <a href="{{ route('riwayat') }}" class="lh-nav-btn {{ $isWhatsAppVariant ? 'wa-nav-btn' : '' }} {{ $isHistoryActive ? 'lh-nav-btn--active' : '' }}" aria-label="Riwayat" @if($isHistoryActive) aria-current="page" @endif>
             <iconify-icon icon="fontisto:history" width="24" height="24"></iconify-icon>
             <span class="lh-nav-tooltip" role="tooltip">
@@ -48,6 +49,7 @@
                 <span>Riwayat Pencarian Anda</span>
             </span>
         </a>
+        @endif
         <a href="{{ route('beranda') }}" class="lh-nav-btn lh-nav-btn--search {{ $isWhatsAppVariant ? 'wa-nav-btn' : '' }} {{ $isSearchActive ? 'lh-nav-btn--active' : '' }}" aria-label="Pencarian" @if($isSearchActive) aria-current="page" @endif>
             <iconify-icon icon="mdi:magnify" width="24" height="24"></iconify-icon>
             <span class="lh-nav-tooltip" role="tooltip">

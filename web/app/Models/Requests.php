@@ -38,16 +38,16 @@ class Requests extends Model
 
     public function imageSearchResults()
     {
-        return $this->hasMany(ImageSearchResults::class);
+        return $this->hasMany(ImageSearchResults::class, 'request_id');
     }
 
     public function feedbacks()
     {
-        return $this->hasMany(Feedbacks::class);
+        return $this->hasMany(Feedbacks::class, 'request_id');
     }
 
     public function interactions()
     {
-        return $this->hasMany(UserInteractions::class);
+        return $this->hasMany(UserInteractions::class, 'request_id');
     }
 }

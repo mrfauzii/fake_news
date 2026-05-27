@@ -45,7 +45,7 @@ class GoogleAuthController extends Controller
                 return redirect('pencarian');
             }
 
-            return redirect('/dashboard');
+            return redirect('/admin/dashboard');
 
         } catch (\Exception $e) {
             dd([

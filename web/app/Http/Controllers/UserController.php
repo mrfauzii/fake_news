@@ -17,7 +17,7 @@ class UserController extends Controller
                 ->orWhere('email', 'like', "%{$search}%")
                 ->orWhere('phone_number', 'like', "%{$search}%");
         })
-        ->paginate(10)
+        ->paginate(2)
         ->appends(['search' => $search]);
 
         $usersFromDb->through(function ($user) {

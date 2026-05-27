@@ -120,4 +120,22 @@ class AdminController extends Controller
     {
         return view('admin.pencarian');
     }
+
+    // SETTING
+    public function setting()
+    {
+        return view('admin.setting');
+    }
+
+    public function saveSetting(Request $request)
+    {
+        session([
+            'knowledge_base_update_time' => $request->knowledge_base_update_time
+        ]);
+
+        return back()->with(
+            'success',
+            'Jadwal pembaruan knowledge base berhasil diperbarui'
+        );
+    }
 }

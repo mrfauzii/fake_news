@@ -124,6 +124,11 @@ Route::get('/admin/cekberita', [PencarianController::class, 'adminIndex']);
 
 // Admin logout 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Admin Setting
+Route::get('/admin/setting', [AdminController::class, 'setting']);
+Route::post('/admin/setting/save', [AdminController::class, 'saveSetting']);
+
 /*
 |--------------------------------------------------------------------------
 | WHATSAPP WEBHOOK & API (NO AUTH)

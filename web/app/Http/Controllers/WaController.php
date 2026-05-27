@@ -115,13 +115,14 @@ class WaController extends Controller
                     // Generate Link Beranda Website menggunakan Route Name Laravel
                     $linkWebsite = route('beranda');
 
-                    $waReply = "🤖 *MENGENAL LENSA HOAX AI* 🤖\n";
+                    $waReply = "🤖 *MENGENAL LENSA HOAX* 🤖\n";
                     $waReply .= "━━━━━━━━━━━━━━━━━━━\n\n";
-                    $waReply .= "*Lensa Hoax* adalah sistem yang dirancang khusus untuk mendeteksi keaslian berita atau klaim secara cepat dan akurat.\n\n";
+                    $waReply .= "*Lensa Hoax* adalah sistem yang dirancang khusus untuk *mendeteksi keaslian berita* atau klaim secara cepat dan akurat.\n\n";
                     $waReply .= "⚙️ *Fitur Utama via WhatsApp:*\n";
                     $waReply .= "1. `#detect` - Periksa keaslian pesan terakhir yang Anda kirim.\n";
-                    $waReply .= "2. `#trending` - Lihat daftar tren hoaks terpopuler.\n";
-                    $waReply .= "3. `#history` - Lihat riwayat pencarian terakhir Anda.\n\n";
+                    $waReply .= "2. `#info` - Lihat informasi tentang sistem Lensa Hoax.\n";
+                    $waReply .= "3. `#trending` - Lihat daftar tren hoaks terpopuler.\n";
+                    $waReply .= "4. `#history` - Lihat riwayat pencarian terakhir Anda.\n\n";
                     $waReply .= "🌐 *Versi Website:*\n";
                     $waReply .= "Nikmati visualisasi data dan laporan analisis hoaks yang lebih mendalam melalui website resmi kami.\n\n";
                     $waReply .= "🔗 *Kunjungi Sekarang:*\n";
@@ -129,34 +130,54 @@ class WaController extends Controller
                     $waReply .= "━━━━━━━━━━━━━━━━━━━\n";
                     $waReply .= "💡 _Mari bersama-sama putus mata rantai hoaks!_";
                     break;
-                // ==========================================
-                // COMMAND: #trending
-                // ==========================================
-                case str_starts_with($message, '#trending'):
-                    $linkWebsite = route('beranda');
-                    $trendingHoaxes = \App\Models\Requests::where('final_label', 'fake')
-                        ->where('status', '!=', 'pending')
-                        ->latest()
-                        ->take(3)
-                        ->get();
+                    // ==========================================
+                    // COMMAND: #trending
+                    // ==========================================
+                    case str_starts_with($message, '#trending'):
+                        // 1. Ambil data dari view database yang sama dengan website (Hanya yang HOAKS/FAKE)
+                        $trendingHoaxes = \Illuminate\Support\Facades\DB::table('history_view')
+                            ->select(
+                                'input_text',
+                                \Illuminate\Support\Facades\DB::raw('COUNT(*) as count')
+                            )
+                            ->where('final_label', 'fake') // Hanya ambil yang terindikasi hoaks
+                            ->groupBy('input_text')
+                            ->orderByDesc('count') // Urutkan dari yang paling banyak dicari/populer
+                            ->take(3) // Ambil 3 besar
+                            ->get();
 
-                    $waReply = "🔥 *PENCARIAN TERPOPULER (TREN HOAKS)* 🔥\n";
-                    $waReply .= "━━━━━━━━━━━━━━━━━━━\n";
-                    $waReply .= "Berikut adalah klaim hoaks yang baru-baru ini dianalisis oleh sistem Lensa Hoax:\n\n";
+                        // 2. Kamus Nama Bulan untuk mempercantik info periode saat ini
+                        $bulanIndo = [
+                            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+                            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+                            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                        ];
+                        $periodeSekarang = $bulanIndo[date('n')] . ' ' . date('Y');
 
-                    if ($trendingHoaxes->isNotEmpty()) {
-                        foreach ($trendingHoaxes as $index => $hoax) {
-                            $waReply .= ($index + 1) . ". *\"" . $hoax->input_text . "\"*\n";
-                            $waReply .= "🎯 _Tingkat Keyakinan AI: " . round($hoax->final_confidence * 100) . "%_\n\n";
+                        // 3. Susun struktur pesan WhatsApp
+                        $waReply = "🔥 *PENCARIAN HOAX TERPOPULER* 🔥\n";
+                        $waReply .= "📊 *Periode:* " . $periodeSekarang . "\n";
+                        $waReply .= "━━━━━━━━━━━━━━━━━━━\n";
+                        $waReply .= "Berikut adalah klaim hoaks yang paling banyak ditanyakan oleh pengguna minggu ini:\n\n";
+
+                        if ($trendingHoaxes->isNotEmpty()) {
+                            foreach ($trendingHoaxes as $index => $hoax) {
+                                $waReply .= ($index + 1) . ". *\"" . $hoax->input_text . "\"*\n";
+                                $waReply .= "📈 _Dicari sebanyak: " . $hoax->count . " kali_\n\n";
+                            }
+
+                            // Link dinamis ke halaman pencarian terpopuler di website Anda (jika ada route name-nya)
+                            // Misal nama routenya 'populer', jika tidak ada bisa tetap pakai route('beranda')
+                            $linkPopuler = route('beranda');
+
+                            $waReply .= "🌐 *Lihat Statistik Lengkap di Web:*\n";
+                            $waReply .= "👉 " . $linkPopuler . "\n\n";
+                            $waReply .= "💡 _Jangan mudah terprovokasi dan langsung menyebarkan berita di atas ya!_ \n";
+                        } else {
+                            $waReply .= "Belum ada data tren hoaks yang cukup untuk bulan ini. Sistem masih terus memantau ruang digital.\n";
                         }
-                        $waReply .= "💡 _Jangan mudah terprovokasi jika menerima pesan serupa._\n";
-                    } else {
-                        $waReply .= "Belum ada data tren hoaks saat ini. Sistem masih terus memantau.\n";
-                    }
-                    $waReply .= "━━━━━━━━━━━━━━━━━━━";
-                    $waReply .= "🔗 *Atau kunjungi website kami untuk pengalaman yang lebih lengkap:*\n";
-                    $waReply .= "👉 " . $linkWebsite . "\n\n";
-                    break;
+                        $waReply .= "━━━━━━━━━━━━━━━━━━━";
+                        break;
 
                 // ==========================================
                 // COMMAND: #history

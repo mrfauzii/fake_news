@@ -11,15 +11,22 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $search = request('search');
-        $usersFromDb = Users::when($search, function ($query) use ($search) {
-            $query->where('name', 'like', "%{$search}%")
-                ->orWhere('email', 'like', "%{$search}%")
-                ->orWhere('phone_number', 'like', "%{$search}%");
-        })
-        ->paginate(2)
-        ->appends(['search' => $search]);
+        // 1. Ambil keyword pencarian secara aman melalui request object
+        $search = $request->input('search');
 
+        // 2. Query ke database dengan klausa pencarian dinamis (kondisional)
+        $usersFromDb = Users::when($search, function ($query) use ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone_number', 'like', "%{$search}%");
+            });
+        })
+        ->orderBy('name', 'asc') // Menambahkan sorting agar susunan tabel teratur rapi
+        ->paginate(2)          // Mengganti batasan menjadi 10 baris per halaman demi kenyamanan UI
+        ->withQueryString();     // Mengunci query parameter agar filter pencarian tidak hilang saat klik link page
+
+        // 3. Mapping data koleksi pagination tanpa memutus rantai pagination-nya
         $usersFromDb->through(function ($user) {
             return [
                 'nama' => $user->name,
@@ -28,8 +35,10 @@ class UserController extends Controller
             ];
         });
 
+        // 4. Return data utuh ke view admin.user
         return view('admin.user', [
-            'users' => $usersFromDb,]);
+            'users' => $usersFromDb,
+        ]);
     }
 
     /**
@@ -64,19 +73,13 @@ class UserController extends Controller
         $validated = $validator->validated();
 
         if (!empty($validated['phone_number'])) {
-
-            $registeredPhone = Users::where(
-                'phone_number',
-                $validated['phone_number']
-            )->first();
+            $registeredPhone = Users::where('phone_number', $validated['phone_number'])->first();
 
             if (!$registeredPhone) {
-
                 return response()->json([
                     'success' => false,
                     'message' => 'Nomor ini belum terdaftar. Silakan cek via WhatsApp pada menu Dapatkan Melalui WhatsApp.'
                 ], 422);
-
             }
         }
 
@@ -84,7 +87,6 @@ class UserController extends Controller
         $user->name = $validated['name'] ?? $user->name;
         $user->email = $validated['email'] ?? $user->email;
         $user->phone_number = $validated['phone_number'] ?? $user->phone_number;
-
         $user->save();
 
         return response()->json([
@@ -95,7 +97,7 @@ class UserController extends Controller
     }
 
     /**
-     * Return JSON data dummy buat admin
+     * Return JSON data untuk kebutuhan API Admin/Eksternal jika diperlukan
      */
     public function getUserData()
     {

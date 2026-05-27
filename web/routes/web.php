@@ -158,6 +158,10 @@ Route::post('/login-wa/request', [AuthController::class, 'requestToken'])->name(
 Route::get('/login-wa/verify', [AuthController::class, 'showTokenForm'])->name('login.wa.verify');
 Route::post('/login-wa/verify', [AuthController::class, 'verifyToken'])->name('login.wa.verify.post');
 
+//verifikasi nomer wa
+// Route untuk Verifikasi Nomor WA
+Route::get('/verify-wa/{token}', [App\Http\Controllers\WaController::class, 'verifyWaLink'])->name('wa.verify.link');
+
 /*
 |--------------------------------------------------------------------------
 | MOBILE NAVIGATION (simple endpoints so views can fetch correct nav)

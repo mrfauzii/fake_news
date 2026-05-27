@@ -4,353 +4,149 @@
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/admin/umpanbalik-style.css') }}">
+<link rel="stylesheet" href="{{ asset('css/admin/components.css') }}">
 @endpush
 
 @section('content')
 
-<!-- ===== HEADER TITLE ===== -->
 <div class="feedback-header-top">
     <div class="feedback-title">
         <h1>Manajemen Umpan Balik</h1>
         <p>Pantau dan tanggapi masukan dari pengguna untuk meningkatkan akurasi sistem.</p>
     </div>
 
-    <div class="search-wrapper">
+    <form action="{{ url('/admin/umpanbalik') }}" method="GET" class="search-wrapper">
         <input
             type="text"
+            name="search"
             id="searchFeedback"
             class="search-input"
             placeholder="Search..."
+            value="{{ request('search') }}"
         >
-
-        <button class="search-btn">
+        <button type="submit" class="search-btn">
             <i class="fa fa-search"></i>
         </button>
-    </div>
+    </form>
 </div>
 
-{{--
-<!-- ===== STATS ===== -->
-<div class="stats-container">
-
-    <!-- TOTAL FEEDBACK -->
-    <div class="stats-card">
-        <div class="stats-top">
-            <span>TOTAL UMPAN BALIK</span>
-            <div class="icon-box gray">
-                <i class="fa fa-comments"></i>
-            </div>
-        </div>
-        <h2>{{ number_format($totalFeedback) }}</h2>
-        <p class="positive">↑ Data dari database</p>
-    </div>
-
-    =========================
-     CARD BELUM DIBACA
-    ========================= 
-
-    <div class="stats-card active">
-        <div class="stats-top">
-            <span>BELUM DIBACA</span>
-            <div class="icon-box red">
-                <i class="fa fa-envelope"></i>
-            </div>
-        </div>
-        <h2>{{ $belumDibaca }}</h2>
-        <p class="negative">Perlu perhatian segera!</p>
-    </div>
-
-</div>
-
-<div class="umpanbalik-title">
-
-  <h2>Umpan Balik Terbaru</h2>
-
-    =========================
-     FILTER
-    ========================= 
-    
-    <div class="umpanbalik-tools">
-        <button class="btn-tool">
-            <i class="fa fa-filter"></i> Filter
-        </button>
-    </div>
-</div>
---}}
-
-<!-- ===== LIST ===== -->
 <div class="umpanbalik-list" id="feedbackList">
 
-    <div style="padding:20px">
-        Memuat data...
-    </div>
+    @forelse($feedbacks as $item)
+        <div class="umpanbalik-item new feedback-item">
+            <div class="umpanbalik-left">
+                <div>
+                    <h4>{{ $item->username }}</h4>
+                    <span>{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('l, j F Y') }}</span>
+                    <p>{{ $item->feedback }}</p>
+
+                    <div class="umpanbalik-actions">
+                        <button
+                            class=" btn-detail"
+                            data-username="{{ $item->username }}"
+                            data-date="{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('l, j F Y') }}"
+                            data-feedback="{{ rawurlencode($item->feedback) }}"
+                            data-link="{{ rawurlencode($item->link ?? '-') }}"
+                            data-result="{{ ucfirst($item->final_label ?? '-') }}"
+                        >
+                            Detail
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @empty
+        <div style="padding:20px; text-align:center; color:#999;">
+            Tidak ada data umpan balik yang ditemukan.
+        </div>
+    @endforelse
 
 </div>
 
-<!-- POPUP DETAIL -->
+<div class="pagination-wrapper">
+    @if ($feedbacks->lastPage() > 1)
+
+        {{-- Tombol Previous --}}
+        @if($feedbacks->currentPage() > 1)
+            <a href="{{ $feedbacks->previousPageUrl() }}">Previous</a>
+        @else
+            <a class="disabled">Previous</a>
+        @endif
+
+        {{-- Nomor Angka Halaman --}}
+        @for ($i = 1; $i <= $feedbacks->lastPage(); $i++)
+            <a href="{{ $feedbacks->url($i) }}"
+               class="page-number {{ $feedbacks->currentPage() == $i ? 'active' : '' }}">
+                {{ $i }}
+            </a>
+        @endfor
+
+        {{-- Tombol Next --}}
+        @if($feedbacks->hasMorePages())
+            <a href="{{ $feedbacks->nextPageUrl() }}">Next</a>
+        @else
+            <a class="disabled">Next</a>
+        @endif
+
+    @endif
+</div>
+
 <div id="feedbackPopup" class="popup-overlay" style="display:none;">
-
     <div class="popup-box">
-
-        <button id="closePopup"
-        class="popup-close">
-
-            ✕
-
-        </button>
-
+        <button id="closePopup" class="popup-close">✕</button>
 
         <div class="popup-header">
-
             <h2>Detail Umpan Balik</h2>
-
-            <p>
-                Informasi lengkap masukan pengguna
-            </p>
-
+            <p>Informasi lengkap masukan pengguna</p>
         </div>
 
-
         <div class="popup-info">
-
             <div class="info-card user-card">
+                <div class="info-title">Nama Pengguna</div>
+                <div class="info-value" id="popupUser"></div>
 
-                <div class="info-title">
-                    Nama Pengguna
-                </div>
-
-                <div class="info-value"
-                id="popupUser">
-                </div>
-
-                <div class="info-title"
-                style="margin-top:12px">
-                    Tanggal
-                </div>
-
-                <div class="info-value"
-                id="popupDate">
-                </div>
-
+                <div class="info-title" style="margin-top:12px">Tanggal</div>
+                <div class="info-value" id="popupDate"></div>
             </div>
 
             <div class="info-card">
+                <div class="info-title">Berita yang dicari</div>
+                <div class="info-value" id="popupLink"></div>
 
-                <div class="info-title">
-                    Berita yang dicari
-                </div>
-
-                <div
-                class="info-value"
-                id="popupLink">
-                </div>
-
-                <div class="info-title">
-                    Hasil Deteksi
-                </div>
-
-                <div class="info-value"
-                id="popupResult">
-                </div>
-
+                <div class="info-title">Hasil Deteksi</div>
+                <div class="info-value" id="popupResult"></div>
             </div>
-
         </div>
-
 
         <h3>Isi Feedback</h3>
-
-        <div
-        class="feedback-box"
-        id="popupFeedback">
-
-        </div>
-
+        <div class="feedback-box" id="popupFeedback"></div>
     </div>
-
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const popup = document.getElementById('feedbackPopup');
+    const closeBtn = document.getElementById('closePopup');
 
-document.addEventListener('DOMContentLoaded',function(){
+    /* Handler klik tombol Detail menggunakan Event Delegation */
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('btn-detail')) {
+            document.getElementById('popupUser').innerText = e.target.dataset.username;
+            document.getElementById('popupDate').innerText = e.target.dataset.date;
+            document.getElementById('popupFeedback').innerText = decodeURIComponent(e.target.dataset.feedback);
+            document.getElementById('popupLink').innerText = decodeURIComponent(e.target.dataset.link);
+            document.getElementById('popupResult').innerText = e.target.dataset.result;
 
-    const container=
-    document.getElementById('feedbackList');
-
-    const popup=
-    document.getElementById('feedbackPopup');
-
-    const closeBtn=
-    document.getElementById('closePopup');
-
-    fetch('/admin/umpanbalik-data')
-
-    .then(response=>response.json())
-
-    .then(result=>{
-
-        container.innerHTML='';
-
-        result.data.forEach(item=>{
-
-            container.innerHTML += `
-            <div class="umpanbalik-item new feedback-item"
-                data-user="${item.username.toLowerCase()}"
-                data-feedback="${item.feedback.toLowerCase()}"
-                >
-
-                <div class="umpanbalik-left">
-
-
-                    <div>
-
-                        <h4>${item.username}</h4>
-
-                        <span>${item.date}</span>
-
-                        <p>${item.feedback}</p>
-
-                        <div class="umpanbalik-actions">
-
-                            <button
-                            class="btn-outline btn-detail"
-                            data-username="${item.username}"
-                            data-date="${item.date}"
-                            data-feedback="${encodeURIComponent(item.feedback)}"
-                            data-link="${encodeURIComponent(item.link ?? '-')}"
-                            data-result="${item.result}"
-                            >
-                            Detail
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                {{--
-                <span class="badge new-badge">
-                   Baru
-                </span>
-                    --}}
-            </div>
-            `;
-
-        });
-
-    })
-
-    .catch(error=>{
-
-        console.log(error);
-
-        container.innerHTML=`
-            <p style="color:red">
-                Gagal memuat data
-            </p>
-        `;
-
-    });
-
-    /* =====================
-    SEARCH FEEDBACK
-    ===================== */
-
-    document
-    .getElementById('searchFeedback')
-    .addEventListener('keyup',function(){
-
-        const keyword=
-        this.value.toLowerCase();
-
-        const cards=
-        document.querySelectorAll(
-            '.feedback-item'
-        );
-
-        cards.forEach(card=>{
-
-            const username=
-            card.dataset.user;
-
-            const feedback=
-            card.dataset.feedback;
-
-            const match=
-
-            username.includes(keyword)
-
-            ||
-
-            feedback.includes(keyword);
-
-            card.style.display=
-            match ? 'flex' : 'none';
-
-        });
-
-    });
-
-    document.addEventListener('click',function(e){
-
-    if(e.target.classList.contains('btn-detail')){
-
-        document.getElementById(
-            'popupUser'
-        ).innerText =
-        e.target.dataset.username;
-
-        document.getElementById(
-            'popupDate'
-        ).innerText =
-        e.target.dataset.date;
-
-        document.getElementById(
-            'popupFeedback'
-        ).innerText =
-        decodeURIComponent(
-            e.target.dataset.feedback
-        );
-
-        document.getElementById(
-            'popupLink'
-        ).innerText =
-        decodeURIComponent(
-            e.target.dataset.link
-        );
-
-        document.getElementById(
-        'popupResult'
-        ).innerText =
-        e.target.dataset.result;
-
-        popup.style.display='flex';
-    }
-
-});
-
-    closeBtn.addEventListener(
-        'click',
-        ()=> popup.style.display='none'
-    );
-
-
-    popup.addEventListener(
-        'click',
-        function(e){
-
-            if(e.target===popup){
-
-                popup.style.display='none';
-
-            }
-
+            popup.style.display = 'flex';
         }
-    );
+    });
 
+    /* Handler Menutup Popup */
+    closeBtn.addEventListener('click', () => popup.style.display = 'none');
+    popup.addEventListener('click', function(e) {
+        if (e.target === popup) { popup.style.display = 'none'; }
+    });
 });
-
 </script>
 
 @endsection

@@ -8,41 +8,23 @@ use Carbon\Carbon;
 
 class UmpanBalikController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // ambil total sesuai data yang benar-benar tampil
+        // Set locale Carbon ke Indonesia agar format hari & bulan otomatis berbahasa Indonesia
+        Carbon::setLocale('id');
+
+        // 1. Ambil kata kunci pencarian dari URL (?search=...)
+        $search = $request->input('search');
+
+        // 2. Hitung total feedback keseluruhan di database untuk mengisi komponen Stats Card
         $totalFeedback = DB::table('feedbacks')
             ->join('users', 'feedbacks.user_id', '=', 'users.id')
             ->count();
 
-        /*
-        // sementara dinonaktifkan
-        $belumDibaca = $totalFeedback;
-        */
-
-        return view(
-            'admin.umpanbalik',
-            compact(
-                'totalFeedback'
-            )
-        );
-    }
-
-    public function getFeedbackData()
-    {
-        Carbon::setLocale('id');
-
-        $feedbacks = DB::table('feedbacks')
+        // 3. Siapkan query dasar untuk mengambil list data umpan balik
+        $query = DB::table('feedbacks')
             ->join('users', 'feedbacks.user_id', '=', 'users.id')
-            
-             // TAMBAHAN
-            ->leftJoin(
-                'requests',
-                'feedbacks.request_id',
-                '=',
-                'requests.id'
-            )
-
+            ->leftJoin('requests', 'feedbacks.request_id', '=', 'requests.id')
             ->select(
                 'feedbacks.id',
                 'users.name as username',
@@ -50,30 +32,22 @@ class UmpanBalikController extends Controller
                 'feedbacks.created_at',
                 'requests.input_text as link',
                 'requests.final_label'
-            )
-            ->orderBy('feedbacks.created_at', 'desc')
-            ->get()
-            ->map(function($item){
+            );
 
-                return [
-                    'id' => $item->id,
-                    'username' => $item->username,
-                    'feedback' => $item->feedback,
-                    'link' => $item->link ?? '-',
-                    'result' => ucfirst($item->final_label ?? '-'),
-                    'date' => Carbon::parse(
-                        $item->created_at
-                    )->translatedFormat(
-                        'l, j F Y'
-                    ),
-
-                ];
+        // 4. LOGIKA PENCARIAN GLOBAL: Jika kolom search diisi, saring database di semua halaman
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('users.name', 'like', "%{$search}%")
+                  ->orWhere('feedbacks.feedback', 'like', "%{$search}%");
             });
+        }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Data umpan balik berhasil dimuat.',
-            'data' => $feedbacks
-        ]);
+        // 5. Batasi 10 data per halaman & kunci parameter pencarian di URL saat klik pindah page
+        $feedbacks = $query->orderBy('feedbacks.created_at', 'desc')
+            ->paginate(10)
+            ->withQueryString();
+
+        // 6. Kirim seluruh variabel ke view admin.umpanbalik
+        return view('admin.umpanbalik', compact('totalFeedback', 'feedbacks'));
     }
 }

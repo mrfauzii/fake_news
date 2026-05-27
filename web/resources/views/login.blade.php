@@ -75,7 +75,7 @@
                 </div>
 
                 <div class="login-panel__back">
-                    <a href="{{ route('landing') }}" class="back-link">Kembali ke Halaman Utama &rsaquo;</a>
+                    <a href="{{ route('beranda') }}" class="back-link">Kembali ke Halaman Utama &rsaquo;</a>
                 </div>
 
             </div>

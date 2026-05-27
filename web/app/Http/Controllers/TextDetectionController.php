@@ -33,7 +33,7 @@ class TextDetectionController extends Controller
         $detection = new TextDetectionController();
         return $detection->detect($inputText, $skipSimilarity);
     }
-    public function detect($inputText, $skipSimilarity = 0)
+    public function detect($inputText, $wa = 0, $user_wa = 0, $skipSimilarity = 0)
     {
 
         $userId = Auth::check() ? Auth::id() : 2;
@@ -61,10 +61,9 @@ class TextDetectionController extends Controller
                         if ($oldRequest) {
                             // HANYA tambah UserInteraction baru yang mengarah ke request lama
                             UserInteractions::create([
-                                'user_id'    => $userId,
+                                'user_id'    => ($wa == 1) ? $user_wa : $userId,
                                 'request_id' => $matchedId,
                             ]);
-
                             // Format data lama agar persis dengan output frontend
                             $responseData = $this->formatMatchedResponse($oldRequest, $matchedId);
 
@@ -90,10 +89,9 @@ class TextDetectionController extends Controller
             $requestId = $requestData->id;
 
             UserInteractions::create([
-                'user_id'    => $userId,
+                'user_id'    => ($wa == 1) ? $user_wa : $userId,
                 'request_id' => $requestId,
             ]);
-
             $response = Http::timeout(120)->post('http://127.0.0.1:8004/text-detection', [
                 'query' => $inputText,
                 'id_request' => $requestId

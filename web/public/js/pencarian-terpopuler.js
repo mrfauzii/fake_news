@@ -275,6 +275,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         grid.innerHTML = itemsToDisplay.map((item, idx) => {
             const detailUrl = buildSearchUrl(item.query);
+            console.log(item.id);
             const displayRank = idx + 1; // 1..3
             const rankClass = item.category === 'hoax' ? 'rank-hoax' : 'rank-fakta';
 
@@ -300,6 +301,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function buildSearchUrl(query) {
         const url = new URL(searchRoute, window.location.origin);
         url.searchParams.set('informasi', query);
+        console.log(url.toString());
         return url.toString();
     }
 

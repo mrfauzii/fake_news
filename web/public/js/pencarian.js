@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function () {
     /**
      * Search by text
      */
-    function searchText(informasi) {
+    function searchText(informasi, skip_similarity = 0 ) {
         showLoading();
         clearImagePreview(); // Clear image preview when searching by text
 
@@ -146,6 +146,7 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             body: JSON.stringify({
                 informasi: informasi, 
+                skip_similarity: skip_similarity
             }),
         })
             .then(response => {
@@ -372,8 +373,19 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnTelusuriUlang = document.getElementById('btnTelusuriUlang');
     if (btnTelusuriUlang) {
         btnTelusuriUlang.addEventListener('click', function () {
-            inputInformasi.focus();
-            inputInformasi.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            const informasi = inputInformasi.value.trim();
+
+        if (!informasi) {
+            showError('Silakan masukkan informasi terlebih dahulu');
+            return;
+        }
+
+        if (informasi.length < 10) {
+            showError('Informasi minimal harus 10 karakter');
+            return;
+        }
+
+        searchText(informasi, skip_similarity = 1);
         });
     }
 

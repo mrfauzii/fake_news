@@ -49,8 +49,12 @@
     font-size: 20px;
 }
 
-.lh-logo__lensa { color: var(--color-primary-mid); }
-.lh-logo__hoax  { color: var(--color-primary); }
+.lh-logo__lensa {
+    color: var(--color-primary-mid);
+}
+.lh-logo__hoax {
+    color: var(--color-primary);
+}
 
 /* Nav icon buttons */
 .lh-nav-icons,
@@ -70,16 +74,21 @@
     max-width: 42px;
     padding: 0;
     border-radius: var(--radius-circle, 50%);
-    background: linear-gradient(90deg, #73070B 0%, #B8201D 100%);
+    background: linear-gradient(90deg, #73070b 0%, #b8201d 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--color-white);
-    border: 1px solid #73070B;
+    border: 1px solid #73070b;
     box-shadow: 0 6px 14px rgba(115, 7, 11, 0.22);
     overflow: hidden;
     white-space: nowrap;
-    transition: width 0.24s ease, background 0.2s ease, transform 0.2s ease, box-shadow 0.22s ease, padding 0.24s ease;
+    transition:
+        width 0.24s ease,
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.22s ease,
+        padding 0.24s ease;
     flex-shrink: 0;
 }
 
@@ -88,10 +97,10 @@
 .lh-nav-btn--desktop:hover,
 .lh-nav-btn--desktop:focus-visible,
 .lh-nav-btn--active {
-    width: min(240px, 33vw);
-    min-width: min(240px, 33vw);
-    max-width: min(240px, 33vw);
-    background: linear-gradient(90deg, #73070B 0%, #B8201D 100%);
+    width: auto;
+    min-width: 42px;
+    max-width: 300px;
+    background: linear-gradient(90deg, #73070b 0%, #b8201d 100%);
     transform: translateY(-1px);
     box-shadow: 0 10px 18px rgba(115, 7, 11, 0.32);
     justify-content: flex-start;
@@ -151,7 +160,10 @@
     pointer-events: none;
     opacity: 0;
     transform: translateX(-6px);
-    transition: max-width 0.24s ease, opacity 0.18s ease, transform 0.18s ease;
+    transition:
+        max-width 0.24s ease,
+        opacity 0.18s ease,
+        transform 0.18s ease;
     min-width: 0;
 }
 
@@ -309,8 +321,10 @@
     .lh-navbar--mobile-top,
     .lh-navbar--mobile {
         --nav-transition: 110ms;
-        --nav-ease: cubic-bezier(.25,.9,.25,1);
-        transition: opacity var(--nav-transition) var(--nav-ease), transform var(--nav-transition) var(--nav-ease);
+        --nav-ease: cubic-bezier(0.25, 0.9, 0.25, 1);
+        transition:
+            opacity var(--nav-transition) var(--nav-ease),
+            transform var(--nav-transition) var(--nav-ease);
         will-change: opacity, transform;
     }
 
@@ -363,17 +377,25 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,242,242,0.96) 100%);
+        background: linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.98) 0%,
+            rgba(248, 242, 242, 0.96) 100%
+        );
         border: 1px solid rgba(115, 7, 11, 0.08);
         box-shadow: 0 2px 8px rgba(115, 7, 11, 0.06);
-        color: #73070B;
+        color: #73070b;
         transition: all 0.22s ease;
         cursor: pointer;
     }
 
     .lh-nav-btn--user-top:hover,
     .lh-nav-btn--user-top:focus-visible {
-        background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(244,236,236,0.98) 100%);
+        background: linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(244, 236, 236, 0.98) 100%
+        );
         border-color: rgba(115, 7, 11, 0.12);
         box-shadow: 0 4px 12px rgba(115, 7, 11, 0.1);
         transform: translateY(-1px);
@@ -460,17 +482,26 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,242,242,0.96) 100%);
+        background: linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.98) 0%,
+            rgba(248, 242, 242, 0.96) 100%
+        );
         border: 1px solid rgba(115, 7, 11, 0.08);
         box-shadow: 0 6px 14px rgba(115, 7, 11, 0.08);
         /* Mobile-specific transitions: faster and more GPU-friendly */
         --nav-transition: 110ms;
-        --nav-ease: cubic-bezier(.25,.9,.25,1);
-        transition: transform var(--nav-transition) var(--nav-ease), box-shadow calc(var(--nav-transition) - 30ms) ease, background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+        --nav-ease: cubic-bezier(0.25, 0.9, 0.25, 1);
+        transition:
+            transform var(--nav-transition) var(--nav-ease),
+            box-shadow calc(var(--nav-transition) - 30ms) ease,
+            background-color 120ms ease,
+            color 120ms ease,
+            border-color 120ms ease;
         will-change: transform, opacity, box-shadow;
         backface-visibility: hidden;
         cursor: pointer;
-        color: #73070B;
+        color: #73070b;
         position: relative;
         overflow: hidden;
         isolation: isolate;
@@ -492,13 +523,17 @@
         background: #b61a1c;
         box-shadow: 0 2px 6px rgba(184, 32, 29, 0.12);
         opacity: 0;
-        transition: transform var(--nav-transition) var(--nav-ease), opacity calc(var(--nav-transition) - 20ms) var(--nav-ease);
+        transition:
+            transform var(--nav-transition) var(--nav-ease),
+            opacity calc(var(--nav-transition) - 20ms) var(--nav-ease);
         pointer-events: none;
     }
 
     /* Hide per-button pseudo indicators on mobile; we use a single moving indicator instead */
     .lh-nav-btn::before,
-    .lh-nav-btn--mobile::before { display: none !important; }
+    .lh-nav-btn--mobile::before {
+        display: none !important;
+    }
 
     /* Global moving indicator positioned inside the icon container */
     .lh-nav-icons--mobile {
@@ -517,7 +552,9 @@
         /* use transform with CSS variable for smooth GPU-accelerated movement */
         transform: translateX(var(--indicator-x, 0px)) translateX(-50%) scale(1);
         opacity: 1;
-        transition: transform calc(var(--nav-transition) * 1.1) var(--nav-ease), opacity calc(var(--nav-transition) - 20ms) var(--nav-ease);
+        transition:
+            transform calc(var(--nav-transition) * 1.1) var(--nav-ease),
+            opacity calc(var(--nav-transition) - 20ms) var(--nav-ease);
         pointer-events: none;
         z-index: 2;
         will-change: transform;
@@ -533,7 +570,9 @@
     /* Slight icon scale for emphasis when active, done via transform for performance */
     .lh-nav-btn > iconify-icon,
     .lh-nav-btn--mobile > iconify-icon {
-        transition: transform calc(var(--nav-transition) + 20ms) var(--nav-ease), color calc(var(--nav-transition) - 30ms) ease;
+        transition:
+            transform calc(var(--nav-transition) + 20ms) var(--nav-ease),
+            color calc(var(--nav-transition) - 30ms) ease;
         will-change: transform, color;
         display: block;
         font-size: 24px;
@@ -559,9 +598,13 @@
     .lh-nav-btn--mobile:focus-visible {
         /* avoid scaling to prevent oval artifacts; use subtle lift only */
         transform: translateY(-2px) translateZ(0);
-        background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(244,236,236,0.98) 100%);
-        box-shadow: 0 6px 12px rgba(115, 7, 11, 0.10);
-        border-color: rgba(115, 7, 11, 0.10);
+        background: linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(244, 236, 236, 0.98) 100%
+        );
+        box-shadow: 0 6px 12px rgba(115, 7, 11, 0.1);
+        border-color: rgba(115, 7, 11, 0.1);
     }
 
     .lh-nav-btn:active,
@@ -575,7 +618,7 @@
     .lh-nav-btn--mobile:focus-visible > iconify-icon,
     .lh-nav-btn--active > iconify-icon {
         transform: scale(1.02);
-        color: #73070B;
+        color: #73070b;
     }
 
     .lh-nav-tooltip,
@@ -601,7 +644,11 @@
     }
 
     .lh-nav-btn--search {
-        background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,242,242,0.96) 100%);
+        background: linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.98) 0%,
+            rgba(248, 242, 242, 0.96) 100%
+        );
         box-shadow: 0 6px 14px rgba(115, 7, 11, 0.08);
         transform: translateY(-1px);
     }
@@ -635,7 +682,10 @@
             transition: none !important;
         }
 
-        .lh-nav-btn::before { transform: translateX(-50%) scale(1) !important; opacity: 1 !important; }
+        .lh-nav-btn::before {
+            transform: translateX(-50%) scale(1) !important;
+            opacity: 1 !important;
+        }
     }
 
     .lh-nav-btn--active > iconify-icon {

@@ -31,14 +31,16 @@ class TextDetectionController extends Controller
 
         $inputText = $request->input('query');
         $userId = Auth::check() ? Auth::id() : 2;
-
+        
         try {
             // ========================================================
             // A. CEK SIMILARITY SEARCH TERLEBIH DAHULU
             // ========================================================
+            if ($request->input('skip_similarity') === 0) {
             $simResponse = Http::timeout(60)->post('http://127.0.0.1:8004/similarity-search', [
                 'query' => $inputText
             ]);
+            
             if ($simResponse->successful()) {
                 $simData = $simResponse->json();
 
@@ -66,6 +68,7 @@ class TextDetectionController extends Controller
                         ]);
                     }
                 }
+            }
             }
 
             // ========================================================
@@ -138,6 +141,7 @@ class TextDetectionController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
+    
     }
 
     /**

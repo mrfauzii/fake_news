@@ -1,7 +1,7 @@
 @php
     $isWhatsAppVariant = isset($variant) && $variant === 'wa';
-    $isLandingActive = request()->routeIs('landing');
-    $isSearchActive = request()->routeIs('beranda');
+    $isLandingActive = request()->routeIs('beranda');
+    $isSearchActive = request()->routeIs('deteksi');
     $isPopularActive = request()->routeIs('pencarian.populer');
     $isWhatsAppActive = request()->routeIs('whatsapp.page');
     $isHistoryActive = request()->routeIs('riwayat');
@@ -27,7 +27,7 @@
     @else
         <nav class="lh-nav-icons lh-nav-icons--desktop" aria-label="Navigasi utama">
     @endif
-        <a href="{{ route('landing') }}" class="lh-nav-btn {{ $isWhatsAppVariant ? 'wa-nav-btn' : '' }} {{ $isLandingActive ? 'lh-nav-btn--active' : '' }}" aria-label="Beranda Utama" @if($isLandingActive) aria-current="page" @endif>
+        <a href="{{ route('beranda') }}" class="lh-nav-btn {{ $isWhatsAppVariant ? 'wa-nav-btn' : '' }} {{ $isLandingActive ? 'lh-nav-btn--active' : '' }}" aria-label="Beranda Utama" @if($isLandingActive) aria-current="page" @endif>
             <iconify-icon icon="mdi:home" width="24" height="24"></iconify-icon>
             <span class="lh-nav-tooltip" role="tooltip">
                 <iconify-icon icon="mdi:home" width="17" height="17"></iconify-icon>
@@ -41,6 +41,7 @@
                 <span>Pencarian Terpopuler</span>
             </span>
         </a>
+        @if(Auth::check())
         <a href="{{ route('riwayat') }}" class="lh-nav-btn {{ $isWhatsAppVariant ? 'wa-nav-btn' : '' }} {{ $isHistoryActive ? 'lh-nav-btn--active' : '' }}" aria-label="Riwayat" @if($isHistoryActive) aria-current="page" @endif>
             <iconify-icon icon="fontisto:history" width="24" height="24"></iconify-icon>
             <span class="lh-nav-tooltip" role="tooltip">
@@ -48,7 +49,8 @@
                 <span>Riwayat Pencarian Anda</span>
             </span>
         </a>
-        <a href="{{ route('beranda') }}" class="lh-nav-btn lh-nav-btn--search {{ $isWhatsAppVariant ? 'wa-nav-btn' : '' }} {{ $isSearchActive ? 'lh-nav-btn--active' : '' }}" aria-label="Pencarian" @if($isSearchActive) aria-current="page" @endif>
+        @endif
+        <a href="{{ route('deteksi') }}" class="lh-nav-btn lh-nav-btn--search {{ $isWhatsAppVariant ? 'wa-nav-btn' : '' }} {{ $isSearchActive ? 'lh-nav-btn--active' : '' }}" aria-label="Pencarian" @if($isSearchActive) aria-current="page" @endif>
             <iconify-icon icon="mdi:magnify" width="24" height="24"></iconify-icon>
             <span class="lh-nav-tooltip" role="tooltip">
                 <iconify-icon icon="mdi:magnify" width="17" height="17"></iconify-icon>
@@ -127,7 +129,7 @@
 <!-- Mobile: Bottom Navbar -->
 <header class="lh-navbar lh-navbar--mobile">
     <nav class="lh-nav-icons lh-nav-icons--mobile" aria-label="Navigasi utama">
-        <a href="{{ route('landing') }}" class="lh-nav-btn {{ $isLandingActive ? 'lh-nav-btn--active' : '' }}" aria-label="Beranda Utama" @if($isLandingActive) aria-current="page" @endif>
+        <a href="{{ route('beranda') }}" class="lh-nav-btn {{ $isLandingActive ? 'lh-nav-btn--active' : '' }}" aria-label="Beranda Utama" @if($isLandingActive) aria-current="page" @endif>
             <iconify-icon icon="mdi:home" width="24" height="24"></iconify-icon>
             <span class="lh-nav-tooltip" role="tooltip">
                 <iconify-icon icon="mdi:home" width="17" height="17"></iconify-icon>
@@ -148,7 +150,7 @@
                 <span>Riwayat Pencarian Anda</span>
             </span>
         </a>
-        <a href="{{ route('beranda') }}" class="lh-nav-btn lh-nav-btn--search {{ $isSearchActive ? 'lh-nav-btn--active' : '' }}" aria-label="Pencarian" @if($isSearchActive) aria-current="page" @endif>
+        <a href="{{ route('deteksi') }}" class="lh-nav-btn lh-nav-btn--search {{ $isSearchActive ? 'lh-nav-btn--active' : '' }}" aria-label="Pencarian" @if($isSearchActive) aria-current="page" @endif>
             <iconify-icon icon="mdi:magnify" width="24" height="24"></iconify-icon>
             <span class="lh-nav-tooltip" role="tooltip">
                 <iconify-icon icon="mdi:magnify" width="17" height="17"></iconify-icon>

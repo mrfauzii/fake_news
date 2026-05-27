@@ -9,8 +9,8 @@
 
 @section('content')
 
-<div class="feedback-header-top">
-    <div class="feedback-title">
+<div class="page-header-top">
+    <div class="page-title-box">
         <h1>Manajemen Umpan Balik</h1>
         <p>Pantau dan tanggapi masukan dari pengguna untuk meningkatkan akurasi sistem.</p>
     </div>

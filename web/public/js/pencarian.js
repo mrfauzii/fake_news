@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
      * Handle upload button click
      */
     btnUnggah.addEventListener('click', function () {
-        clearImagePreview(); // Clear previous preview if any
+        // clearImagePreview(); // Clear previous preview if any
         fileInput.click();
     });
 
@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Handle both response formats
                     const resultData = data;
                     displayResult(resultData);
-                    clearImagePreview();
+                // clearImagePreview();
                 } else {
                     showError(data.message || 'Gagal mengupload gambar. Silakan coba lagi.');
                     fileInput.value = '';
@@ -253,6 +253,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Normalize and map verdict label
     const normalizedVerdict = String(verdict || '').toLowerCase();
+    console.log(normalizedVerdict);
     const verdictMap = {
         fake: { label: 'HOAX', className: 'lh-verdict--hoax' },
         valid: { label: 'FAKTA', className: 'lh-verdict--valid' },

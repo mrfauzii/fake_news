@@ -131,10 +131,15 @@ class RiwayatController extends Controller
         $userId = Auth::check() ? Auth::id() : 2; // Jika guest pakai ID 2
 
         // Ambil riwayat khusus milik user ini
-        $histories = history_view::with('request.image')
-            ->where('user_id', $userId)
-            ->orderBy('created_at', 'desc')
-            ->get();
+       $histories = history_view::with([
+    'request.image',
+    'request.stage1Results',
+    'request.stage2Results',
+    'request.feedbacks'
+])
+->where('user_id', $userId)
+->orderBy('created_at', 'desc')
+->get();
 
         $data = $histories->map(function ($history) {
 
@@ -174,19 +179,22 @@ class RiwayatController extends Controller
             }
 
             // Ambil umpan balik jika ada (hanya feedback milik user ini untuk request)
-            $feedback = null;
-            if (Auth::check()) {
-                $fb = \App\Models\Feedbacks::where('user_id', Auth::id())
-                    ->where('request_id', $history->request_id)
-                    ->first();
-                if ($fb) {
-                    $feedback = [
-                        'id' => $fb->id,
-                        'feedback' => $fb->feedback,
-                        'created_at' => $fb->created_at,
-                    ];
-                }
-            }
+           $feedback = null;
+
+if (Auth::check()) {
+
+    $fb = $history->request->feedbacks
+        ->where('user_id', Auth::id())
+        ->first();
+
+    if ($fb) {
+        $feedback = [
+            'id' => $fb->id,
+            'feedback' => $fb->feedback,
+            'created_at' => $fb->created_at,
+        ];
+    }
+}
 
             return [
                 'id'          => $history->request_id,

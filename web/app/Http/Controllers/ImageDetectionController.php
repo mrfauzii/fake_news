@@ -83,7 +83,7 @@ class ImageDetectionController extends Controller
 
                 // 6. Update hasil akhir di tabel 'requests'
                 $isHoax = $res['prediction'] == 1;
-                $finalLabel = $isHoax ? 'HOAX' : 'FAKTA';
+                $finalLabel = $isHoax ? 'fake' : 'real';
                 if ($isHoax) {
                     $hoaxPercentage = round($res['confidence'] * 100);
                     $factPercentage = 100 - $hoaxPercentage;
@@ -97,11 +97,12 @@ class ImageDetectionController extends Controller
                     'final_confidence' => $res['confidence'],
                     'status' => 'completed'
                 ]);
+                $finalLabel = $isHoax ? 'HOAX' : 'FAKTA';
 
                 // 7. RETURN SESUAI FIGMA
                 return response()->json([
                     'status' => 'success',
-                    'verdict' => strtolower($finalLabel),
+                    'verdict' => $finalLabel,
                     'confidence' => $hoaxPercentage,
                     'summary' => 'Analisis gambar menunjukkan indikasi ' . $finalLabel . ' dengan tingkat kepercayaan ' . $hoaxPercentage . '%.',
                     'sources' => $links,
@@ -109,8 +110,8 @@ class ImageDetectionController extends Controller
                     'data' => [
                         'indication' => $finalLabel,
                         'confidence_score' => [
-                            'hoax' => $hoaxPercentage,
-                            'fact' => $factPercentage
+                            'fake' => $hoaxPercentage,
+                            'real' => $factPercentage
                         ],
                         'image_preview' => $url
                     ]

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache; // TAMBAHAN: Import Cache untuk simpan data tanpa tabel database
 use Carbon\Carbon;
 use App\Models\Users; 
 use App\Models\Requests; 
@@ -100,6 +101,10 @@ class AdminController extends Controller
             'last_updated'       => Carbon::now()->translatedFormat('d F Y, H:i') . ' WIB',
         ];
 
+        // AMBIL DATA REAL-TIME: Membaca cache waktu klik terakhir. Jika belum ada, default pakai jam sekarang.
+        $lastUpdatedTime = Cache::get('last_kb_actual_update', Carbon::now()->format('Y-m-d H:i:s'));
+        $formattedLastUpdate = Carbon::parse($lastUpdatedTime)->translatedFormat('d F Y, H:i') . ' WIB';
+        
         return view('admin.dashboard', compact('dashboardPopular', 'dashboardStats'));
     }
 
@@ -137,5 +142,30 @@ class AdminController extends Controller
             'success',
             'Jadwal pembaruan knowledge base berhasil diperbarui'
         );
+    }
+
+    /* --- FUNGSI UPDATE NOW YANG SUDAH DIPERBAIKI (TANPA DATABASE) --- */
+    public function updateNow()
+    {
+        try {
+            $currentRealTime = Carbon::now()->format('H:i');
+            
+            // 1. Simpan jam baru ke session utama
+            session(['knowledge_base_update_time' => $currentRealTime]);
+            
+            // 2. TAMBAHKAN BARIS INI (Membuat alert hijau muncul setelah halaman di-reload)
+            session()->flash('success', 'Jadwal pembaruan knowledge base berhasil diperbarui secara instan!');
+
+            // 3. Kembalikan sinyal sukses ke JavaScript
+            return response()->json([
+                'status' => 'success'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }

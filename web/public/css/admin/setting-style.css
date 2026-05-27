@@ -3,7 +3,6 @@
 }
 
 /* HEADER */
-
 .setting-header h1{
     font-size: 28px;
     font-weight: 700;
@@ -23,17 +22,15 @@
 }
 
 /* CARD */
-
 .setting-box{
     background: #fff;
     border-radius: 16px;
     padding: 24px;
-    width: 420px;
+    width: 375px;
     box-shadow: 0 6px 18px rgba(0,0,0,0.05);
 }
 
 /* INPUT GROUP */
-
 .input-group-setting{
     display: flex;
     flex-direction: column;
@@ -48,9 +45,8 @@
 }
 
 /* INPUT */
-
 .time-input{
-    width: 100%;
+    width: 320px;
     height: 58px;
     padding: 0 18px;
     border: 1px solid #ddd;
@@ -65,16 +61,22 @@
     box-shadow: 0 0 0 4px rgba(196,18,18,0.15);
 }
 
-/* BUTTON */
+/* BUTTONS */
+.setting-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    align-items: center;
+}
 
 .save-btn{
     background: #c41212;
     color: white;
     border: none;
     height: 52px;
-    padding: 0 28px;
+    padding: 0 16px;
     border-radius: 14px;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: 0.3s;
@@ -84,6 +86,28 @@
     background: #a50f0f;
 }
 
+/* BUTTON PERBARUI SEKARANG (BARU) */
+.sync-btn {
+    background: #4b5563;
+    color: white;
+    border: none;
+    height: 52px;
+    padding: 0 16px;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.3s;
+}
+
+.sync-btn:hover {
+    background: #374151;
+}
+
+/* ALERT SUCCESS */
 .success-alert {
     position: fixed;
     top: 85px; 
@@ -107,7 +131,7 @@
     font-size: 18px;
 }
 
-/* ANIMASI BARU (SLIDE DOWN) */
+/* ANIMASI SLIDE DOWN */
 @keyframes slideDown {
     from {
         opacity: 0;

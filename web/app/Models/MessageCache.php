@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class MessageCache extends Model
 {
-    protected $table = 'messageCache';
+    protected $table = 'message_cache';
 
-    public $timestamps = false;
+    // public $timestamps = true;
 
     protected $fillable = [
         'sender_number',

@@ -4,6 +4,7 @@
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/admin/user-style.css') }}">
+<link rel="stylesheet" href="{{ asset('css/admin/components.css') }}">
 @endpush
 
 @section('content')

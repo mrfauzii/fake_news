@@ -21,3 +21,75 @@
     border-radius: 6px;
     background: white;
 }
+
+/* ==========================================================================
+   GLOBAL REUSABLE COMPONENT: PAGINATION 
+   Bisa digunakan di Data Pengguna, Umpan Balik, dan Riwayat Global
+   ========================================================================== */
+
+.pagination-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+/* Mendukung elemen <a> maupun <button> */
+.pagination-wrapper a, 
+.pagination-wrapper button {
+    padding: 12px 18px;
+    border: 1px solid #ddd;
+    text-decoration: none;
+    color: #444;
+    background: #fff;
+    transition: 0.3s;
+    margin-left: -1px; /* Biar border antar tombol menyatu */
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagination-wrapper a:first-child, 
+.pagination-wrapper button:first-child {
+    border-radius: 10px 0 0 10px;
+}
+
+.pagination-wrapper a:last-child, 
+.pagination-wrapper button:last-child {
+    border-radius: 0 10px 10px 0;
+}
+
+.pagination-wrapper a:hover:not(.disabled), 
+.pagination-wrapper button:hover:not(.disabled) {
+    background: #c71919; /* Warna merah LensaHoax */
+    color: white;
+    border-color: #c71919;
+}
+
+/* State Aktif (Halaman yang sedang dibuka) */
+.pagination-wrapper .page-number.active,
+.pagination-wrapper button.active {
+    background: #c71919;
+    color: white;
+    border-color: #c71919;
+    cursor: default;
+    pointer-events: none; /* Biar tidak bisa diklik ulang */
+}
+
+/* State Disabled (Tombol Previous/Next mati) */
+.pagination-wrapper .disabled,
+.pagination-wrapper button:disabled {
+    pointer-events: none;
+    background: #f3f3f3;
+    color: #999;
+    cursor: not-allowed;
+    border-color: #ddd;
+}
+
+/* Ukuran khusus untuk tombol Previous dan Next agar lebih lebar */
+.pagination-wrapper a:not(.page-number), 
+.pagination-wrapper button:not(.page-number) {
+    padding: 12px 20px;
+}

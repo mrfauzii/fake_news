@@ -17,12 +17,19 @@ class WaController extends Controller
     public function webhook(Request $request)
     {
         try {
-            $sender = (string) $request->input('sender');
+            $senderRaw = (string) $request->input('sender'); // Ambil data asli Fonnte (62...)
             $message = trim(strtolower($request->input('message')));
             $name = $request->input('name');
 
-            // 1. Simpan atau Ambil Data User
-            Users::firstOrCreate(
+            // 🔥 NORMALISASI DI SINI SEJAK AWAL
+            $sender = $senderRaw;
+            if (str_starts_with($senderRaw, '62')) {
+                $sender = '0' . substr($senderRaw, 2); // Sekarang variabel $sender isinya pasti berawalan '0'
+            }
+
+            // Sekarang semua fungsi di bawahnya (firstOrCreate, #detect, #history)
+            // akan aman menggunakan variabel $sender yang sudah berawalan '0'
+            $user = Users::firstOrCreate(
                 ['phone_number' => $sender],
                 ['name' => $name ?? 'User WA']
             );
@@ -57,7 +64,8 @@ class WaController extends Controller
 
                         // Panggil TextDetectionController secara Non-Static
                         $detection = new TextDetectionController();
-                        $reply = $detection->detect($text);
+                        Log::info("Processing #detect for user_id: " . $user->id . " with text: " . $text);
+                        $reply = $detection->detect($text, 1, $user->id); // Pastikan untuk passing user_id agar bisa tercatat di UserInteractions
                         $result = json_decode($reply->getContent(), true);
 
                         if (isset($result['status']) && $result['status'] !== 'error') {
@@ -104,23 +112,28 @@ class WaController extends Controller
                 // COMMAND: #info
                 // ==========================================
                 case str_starts_with($message, '#info'):
+                    // Generate Link Beranda Website menggunakan Route Name Laravel
+                    $linkWebsite = route('beranda');
+
                     $waReply = "🤖 *MENGENAL LENSA HOAX AI* 🤖\n";
                     $waReply .= "━━━━━━━━━━━━━━━━━━━\n\n";
-                    $waReply .= "*Lensa Hoax* adalah sistem berbasis Kecerdasan Buatan (AI) yang dirancang khusus untuk mendeteksi keaslian berita atau klaim secara cepat dan akurat.\n\n";
+                    $waReply .= "*Lensa Hoax* adalah sistem yang dirancang khusus untuk mendeteksi keaslian berita atau klaim secara cepat dan akurat.\n\n";
                     $waReply .= "⚙️ *Fitur Utama via WhatsApp:*\n";
                     $waReply .= "1. `#detect` - Periksa keaslian pesan terakhir yang Anda kirim.\n";
                     $waReply .= "2. `#trending` - Lihat daftar tren hoaks terpopuler.\n";
                     $waReply .= "3. `#history` - Lihat riwayat pencarian terakhir Anda.\n\n";
                     $waReply .= "🌐 *Versi Website:*\n";
-                    $waReply .= "Nikmati visualisasi data dan laporan analisis hoaks yang lebih mendalam melalui website kami di https://lensahoax.comn";
+                    $waReply .= "Nikmati visualisasi data dan laporan analisis hoaks yang lebih mendalam melalui website resmi kami.\n\n";
+                    $waReply .= "🔗 *Kunjungi Sekarang:*\n";
+                    $waReply .= "👉 " . $linkWebsite . "\n\n";
                     $waReply .= "━━━━━━━━━━━━━━━━━━━\n";
                     $waReply .= "💡 _Mari bersama-sama putus mata rantai hoaks!_";
                     break;
-
                 // ==========================================
                 // COMMAND: #trending
                 // ==========================================
                 case str_starts_with($message, '#trending'):
+                    $linkWebsite = route('beranda');
                     $trendingHoaxes = \App\Models\Requests::where('final_label', 'fake')
                         ->where('status', '!=', 'pending')
                         ->latest()
@@ -141,26 +154,32 @@ class WaController extends Controller
                         $waReply .= "Belum ada data tren hoaks saat ini. Sistem masih terus memantau.\n";
                     }
                     $waReply .= "━━━━━━━━━━━━━━━━━━━";
+                    $waReply .= "🔗 *Atau kunjungi website kami untuk pengalaman yang lebih lengkap:*\n";
+                    $waReply .= "👉 " . $linkWebsite . "\n\n";
                     break;
 
                 // ==========================================
                 // COMMAND: #history
                 // ==========================================
                 case str_starts_with($message, '#history'):
-                    // 1. Mengambil data user berdasarkan nomor pengirim WA
-                    $user = \App\Models\Users::where('phone_number', $sender)->first();
-                    $userId = $user ? $user->id : null;
-
-                    // 2. Hitung total pencarian yang pernah dilakukan user ini
-                    $totalPencarian = 0;
-                    if ($userId) {
-                        $totalPencarian = \App\Models\UserInteractions::where('user_id', $userId)->count();
+                    // 1. NORMALISASI: Ubah awalan '62' dari Fonnte menjadi '0' agar cocok dengan DB Anda
+                    $formattedNumber = $sender;
+                    if (str_starts_with($sender, '62')) {
+                        $formattedNumber = '0' . substr($sender, 2); // Mengubah 62857... menjadi 0857...
                     }
 
-                    // 3. Generate Link Beranda Website menggunakan Route Name Laravel
+                    // 2. Cari user berdasarkan nomor yang SUDAH DINORMALISASI
+                    $user = \App\Models\Users::where('phone_number', $formattedNumber)->first();
+
+                    // 3. Ambil ID-nya. Jika user belum terdaftar di DB, default ke ID 2 seperti logic deteksi
+                    $userId = $user ? $user->id : 2;
+
+                    // 4. Hitung total pencarian berdasarkan userId yang akurat
+                    $totalPencarian = \App\Models\UserInteractions::where('user_id', $userId)->count();
+
                     $linkWebsite = route('beranda');
 
-                    // 4. Susun struktur pesan WhatsApp yang mengarah ke Web
+                    // 5. Susun struktur pesan WhatsApp
                     $waReply = "📜 *RIWAYAT PENCARIAN ANDA* 📜\n";
                     $waReply .= "━━━━━━━━━━━━━━━━━━━\n\n";
                     $waReply .= "Halo *" . ($name ?? 'Pengguna Lensa Hoax') . "*,\n";

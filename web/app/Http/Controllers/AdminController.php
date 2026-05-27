@@ -132,11 +132,11 @@ class AdminController extends Controller
         return view('admin.setting');
     }
 
+    // Menyimpan jadwal pembaruan manual dari tombol "Simpan Jadwal"
     public function saveSetting(Request $request)
     {
-        session([
-            'knowledge_base_update_time' => $request->knowledge_base_update_time
-        ]);
+        // Mengubah session menjadi Cache permanen
+        Cache::forever('knowledge_base_update_time', $request->knowledge_base_update_time);
 
         return back()->with(
             'success',
@@ -144,19 +144,19 @@ class AdminController extends Controller
         );
     }
 
-    /* --- FUNGSI UPDATE NOW YANG SUDAH DIPERBAIKI (TANPA DATABASE) --- */
+    /* --- FUNGSI UPDATE NOW MENGGUNAKAN CACHE PERMANEN (DIPERBAIKI) --- */
     public function updateNow()
     {
         try {
             $currentRealTime = Carbon::now()->format('H:i');
             
-            // 1. Simpan jam baru ke session utama
-            session(['knowledge_base_update_time' => $currentRealTime]);
+            // 1. Simpan jam real-time baru ke Cache secara permanen
+            Cache::forever('knowledge_base_update_time', $currentRealTime);
             
-            // 2. TAMBAHKAN BARIS INI (Membuat alert hijau muncul setelah halaman di-reload)
+            // 2. Membuat alert hijau muncul setelah halaman di-reload otomatis oleh JS
             session()->flash('success', 'Jadwal pembaruan knowledge base berhasil diperbarui secara instan!');
 
-            // 3. Kembalikan sinyal sukses ke JavaScript
+            // 3. Kembalikan sinyal sukses ke JavaScript Fetch
             return response()->json([
                 'status' => 'success'
             ]);

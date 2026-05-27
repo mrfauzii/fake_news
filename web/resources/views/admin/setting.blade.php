@@ -32,7 +32,7 @@
                     type="time"
                     name="knowledge_base_update_time"
                     class="time-input"
-                    value="{{ session('knowledge_base_update_time') }}"
+                    value="{{ \Cache::get('knowledge_base_update_time', '14:45') }}"
                 >
             </div>
 

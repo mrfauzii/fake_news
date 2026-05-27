@@ -17,110 +17,189 @@ class WaController extends Controller
     public function webhook(Request $request)
     {
         try {
-
             $sender = (string) $request->input('sender');
             $message = trim(strtolower($request->input('message')));
             $name = $request->input('name');
 
+            // 1. Simpan atau Ambil Data User
             Users::firstOrCreate(
                 ['phone_number' => $sender],
                 ['name' => $name ?? 'User WA']
             );
 
-            // 🔥 2. JIKA BUKAN COMMAND (#)
+            // 🔥 2. JIKA BUKAN COMMAND (#) -> SIMPAN KE CACHE
             if (!str_contains($message, '#')) {
-
                 MessageCache::create([
                     'sender_number' => $sender,
-                    'latest_message' => $message
+                    'latest_message' => $request->input('message') // Simpan teks asli (bukan strtolower)
                 ]);
 
                 return response()->json(['status' => 'cached']);
             }
 
-            // 🔥 3. COMMAND: #detect
-            if (str_starts_with($message, '#detect')) {
+            // Variabel untuk menampung balasan WhatsApp
+            $waReply = "";
 
-                $lastMessage = MessageCache::where('sender_number', $sender)
-                    ->where('created_at', '>=', Carbon::now()->subMinutes(5))
-                    ->latest()
-                    ->first();
+            // 🔥 3. PROSES COMMAND BERDASARKAN KEYWORD (#)
+            switch (true) {
 
-                if ($lastMessage) {
-                    // Ambil teks murni dari pesan terakhir
-                    $text = $lastMessage->latest_message;
+                // ==========================================
+                // COMMAND: #detect
+                // ==========================================
+                case str_starts_with($message, '#detect'):
+                    $lastMessage = MessageCache::where('sender_number', $sender)
+                        ->where('created_at', '>=', \Carbon\Carbon::now()->subMinutes(5))
+                        ->latest()
+                        ->first();
 
-                    // 1. Panggil secara Non-Static (Gunakan 'new')
-                    $detection = new TextDetectionController();
-                    $reply = $detection->detect($text);
+                    if ($lastMessage) {
+                        $text = $lastMessage->latest_message;
 
-                    // 2. Bongkar response JsonResponse bawaan Laravel menjadi array PHP biasa
-                    $result = json_decode($reply->getContent(), true);
+                        // Panggil TextDetectionController secara Non-Static
+                        $detection = new TextDetectionController();
+                        $reply = $detection->detect($text);
+                        $result = json_decode($reply->getContent(), true);
 
-                    // 3. IF-ELSE untuk mengecek apakah proses AI sukses atau error
-                    if (isset($result['status']) && $result['status'] !== 'error') {
+                        if (isset($result['status']) && $result['status'] !== 'error') {
+                            $data = $result['data'];
+                            $verdict = strtolower($data['verdict'] ?? '');
 
-                        // Ambil data matang yang SUDAH DIFORMAT oleh TextDetectionController
-                        $data = $result['data'];
+                            if ($verdict === 'fake') {
+                                $statusTeks = "🚨 *HOAKS* 🚨";
+                            } else {
+                                $statusTeks = "✅ *FAKTA* ✅";
+                            }
 
-                        // Tentukan emoji & judul kesimpulan berdasarkan 'verdict' yang sudah jadi (fake/valid)
-                        $verdict = strtolower($data['verdict'] ?? '');
-                        if ($verdict === 'fake') {
-                            $statusTeks = "🚨 *HOAKS* 🚨";
-                        } else {
-                            $statusTeks = "✅ *FAKTA* ✅";
-                        }
+                            $waReply = "🔍 *HASIL CEK FAKTA AI* 🔍\n";
+                            $waReply .= "━━━━━━━━━━━━━━━━━━━\n\n";
+                            $waReply .= "📝 *Klaim Berita:*\n";
+                            $waReply .= "\"_" . $text . "_\"\n\n";
+                            $waReply .= "📊 *Kesimpulan:* " . $statusTeks . "\n";
+                            $waReply .= "🎯 *Keyakinan:* " . $data['confidence'] . "%\n\n";
+                            $waReply .= "📖 *Ringkasan Analisis:*\n";
+                            $waReply .= $data['summary'] . "\n\n";
 
-                        // 4. Susun struktur pesan WA menggunakan data siap pakai
-                        $waReply = "🔍 *HASIL CEK FAKTA AI* 🔍\n";
-                        $waReply .= "━━━━━━━━━━━━━━━━━━━\n\n";
-                        $waReply .= "📝 *Klaim Berita:*\n";
-                        $waReply .= "\"_" . $text . "_\"\n\n";
-                        $waReply .= "📊 *Kesimpulan:* " . $statusTeks . "\n";
-                        $waReply .= "🎯 *Keyakinan:* " . $data['confidence'] . "%\n\n";
-                        $waReply .= "📖 *Ringkasan Analisis:*\n";
-                        $waReply .= $data['summary'] . "\n\n"; // Kalimat "Hasil penelusuran..." otomatis muncul di sini
-
-                        // 5. Tampilkan Sumber Referensi Berita
-                        if (!empty($data['sources'])) {
-                            $waReply .= "🌐 *Sumber Referensi Berita:* \n";
-                            foreach ($data['sources'] as $index => $source) {
-                                // Stage 1 berbentuk array, Stage 2 berbentuk string murni URL
-                                $url = is_array($source) ? ($source['url'] ?: 'Database Sistem') : $source;
-                                if (!empty($url)) {
-                                    $waReply .= ($index + 1) . ". " . $url . "\n";
+                            if (!empty($data['sources'])) {
+                                $waReply .= "🌐 *Sumber Referensi Berita:* \n";
+                                foreach ($data['sources'] as $index => $source) {
+                                    $url = is_array($source) ? ($source['url'] ?: 'Database Sistem') : $source;
+                                    if (!empty($url)) {
+                                        $waReply .= ($index + 1) . ". " . $url . "\n";
+                                    }
                                 }
                             }
-                        }
 
-                        $waReply .= "━━━━━━━━━━━━━━━━━━━\n";
-                        $waReply .= "💡 _Gunakan informasi secara bijak sebelum membagikannya._";
+                            $waReply .= "━━━━━━━━━━━━━━━━━━━\n";
+                            $waReply .= "💡 _Gunakan informasi secara bijak sebelum membagikannya._";
+                        } else {
+                            $errorMessage = $result['message'] ?? 'Terjadi kesalahan pada sistem internal.';
+                            $waReply = "❌ *Gagal Memproses Cek Fakta* ❌\n\nKeterangan: " . $errorMessage;
+                        }
                     } else {
-                        // Jika statusnya 'error' (misal API Python mati / timeout)
-                        $errorMessage = $result['message'] ?? 'Terjadi kesalahan pada sistem internal.';
-                        $waReply = "❌ *Gagal Memproses Cek Fakta* ❌\n\nKeterangan: " . $errorMessage;
+                        $waReply = "⚠️ *Pesan Tidak Ditemukan*\n\nMaaf, sistem tidak menemukan pesan yang Anda kirimkan dalam 5 minut terakhir untuk dideteksi. Silakan kirim beritanya terlebih dahulu, lalu ketik `#detect`.";
+                    }
+                    break;
+
+                // ==========================================
+                // COMMAND: #info
+                // ==========================================
+                case str_starts_with($message, '#info'):
+                    $waReply = "🤖 *MENGENAL LENSA HOAX AI* 🤖\n";
+                    $waReply .= "━━━━━━━━━━━━━━━━━━━\n\n";
+                    $waReply .= "*Lensa Hoax* adalah sistem berbasis Kecerdasan Buatan (AI) yang dirancang khusus untuk mendeteksi keaslian berita atau klaim secara cepat dan akurat.\n\n";
+                    $waReply .= "⚙️ *Fitur Utama via WhatsApp:*\n";
+                    $waReply .= "1. `#detect` - Periksa keaslian pesan terakhir yang Anda kirim.\n";
+                    $waReply .= "2. `#trending` - Lihat daftar tren hoaks terpopuler.\n";
+                    $waReply .= "3. `#history` - Lihat riwayat pencarian terakhir Anda.\n\n";
+                    $waReply .= "🌐 *Versi Website:*\n";
+                    $waReply .= "Nikmati visualisasi data dan laporan analisis hoaks yang lebih mendalam melalui website kami di https://lensahoax.comn";
+                    $waReply .= "━━━━━━━━━━━━━━━━━━━\n";
+                    $waReply .= "💡 _Mari bersama-sama putus mata rantai hoaks!_";
+                    break;
+
+                // ==========================================
+                // COMMAND: #trending
+                // ==========================================
+                case str_starts_with($message, '#trending'):
+                    $trendingHoaxes = \App\Models\Requests::where('final_label', 'fake')
+                        ->where('status', '!=', 'pending')
+                        ->latest()
+                        ->take(3)
+                        ->get();
+
+                    $waReply = "🔥 *PENCARIAN TERPOPULER (TREN HOAKS)* 🔥\n";
+                    $waReply .= "━━━━━━━━━━━━━━━━━━━\n";
+                    $waReply .= "Berikut adalah klaim hoaks yang baru-baru ini dianalisis oleh sistem Lensa Hoax:\n\n";
+
+                    if ($trendingHoaxes->isNotEmpty()) {
+                        foreach ($trendingHoaxes as $index => $hoax) {
+                            $waReply .= ($index + 1) . ". *\"" . $hoax->input_text . "\"*\n";
+                            $waReply .= "🎯 _Tingkat Keyakinan AI: " . round($hoax->final_confidence * 100) . "%_\n\n";
+                        }
+                        $waReply .= "💡 _Jangan mudah terprovokasi jika menerima pesan serupa._\n";
+                    } else {
+                        $waReply .= "Belum ada data tren hoaks saat ini. Sistem masih terus memantau.\n";
+                    }
+                    $waReply .= "━━━━━━━━━━━━━━━━━━━";
+                    break;
+
+                // ==========================================
+                // COMMAND: #history
+                // ==========================================
+                case str_starts_with($message, '#history'):
+                    // 1. Mengambil data user berdasarkan nomor pengirim WA
+                    $user = \App\Models\Users::where('phone_number', $sender)->first();
+                    $userId = $user ? $user->id : null;
+
+                    // 2. Hitung total pencarian yang pernah dilakukan user ini
+                    $totalPencarian = 0;
+                    if ($userId) {
+                        $totalPencarian = \App\Models\UserInteractions::where('user_id', $userId)->count();
                     }
 
-                    // 6. Kirim variabel $waReply ini ke fungsi pengirim WA Anda
-                    // Contoh: $this->sendWhatsApp($sender, $waReply);
-                    Log::info("WhatsApp Reply Sent: " . $waReply);
-                }
+                    // 3. Generate Link Beranda Website menggunakan Route Name Laravel
+                    $linkWebsite = route('beranda');
+
+                    // 4. Susun struktur pesan WhatsApp yang mengarah ke Web
+                    $waReply = "📜 *RIWAYAT PENCARIAN ANDA* 📜\n";
+                    $waReply .= "━━━━━━━━━━━━━━━━━━━\n\n";
+                    $waReply .= "Halo *" . ($name ?? 'Pengguna Lensa Hoax') . "*,\n";
+
+                    if ($totalPencarian > 0) {
+                        $waReply .= "Sistem mencatat Anda telah melakukan *" . $totalPencarian . " kali cek fakta* melalui WhatsApp.\n\n";
+                        $waReply .= "Untuk melihat daftar riwayat lengkap, grafik analitik data, dan detail sumber referensi, silakan kunjungi Dashboard Website kami.\n\n";
+                    } else {
+                        $waReply .= "Anda belum memiliki riwayat cek fakta di sistem kami.\n\n";
+                        $waReply .= "Yuk, jelajahi fitur lengkap dan mulai pelacakan berita melalui platform web kami.\n\n";
+                    }
+
+                    $waReply .= "🔐 *Akses Instan Dashboard Web:*\n";
+                    $waReply .= "👉 " . $linkWebsite . "\n\n";
+                    $waReply .= "💡 _Cukup login menggunakan nomor WhatsApp Anda untuk masuk ke akun Anda secara otomatis._\n";
+                    $waReply .= "━━━━━━━━━━━━━━━━━━━\n";
+                    $waReply .= "🌐 _Lensa Hoax - Bersama Lawan Misinformasi_";
+                    break;
+
+                // Jika command tidak dikenali (Misal user asal ketik #halo)
+                default:
+                    $waReply = "🤖 *Command Tidak Dikenali*\n\nKetik `#info` untuk melihat daftar perintah resmi yang tersedia di Lensa Hoax AI.";
+                    break;
             }
 
-            // Log untuk tracking lokal di Laravel
-            Log::info("WhatsApp Reply Sent to " . $sender);
+            // 🔥 4. KIRIM KE FONNTE (Hanya jika variabel balasan terisi)
+            if (!empty($waReply)) {
+                \Illuminate\Support\Facades\Http::timeout(5)->withHeaders([
+                    'Authorization' => env('FONNTE_TOKEN')
+                ])->post('https://api.fonnte.com/send', [
+                    'target' => $sender,
+                    'message' => $waReply
+                ]);
 
-            // 🔥 4. KIRIM KE FONNTE
-            Http::timeout(5)->withHeaders([
-                'Authorization' => env('FONNTE_TOKEN')
-            ])->post('https://api.fonnte.com/send', [
-                'target' => $sender,
-                'message' => $waReply
-            ]);
+                Log::info("WhatsApp Reply Sent to " . $sender);
+            }
 
             return response()->json(['status' => 'replied']);
         } catch (\Exception $e) {
-
             Log::error('ERROR WA', [
                 'msg' => $e->getMessage(),
                 'line' => $e->getLine()

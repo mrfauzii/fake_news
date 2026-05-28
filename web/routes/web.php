@@ -19,18 +19,21 @@ use App\Http\Controllers\PopulerHistoryController;
 use App\Http\Controllers\CsvController;
 use App\Http\Controllers\HistoryManagementController;
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\ScraperController;
 
 /*
 |--------------------------------------------------------------------------
 | PUBLIC ROUTES
 |--------------------------------------------------------------------------
 */
+
+// Landing Page
 Route::get('/', function () {
     return view('landing_page.landing');
-})->name('beranda');
+})->name('landing');
 
 // Pencarian (public)
-Route::get('/pencarian', [PencarianController::class, 'index'])->name('deteksi');
+Route::get('/pencarian', [PencarianController::class, 'index'])->name('beranda');
 Route::post('/telusuri', [PencarianController::class, 'telusuri'])->name('telusuri');
 Route::post('/telusuri-gambar', [ImageDetectionController::class, 'detect'])->name('telusuri.gambar');
 Route::get('/pencarian/populer', [PopulerHistoryController::class, 'index'])->name('pencarian.populer');
@@ -39,6 +42,11 @@ Route::get('/pencarian/populer', [PopulerHistoryController::class, 'index'])->na
 Route::get('/dapatkan-whatsapp', function () {
     return view('user.whatsapp');
 })->name('whatsapp.page');
+
+// Uji coba deteksi view (public test page)
+Route::get('/uji-coba-deteksi', function () {
+    return view('uji-coba-deteksi');
+});
 
 // API detect endpoint (single consolidated route)
 Route::post('/api/detect', [DetectionController::class, 'detect'])->name('detect.hoax');
@@ -76,6 +84,10 @@ Route::prefix('auth/google')->group(function () {
     Route::get('/callback', [GoogleAuthController::class, 'callback'])->name('google.callback');
 });
 
+Route::get('/pencarian', [PencarianController::class, 'index'])->name('beranda');
+// Route::get('/pencarian-terpopuler', function () {
+//     return view('user.pencarian-terpopuler');
+// })->name('pencarian.populer');
 Route::post('/telusuri', [PencarianController::class, 'telusuri'])->name('telusuri');
 Route::post('/telusuri-gambar', [PencarianController::class, 'telusuriGambar'])->name('telusuri.gambar');
 
@@ -124,12 +136,6 @@ Route::get('/admin/cekberita', [PencarianController::class, 'adminIndex']);
 
 // Admin logout 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-// Admin Setting
-Route::get('/admin/setting', [AdminController::class, 'setting']);
-Route::post('/admin/setting/save', [AdminController::class, 'saveSetting']);
-Route::post('/admin/setting/update-now', [AdminController::class, 'updateNow'])->name('admin.setting.updateNow');
-
 /*
 |--------------------------------------------------------------------------
 | WHATSAPP WEBHOOK & API (NO AUTH)
@@ -142,12 +148,19 @@ Route::post('/detect-hoax', [ApiController::class, 'detectHoax']);
 // API untuk menyimpan jadwal scrape
 Route::post('/scrape-schedule', [ApiController::class, 'setScrapeSchedule']);
 
+//route trigger scrapee
+Route::get('/trigger-scraper', [ScraperController::class, 'triggerScraper']);
+
 
 // Login using WhatsApp (web)
 Route::get('/login-wa', [AuthController::class, 'showPhoneForm'])->name('login.wa');
 Route::post('/login-wa/request', [AuthController::class, 'requestToken'])->name('login.wa.request');
 Route::get('/login-wa/verify', [AuthController::class, 'showTokenForm'])->name('login.wa.verify');
 Route::post('/login-wa/verify', [AuthController::class, 'verifyToken'])->name('login.wa.verify.post');
+
+//verifikasi nomer wa
+// Route untuk Verifikasi Nomor WA
+Route::get('/verify-wa/{token}', [App\Http\Controllers\WaController::class, 'verifyWaLink'])->name('wa.verify.link');
 
 /*
 |--------------------------------------------------------------------------

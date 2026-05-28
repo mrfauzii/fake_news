@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\TextDetectionController;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 class WaController extends Controller
 {
@@ -253,28 +255,88 @@ class WaController extends Controller
 
     public function linkWhatsApp(Request $request)
     {
-        // 1. Validasi inputan form dari web
+        // Validasi inputan form dari web
         $request->validate([
             'wa_number' => 'required'
         ]);
 
-        /** @var \App\Models\Users $currentUser */
-        $currentUser = Auth::user();
-        $waNumber = trim($request->wa_number);
-
-        // 2. Cek apakah ada akun bot di DB yang udah pake nomor WA ini
-        $existingWaUser = Users::where('phone_number', $waNumber)->first();
-
-        // 3. Kalau nomor belum terdaftar di database, kembalikan error
-        if (!$existingWaUser) {
-            return back()->with('error', 'Nomor ini belum terdaftar. Silakan cek via WhatsApp pada menu Dapatkan Melalui WhatsApp.');
+        $waNumberRaw = trim($request->wa_number);
+        
+        $waNumberFonnte = $waNumberRaw;
+        if (str_starts_with($waNumberRaw, '0')) {
+            $waNumberFonnte = '62' . substr($waNumberRaw, 1);
         }
 
-        // 4. Kalau nomornya ada dan itu bukan akun yang lagi login -> merge akun
-        if ($existingWaUser->id !== $currentUser->id) {
-            DB::beginTransaction();
-            try {
-                // A. Pindahkan history ke akun utama (Gmail)
+        // Generate Token Random
+        $token = Str::random(40);
+        $userId = Auth::id();
+
+        // Simpan token ke Cache Laravel (Batas waktu 10 Menit)
+        // Format Key: wa_verification_token_{token}
+        Cache::put("wa_verification_{$token}", [
+            'user_id' => $userId,
+            'phone_number' => $waNumberRaw // Simpan dengan awalan 0 buat di DB
+        ], now()->addMinutes(10));
+
+        // Buat Link Verifikasi
+        $verificationLink = url('/verify-wa/' . $token);
+
+        // Pesan WhatsApp
+        $waMessage = "🔐 *VERIFIKASI AKUN LENSA HOAX* 🔐\n\n";
+        $waMessage .= "Halo, kami menerima permintaan untuk menghubungkan nomor ini dengan akun di website Lensa Hoax.\n\n";
+        $waMessage .= "Klik link di bawah ini untuk menyetujui:\n";
+        $waMessage .= "👉 " . $verificationLink . "\n\n";
+        $waMessage .= "_Link ini hanya berlaku selama 10 menit. Abaikan pesan ini jika Anda tidak merasa melakukan permintaan._";
+
+        // Tembak API Fonnte buat kirim Link
+        try {
+            $response = Http::timeout(5)->withHeaders([
+                'Authorization' => env('FONNTE_TOKEN')
+            ])->post('https://api.fonnte.com/send', [
+                'target' => $waNumberFonnte,
+                'message' => $waMessage
+            ]);
+
+            if ($response->successful()) {
+                return back()->with('success', 'Link verifikasi telah dikirim ke nomor WhatsApp Anda. Silakan cek dan klik link tersebut dalam 10 menit ke depan.');
+            } else {
+                return back()->with('error', 'Gagal mengirim pesan WhatsApp. Pastikan nomor benar dan aktif.');
+            }
+        } catch (\Exception $e) {
+            return back()->with('error', 'Terjadi kesalahan saat menghubungi server WhatsApp: ' . $e->getMessage());
+        }
+    }
+
+    public function verifyWaLink($token)
+    {
+        // Cek apakah token ada dan belum expired
+        $cacheData = Cache::get("wa_verification_{$token}");
+
+        if (!$cacheData) {
+            // Kalau udah klik tapi ternyata token nggak valid / kadaluarsa
+            // lgsg bisa redirect ke halaman profil atau beranda dengan pesan error
+            return redirect()->route('beranda')->with('error', 'Link verifikasi tidak valid atau sudah kedaluwarsa.');
+        }
+
+        $userId = $cacheData['user_id'];
+        $waNumber = $cacheData['phone_number'];
+
+        // Ambil data User yang lagi login (berdasarkan ID di cache, buat jaga-jaga kalo bukanya dari HP beda browser)
+        $currentUser = Users::find($userId);
+
+        if (!$currentUser) {
+             return redirect()->route('beranda')->with('error', 'Akun tidak ditemukan.');
+        }
+
+        // Cek apakah ada akun bot (atau akun lain) di DB yang udah pake nomor WA ini
+        $existingWaUser = Users::where('phone_number', $waNumber)->first();
+
+        DB::beginTransaction();
+        try {
+            // SKENARIO 1: Nomor udah dipake di akun lain (MERGE DATA)
+            if ($existingWaUser && $existingWaUser->id !== $currentUser->id) {
+                
+                // Pindahkan history ke akun utama (Gmail)
                 \App\Models\UserInteractions::where('user_id', $existingWaUser->id)
                     ->update(['user_id' => $currentUser->id]);
 
@@ -284,23 +346,25 @@ class WaController extends Controller
                 \App\Models\Feedbacks::where('user_id', $existingWaUser->id)
                     ->update(['user_id' => $currentUser->id]);
 
-                // B. Update nomor HP di akun web
-                $currentUser->phone_number = $waNumber;
-                $currentUser->save();
-
-                // C. Hapus akun WA lama biar nggak duplikat
+                // Hapus akun lama biar nggak duplikat
                 $existingWaUser->delete();
-
-                DB::commit();
-
-                return back()->with('success', 'Akun WhatsApp berhasil dihubungkan dan riwayat telah digabungkan otomatis.');
-            } catch (\Exception $e) {
-                DB::rollBack();
-                return back()->with('error', 'Gagal menggabungkan akun: ' . $e->getMessage());
             }
-        }
 
-        // 5. Kalau kebetulan ID-nya sama (emang udah nyambung)
-        return back()->with('success', 'Nomor WhatsApp ini sudah terhubung dengan akun Anda.');
+            // SKENARIO 2: Nomor bener-bener baru / Skenario 1 udah selesai
+            // Update nomor HP di akun utama web
+            $currentUser->phone_number = $waNumber;
+            $currentUser->save();
+
+            DB::commit();
+
+            // Hapus Token dari Cache biar gabisa diklik 2x
+            Cache::forget("wa_verification_{$token}");
+
+            return redirect()->route('beranda')->with('success', 'Nomor WhatsApp berhasil dihubungkan ke akun Anda!');
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('beranda')->with('error', 'Gagal memverifikasi akun: ' . $e->getMessage());
+        }
     }
 }

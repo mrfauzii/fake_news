@@ -30,10 +30,10 @@ use App\Http\Controllers\ScraperController;
 // Landing Page
 Route::get('/', function () {
     return view('landing_page.landing');
-})->name('landing');
+})->name('beranda');
 
 // Pencarian (public)
-Route::get('/pencarian', [PencarianController::class, 'index'])->name('beranda');
+Route::get('/pencarian', [PencarianController::class, 'index'])->name('deteksi');
 Route::post('/telusuri', [PencarianController::class, 'telusuri'])->name('telusuri');
 Route::post('/telusuri-gambar', [ImageDetectionController::class, 'detect'])->name('telusuri.gambar');
 Route::get('/pencarian/populer', [PopulerHistoryController::class, 'index'])->name('pencarian.populer');
@@ -43,10 +43,6 @@ Route::get('/dapatkan-whatsapp', function () {
     return view('user.whatsapp');
 })->name('whatsapp.page');
 
-// Uji coba deteksi view (public test page)
-Route::get('/uji-coba-deteksi', function () {
-    return view('uji-coba-deteksi');
-});
 
 // API detect endpoint (single consolidated route)
 Route::post('/api/detect', [DetectionController::class, 'detect'])->name('detect.hoax');

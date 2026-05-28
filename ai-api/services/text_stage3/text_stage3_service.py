@@ -4,14 +4,21 @@ import numpy as np
 from .search_service import search_news
 from .feature_service import extract_features
 
-FEATURE_ORDER = [
-    "message_similarity_score",
-    "time_consistency_score",
-    "mean_entailment",
-    "mean_contradiction",
-    "std_entailment",
-]
+# FEATURE_ORDER = [
+#     "message_similarity_score",
+#     "time_consistency_score",
+#     "mean_entailment",
+#     "mean_contradiction",
+#     "std_entailment",
+# ]
 
+FEATURE_ORDER = [
+    "time_consistency_score",
+    "message_similarity_score",
+    "len_results",
+    "std_entailment",
+    "std_contradiction",
+]
 
 def _safe_extract_vector(features_dict):
     """

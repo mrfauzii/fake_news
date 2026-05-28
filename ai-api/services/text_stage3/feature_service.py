@@ -12,7 +12,8 @@ def extract_features(query, results,nli,transformer):
     return {
         "time_consistency_score": time_consistency_score,
         "message_similarity_score": message_similarity_score,
-        **nli_features
+        "len_results": len(results),
+        **nli_features 
     }
     
 def compute_time_consistency_score(results, scale=86400):

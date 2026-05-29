@@ -151,7 +151,7 @@
             <div class="popup-top">
                 <p class="popup-user" id="popupUser"></p>
                 <p class="popup-date" id="popupDate"></p>
-                <div id="popupDeleteStatus" class="popup-delete-status popup-tag"></div>
+                <p class="popup-deleted" id="popupDeleteStatus" style="display: none;"></p>
             </div>
 
             <div class="popup-content">
@@ -309,7 +309,7 @@
                     popupBenar.innerText = openBtn.dataset.benar + '%';
 
                     if (currentCard.dataset.deleted === "true") {
-                        popupDeleteStatus.style.display = 'flex';
+                        popupDeleteStatus.style.display = 'block';
                         const deletedDate = new Date(currentCard.dataset.deletedDate);
                         popupDeleteStatus.textContent = `Dihapus • ${deletedDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
                         deletePopup.innerHTML = '<i class="fa fa-undo"></i>';

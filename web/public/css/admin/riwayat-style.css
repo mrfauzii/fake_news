@@ -109,9 +109,7 @@
     stroke: #b8201d;
     stroke-width: 10;
     stroke-linecap: round;
-
-    stroke-dasharray: 120 37; 
-    stroke-dashoffset: 0; /* ⬅️ 70% */
+    /* HAPUS stroke-dasharray dan stroke-dashoffset statis di sini */
 }
 
 /* hijau kecil */
@@ -120,9 +118,7 @@
     stroke: #7ed6a7;
     stroke-width: 10;
     stroke-linecap: round;
-
-    stroke-dasharray: 37 120;
-    stroke-dashoffset: -120;   /* posisi kanan */
+    /* HAPUS stroke-dasharray dan stroke-dashoffset statis di sini */
 }
 
 /* teks */

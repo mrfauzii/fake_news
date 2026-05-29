@@ -85,13 +85,35 @@
 
                 <div class="card-bottom">
                     <div class="progress-circle">
-                        <svg viewBox="0 0 120 60">
-                            <path d="M10 60 A50 50 0 0 1 110 60" class="bg" />
-                            <path d="M10 60 A50 50 0 0 1 110 60" class="progress-red" />
-                            <path d="M10 60 A50 50 0 0 1 110 60" class="progress-green" />
-                        </svg>
-                        <span>{{ data_get($item, 'hoax', 0) }}%</span>
-                    </div>
+    @php
+        // Mengambil data persentase (Default 0 jika kosong)
+        $hoaxPercent = data_get($item, 'hoax', 0);
+        $benarPercent = data_get($item, 'benar', 0);
+        
+        // Total panjang busur setengah lingkaran (r = 50) adalah ~157
+        $totalLength = 157; 
+        
+        // Kalkulasi panjang masing-masing warna berdasarkan persentase database
+        $redStroke = ($hoaxPercent / 100) * $totalLength;
+        $greenStroke = ($benarPercent / 100) * $totalLength;
+    @endphp
+
+    <svg viewBox="0 0 120 60">
+        <path d="M10 60 A50 50 0 0 1 110 60" class="bg" />
+        
+        @if($hoaxPercent > 0)
+            <path d="M10 60 A50 50 0 0 1 110 60" class="progress-red" 
+                  style="stroke-dasharray: {{ $redStroke }} {{ $totalLength - $redStroke }};" />
+        @endif
+              
+        @if($benarPercent > 0)
+            <path d="M10 60 A50 50 0 0 1 110 60" class="progress-green" 
+                  style="stroke-dasharray: {{ $greenStroke }} {{ $totalLength - $greenStroke }}; 
+                         stroke-dashoffset: -{{ $redStroke }};" />
+        @endif
+    </svg>
+    <span>{{ $hoaxPercent }}%</span>
+</div>
 
                     <div class="legend">
                         <p><span class="dot red"></span> Hoax: {{ data_get($item, 'hoax', 0) }}%</p>

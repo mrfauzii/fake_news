@@ -21,34 +21,40 @@ class AdminController extends Controller
         | AMBIL DATA PENCARIAN POPULER
         |--------------------------------------------------------------------------
         */
-        $histories = DB::table('history_view')
-            ->select(
-                'input_text',
-                'final_label',
-                DB::raw('COUNT(*) as count')
-            )
-            ->whereNotNull('final_label')
-            ->groupBy('input_text', 'final_label')
-            ->orderByDesc('count')
-            ->limit(3)
-            ->get();
+        $histories = DB::table('user_interactions as ui')
+        ->join('requests as r', 'ui.request_id', '=', 'r.id')
+        ->select(
+            'r.input_text',
+            'r.final_label',
+            'r.final_confidence',
+            DB::raw('COUNT(*) as count')
+        )
+        ->whereNotNull('r.final_label')
+        // Filter bulan & tahun berjalan
+        ->whereMonth('r.created_at', date('n'))
+        ->whereYear('r.created_at', date('Y'))
+        ->groupBy('r.input_text', 'r.final_label', 'r.final_confidence')
+        ->orderByDesc('count')
+        ->limit(3)
+        ->get();
 
-        $dashboardPopular = [];
+    $dashboardPopular = [];
 
-        foreach ($histories as $idx => $row) {
-
-            $category = strtolower($row->final_label) === 'fake' || strtolower($row->final_label) === 'hoax'
-                ? 'HOAX'
-                : 'FAKTA';
-
-            $dashboardPopular[] = [
-                'rank' => $idx + 1,
-                'badge' => $category,
-                'title' => $row->input_text,
-                'headline' => Str::limit($row->input_text, 60),
-                'count' => $row->count,
-            ];
-        }
+    foreach ($histories as $idx => $row) {
+        $category = (strtolower($row->final_label) === 'fake' || strtolower($row->final_label) === 'hoax') 
+            ? 'hoax' 
+            : 'fakta';
+            
+        $dashboardPopular[] = [
+            'rank'       => $idx + 1,
+            'category'   => $category,
+            'input'      => $row->input_text,
+            'badge'      => strtoupper($category),
+            'excerpt'    => $row->input_text,                 // Judul utuh
+            'confidence' => $row->final_confidence,
+            'count'      => $row->count,
+        ];
+    }
 
         /*
         |--------------------------------------------------------------------------

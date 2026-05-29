@@ -3,122 +3,131 @@
 @section('title', 'Dashboard Admin')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/admin/dashboard-style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/dashboard-style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/user/pencarian-terpopuler.css') }}">
+
+    <style>
+                .lh-popular-card__bottom {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
+                .dashboard-popular-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+                    gap: 20px;
+                }
+            </style>
 @endpush
 
 @section('content')
 
-<div class="feedback-title">
-    <h1>Dashboard Utama</h1>
-    <p>Data terakhir diperbarui: {{ $lastDate }} </p>
-</div>
-
-<!-- STATS -->
-<div class="stats-container">
-
-    <!-- PENGGUNA -->
-    <div class="stats-card active">
-        <div class="stats-top">
-            <span>PENGGUNA TERDAFTAR</span>
-            <div class="icon-box red">
-                <i class="fa fa-user"></i>
-            </div>
-        </div>
-        <h2>{{ number_format($dashboardStats['total_pengguna']) }}</h2>
-        <p class="positive">Total pengguna aktif di sistem</p>
+    <div class="feedback-title">
+        <h1>Dashboard Utama</h1>
+        <p>Data terakhir diperbarui: {{ $lastDate }} </p>
     </div>
 
-    <!-- BERITA -->
-    <div class="stats-card active">
-        <div class="stats-top">
-            <span>BERITA TERDETEKSI</span>
-            <div class="icon-box red">
-                <i class="fa fa-newspaper"></i>
+    <!-- STATS -->
+    <div class="stats-container">
+
+        <!-- PENGGUNA -->
+        <div class="stats-card active">
+            <div class="stats-top">
+                <span>PENGGUNA TERDAFTAR</span>
+                <div class="icon-box red">
+                    <i class="fa fa-user"></i>
+                </div>
             </div>
+            <h2>{{ number_format($dashboardStats['total_pengguna']) }}</h2>
+            <p class="positive">Total pengguna aktif di sistem</p>
         </div>
-        <h2>{{ number_format($dashboardStats['total_berita']) }}</h2>
-        <p class="negative">Total berita yang telah dianalisis</p>
-    </div>
 
-    <!-- UMPAN BALIK -->
-    <div class="stats-card active">
-        <div class="stats-top">
-            <span>UMPAN BALIK</span>
-            <div class="icon-box red">
-                <i class="fa fa-comment"></i>
+        <!-- BERITA -->
+        <div class="stats-card active">
+            <div class="stats-top">
+                <span>BERITA TERDETEKSI</span>
+                <div class="icon-box red">
+                    <i class="fa fa-newspaper"></i>
+                </div>
             </div>
+            <h2>{{ number_format($dashboardStats['total_berita']) }}</h2>
+            <p class="negative">Total berita yang telah dianalisis</p>
         </div>
-        <h2>{{ number_format($dashboardStats['total_umpan_balik']) }}</h2>
-        <p class="neutral">Total masukan dari pengguna</p>
+
+        <!-- UMPAN BALIK -->
+        <div class="stats-card active">
+            <div class="stats-top">
+                <span>UMPAN BALIK</span>
+                <div class="icon-box red">
+                    <i class="fa fa-comment"></i>
+                </div>
+            </div>
+            <h2>{{ number_format($dashboardStats['total_umpan_balik']) }}</h2>
+            <p class="neutral">Total masukan dari pengguna</p>
+        </div>
+
     </div>
-
-</div>
-
-<div class="dashboard-grid">
-
-    <!-- KIRI -->
-    <div class="left-content">
-
-        <div class="section-header">
+    <div class="section-header">
             <h2><i class="fa fa-chart-line"></i> Pencarian Populer</h2>
         </div>
+    <div class="dashboard-popular-grid">
         
-        <div class="dashboard-popular-grid">
+        @foreach ($dashboardPopular as $item)
+            @php
+                $isHoax = str_contains(strtolower($item['badge']), 'hoax');
+                $isFakta = str_contains(strtolower($item['badge']), 'fakta');
 
-            @foreach($dashboardPopular as $item)
+                $badgeClass = 'lh-popular-card__badge--with-pct';
 
-            <div class="dashboard-popular-card">
+                if ($isHoax) {
+                    $badgeClass .= ' lh-popular-card__badge--hoax';
+                } elseif ($isFakta) {
+                    $badgeClass .= ' lh-popular-card__badge--fakta';
+                }
 
-                <div class="dashboard-popular-rank 
-                    {{ strtolower($item['badge']) == 'hoax' ? 'hoax' : 'fakta' }}">
+                $rankClass = $isHoax ? 'rank-hoax' : 'rank-fakta';
+            @endphp
 
-                        #{{ $item['rank'] }} {{ $item['badge'] }}
+            <article class="lh-popular-card">
 
-                    </div>
-
-                <div class="dashboard-popular-excerpt">
-                    {{ $item['title'] }}
+                <div class="lh-popular-card__rank {{ $rankClass }}">
+                    #{{ $item['rank'] }} {{ $item['badge'] }}
                 </div>
 
-                <div class="dashboard-popular-content">
+                <div class="lh-popular-card__excerpt">
+                    {{ $item['input'] }}
+                </div>
 
-                    <div class="dashboard-popular-row">
+                <div class="lh-popular-card__content">
 
-                        <span class="dashboard-popular-badge">
-                            {{ $item['badge'] }}
+                    <div class="lh-popular-card__meta">
+                        <p class="lh-popular-card__count">
+                            <strong>{{ number_format($item['count'], 0, ',', '.') }}</strong>
+                            orang mencari informasi serupa
+                        </p>
+                    </div>
+
+                    <div class="lh-popular-card__bottom">
+
+                        <span class="{{ $badgeClass }}">
+                            <span class="lh-popular-card__badge-pct">
+                                {{ round($item['confidence'] * 100) }}%
+                            </span>
+
+                            <span class="lh-popular-card__badge-label">
+                                {{ $item['badge'] }}
+                            </span>
                         </span>
 
-                        <h3 class="dashboard-popular-headline">
-                            {{ $item['headline'] }}
-                        </h3>
-
-                    </div>
-
-                    <p class="dashboard-popular-count">
-                        <strong>{{ $item['count'] }}</strong>
-                        orang mencari informasi serupa
-                    </p>
-
-                    <div class="dashboard-popular-footer">
-
-                        <a href="{{ route('pencarian.populer') }}"
-                        class="dashboard-popular-btn">
-
-                            Detail Lengkap
-
-                        </a>
+                        
 
                     </div>
 
                 </div>
 
-            </div>
-
-            @endforeach
-
-        </div>
+            </article>
+        @endforeach
     </div>
 
-</div>
-
-@endsection
+    @endsection

@@ -1,53 +1,69 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const page = document.querySelector('.lh-popular-page');
+document.addEventListener("DOMContentLoaded", function () {
+    const page = document.querySelector(".lh-popular-page");
     if (!page) return;
 
-    const grid = document.getElementById('popularGrid');
-    const emptyState = document.getElementById('popularEmpty');
-    const modal = document.getElementById('filterModal');
-    const modalTitle = document.getElementById('filterModalTitle');
-    const modalEyebrow = document.getElementById('filterModalEyebrow');
-    const modalDescription = document.getElementById('filterModalDescription');
-    const modalOptions = document.getElementById('filterModalOptions');
-    const detailModal = document.getElementById('popularDetailModal');
-    const detailDate = document.getElementById('popularDetailDate');
-    const detailHeadline = document.getElementById('popularDetailHeadline');
-    const detailBody = document.getElementById('popularDetailBody');
-    const detailHoax = document.getElementById('popularDetailHoaxPct');
-    const detailFact = document.getElementById('popularDetailFactPct');
-    const detailSummary = document.getElementById('popularDetailSummary');
-    const categoryLabel = document.getElementById('activeCategoryLabel');
-    const periodLabel = document.getElementById('activePeriodLabel');
-    const countLabel = document.getElementById('popularCountLabel');
-    const triggerButtons = document.querySelectorAll('[data-filter-trigger]');
-    const closeButtons = document.querySelectorAll('[data-filter-close]');
-    const detailCloseButtons = document.querySelectorAll('[data-popular-detail-close]');
+    const grid = document.getElementById("popularGrid");
+    const emptyState = document.getElementById("popularEmpty");
+    const modal = document.getElementById("filterModal");
+    const modalTitle = document.getElementById("filterModalTitle");
+    const modalEyebrow = document.getElementById("filterModalEyebrow");
+    const modalDescription = document.getElementById("filterModalDescription");
+    const modalOptions = document.getElementById("filterModalOptions");
+    const detailModal = document.getElementById("popularDetailModal");
+    const detailDate = document.getElementById("popularDetailDate");
+    const detailHeadline = document.getElementById("popularDetailHeadline");
+    const detailBody = document.getElementById("popularDetailBody");
+    const detailHoax = document.getElementById("popularDetailHoaxPct");
+    const detailFact = document.getElementById("popularDetailFactPct");
+    const detailSummary = document.getElementById("popularDetailSummary");
+    const categoryLabel = document.getElementById("activeCategoryLabel");
+    const periodLabel = document.getElementById("activePeriodLabel");
+    const countLabel = document.getElementById("popularCountLabel");
+    const triggerButtons = document.querySelectorAll("[data-filter-trigger]");
+    const closeButtons = document.querySelectorAll("[data-filter-close]");
+    const detailCloseButtons = document.querySelectorAll(
+        "[data-popular-detail-close]",
+    );
 
     const state = {
-        category: 'all',
-        period: window.defaultPeriod || 'Juni 2026', // <--- UBAH INI
-        periodYear: window.defaultPeriod ? parseInt(window.defaultPeriod.split(' ')[1]) : 2026, // <--- UBAH INI
+        category: "all",
+        period: window.defaultPeriod || "Juni 2026", // <--- UBAH INI
+        periodYear: window.defaultPeriod
+            ? parseInt(window.defaultPeriod.split(" ")[1])
+            : 2026, // <--- UBAH INI
         modalType: null,
     };
 
     const monthNames = [
-        'Januari',
-        'Februari',
-        'Maret',
-        'April',
-        'Mei',
-        'Juni',
-        'Juli',
-        'Agustus',
-        'September',
-        'Oktober',
-        'November',
-        'Desember',
+        "Januari",
+        "Februari",
+        "Maret",
+        "April",
+        "Mei",
+        "Juni",
+        "Juli",
+        "Agustus",
+        "September",
+        "Oktober",
+        "November",
+        "Desember",
     ];
     const categoryOptions = [
-        { value: 'all', label: 'Semua Kategori', description: 'Tampilkan top 3 pencarian untuk bulan yang dipilih.' },
-        { value: 'hoax', label: 'Hoax', description: 'Menampilkan berita hoax teratas.' },
-        { value: 'fakta', label: 'Fakta', description: 'Menampilkan berita fakta teratas.' },
+        {
+            value: "all",
+            label: "Semua Kategori",
+            description: "Tampilkan top 3 pencarian untuk bulan yang dipilih.",
+        },
+        {
+            value: "hoax",
+            label: "Hoax",
+            description: "Menampilkan berita hoax teratas.",
+        },
+        {
+            value: "fakta",
+            label: "Fakta",
+            description: "Menampilkan berita fakta teratas.",
+        },
     ];
 
     // const contentBlueprints = {
@@ -141,39 +157,41 @@ document.addEventListener('DOMContentLoaded', function () {
     //     };
     // }
     // Ambil data langsung dari Controller (Blade Inject)
-    
+
     const popularItems = window.realPopularItems || [];
     let renderedItems = [];
 
     function openModal(type) {
         state.modalType = type;
 
-        modal.classList.toggle('lh-filter-modal--period', type === 'period');
+        modal.classList.toggle("lh-filter-modal--period", type === "period");
 
-        if (type === 'category') {
-            modalEyebrow.textContent = 'Filter kategori';
-            modalTitle.textContent = 'Pilih kategori pencarian';
-            modalDescription.textContent = 'Pilih apakah Anda ingin melihat topik hoax, fakta, atau semua kategori.';
+        if (type === "category") {
+            modalEyebrow.textContent = "Filter kategori";
+            modalTitle.textContent = "Pilih kategori pencarian";
+            modalDescription.textContent =
+                "Pilih apakah Anda ingin melihat topik hoax, fakta, atau semua kategori.";
             renderOptions(categoryOptions, state.category, type);
         } else {
             const periodParts = parsePeriod(state.period);
             state.periodYear = periodParts.year;
-            modalEyebrow.textContent = 'Filter periode';
-            modalTitle.textContent = 'Pilih bulan dan tahun';
-            modalDescription.textContent = 'Pilih periode bulan dan tahun untuk melihat tema pencarian yang paling ramai.';
+            modalEyebrow.textContent = "Filter periode";
+            modalTitle.textContent = "Pilih bulan dan tahun";
+            modalDescription.textContent =
+                "Pilih periode bulan dan tahun untuk melihat tema pencarian yang paling ramai.";
             renderPeriodPicker(state.periodYear);
         }
 
-        modal.removeAttribute('hidden');
-        document.body.classList.add('lh-filter-lock');
+        modal.removeAttribute("hidden");
+        document.body.classList.add("lh-filter-lock");
     }
 
     function closeModal() {
-        modal.setAttribute('hidden', '');
-        if (!detailModal || detailModal.hasAttribute('hidden')) {
-            document.body.classList.remove('lh-filter-lock');
+        modal.setAttribute("hidden", "");
+        if (!detailModal || detailModal.hasAttribute("hidden")) {
+            document.body.classList.remove("lh-filter-lock");
         }
-        modal.classList.remove('lh-filter-modal--period');
+        modal.classList.remove("lh-filter-modal--period");
         state.modalType = null;
     }
 
@@ -181,16 +199,20 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!detailModal || !item) return;
 
         const percentages = resolvePercentages(item);
-        const summary = resolveVerificationSummary(item, percentages, item.category);
+        const summary = resolveVerificationSummary(
+            item,
+            percentages,
+            item.category,
+        );
 
         if (detailDate) {
             detailDate.textContent = resolveDetailDateLabel(item.period);
         }
         if (detailHeadline) {
-            detailHeadline.textContent = `[KABAR PENTING] ${item.headline || item.query || '-'}`;
+            detailHeadline.textContent = `[KABAR PENTING] ${item.headline || item.query || "-"}`;
         }
         if (detailBody) {
-            detailBody.textContent = item.excerpt || item.headline || '-';
+            detailBody.textContent = item.excerpt || item.headline || "-";
         }
         if (detailHoax) {
             detailHoax.textContent = `${percentages.hoax}%`;
@@ -202,15 +224,15 @@ document.addEventListener('DOMContentLoaded', function () {
             detailSummary.textContent = summary;
         }
 
-        detailModal.removeAttribute('hidden');
-        document.body.classList.add('lh-filter-lock');
+        detailModal.removeAttribute("hidden");
+        document.body.classList.add("lh-filter-lock");
     }
 
     function closeDetailModal() {
         if (!detailModal) return;
-        detailModal.setAttribute('hidden', '');
-        if (!modal || modal.hasAttribute('hidden')) {
-            document.body.classList.remove('lh-filter-lock');
+        detailModal.setAttribute("hidden", "");
+        if (!modal || modal.hasAttribute("hidden")) {
+            document.body.classList.remove("lh-filter-lock");
         }
     }
 
@@ -221,74 +243,37 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function resolveVerificationSummary(item, percentages, category) {
-        const directText = item.verificationText || item.verification_text || item.verificationSummary || item.verification_summary;
+        const directText =
+            item.verificationText ||
+            item.verification_text ||
+            item.verificationSummary ||
+            item.verification_summary;
         if (directText) {
             return directText;
         }
 
-        if (category === 'hoax' || percentages.hoax >= percentages.fakta) {
-            return 'Hasil verifikasi menunjukkan sebagian besar informasi ini memiliki indikasi hoaks atau ketidaksesuaian fakta. Mohon cek kembali sumber resmi sebelum menyebarkannya.';
+        if (category === "hoax" || percentages.hoax >= percentages.fakta) {
+            return "Hasil verifikasi menunjukkan sebagian besar informasi ini memiliki indikasi hoaks atau ketidaksesuaian fakta. Mohon cek kembali sumber resmi sebelum menyebarkannya.";
         }
 
-        return 'Hasil verifikasi menunjukkan mayoritas informasi ini sesuai dengan rujukan resmi. Tetap pastikan untuk membandingkan dengan sumber terpercaya saat membagikan.';
+        return "Hasil verifikasi menunjukkan mayoritas informasi ini sesuai dengan rujukan resmi. Tetap pastikan untuk membandingkan dengan sumber terpercaya saat membagikan.";
     }
 
     function resolvePercentages(item) {
-        const hoaxCandidates = [
-            item.confidence,
-            item.hoaxPercentage,
-            item.hoax_percentage,
-            item.fakePercentage,
-            item.fake_percentage,
-            item.hoaxScore,
-            item.hoax_score,
-            item.fakeScore,
-            item.fake_score,
-        ];
-        const factCandidates = [
-            item.confidence,
-            item.factPercentage,
-            item.fact_percentage,
-            item.faktaPercentage,
-            item.fakta_percentage,
-            item.realPercentage,
-            item.real_percentage,
-            item.factScore,
-            item.fact_score,
-            item.faktaScore,
-            item.fakta_score,
-            item.realScore,
-            item.real_score,
-        ];
+        // 1. Ambil nilai confidence
+        let val = item.confidence ? Number(item.confidence) : 0;
 
-        let hoax = pickNumber(hoaxCandidates);
-        let fakta = pickNumber(factCandidates);
-
-        if (hoax === null && fakta === null) {
-            if (item.category === 'hoax') {
-                hoax = 70;
-                fakta = 30;
-            } else {
-                hoax = 30;
-                fakta = 70;
-            }
-        } else if (hoax === null) {
-            hoax = 100 - fakta;
-        } else if (fakta === null) {
-            fakta = 100 - hoax;
-        }
-
-        hoax = normalizePercentage(hoax);
-        fakta = normalizePercentage(fakta);
-
-        const total = hoax + fakta;
-        if (total !== 100) {
-            fakta = Math.max(0, Math.min(100, 100 - hoax));
-        }
-
-        return { hoax, fakta };
+        // 2. Jika nilai masih dalam desimal (misal 0.95), ubah jadi persen (95)
+        // Jika sudah berupa angka bulat (misal 95), biarkan saja.
+        const score = val <= 1 ? Math.round(val * 100) : Math.round(val);
+        const fakta = item.category === "fakta" ? score : 100 -score;
+        const hoax = item.category === "hoax" ? score : 100 -score;
+        // 3. Return apa adanya sesuai kategori
+        // Karena Anda bilang: "kalo hoax ya confidence hoax, kalo fakta ya confidence fakta"
+        return {
+            hoax,fakta,
+        };
     }
-
     function pickNumber(values) {
         for (const value of values) {
             const num = Number(value);
@@ -308,15 +293,17 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function renderOptions(options, selectedValue, type) {
-        modalOptions.innerHTML = options.map(option => {
-            const isSelected = option.value === selectedValue;
-            return `
-                <button type="button" class="lh-filter-option ${isSelected ? 'lh-filter-option--selected' : ''}" data-option-value="${escapeHtml(option.value)}" data-option-type="${escapeHtml(type)}">
+        modalOptions.innerHTML = options
+            .map((option) => {
+                const isSelected = option.value === selectedValue;
+                return `
+                <button type="button" class="lh-filter-option ${isSelected ? "lh-filter-option--selected" : ""}" data-option-value="${escapeHtml(option.value)}" data-option-type="${escapeHtml(type)}">
                     <span class="lh-filter-option__label">${escapeHtml(option.label)}</span>
                     <span class="lh-filter-option__description">${escapeHtml(option.description)}</span>
                 </button>
             `;
-        }).join('');
+            })
+            .join("");
     }
 
     function renderPeriodPicker(year) {
@@ -332,15 +319,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     </button>
                 </div>
                 <div class="lh-period-picker__months">
-                    ${monthNames.map(monthName => {
-                        const optionValue = `${monthName} ${year}`;
-                        const isSelected = optionValue === state.period;
-                        return `
-                            <button type="button" class="lh-period-picker__month ${isSelected ? 'lh-period-picker__month--selected' : ''}" data-option-value="${escapeHtml(optionValue)}" data-option-type="period">
+                    ${monthNames
+                        .map((monthName) => {
+                            const optionValue = `${monthName} ${year}`;
+                            const isSelected = optionValue === state.period;
+                            return `
+                            <button type="button" class="lh-period-picker__month ${isSelected ? "lh-period-picker__month--selected" : ""}" data-option-value="${escapeHtml(optionValue)}" data-option-type="period">
                                 ${escapeHtml(monthName)}
                             </button>
                         `;
-                    }).join('')}
+                        })
+                        .join("")}
                 </div>
             </div>
         `;
@@ -349,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function parsePeriod(period) {
         const match = String(period).match(/^(.+)\s(\d{4})$/);
         if (!match) {
-            return { month: 'Juni', year: 2026 };
+            return { month: "Juni", year: 2026 };
         }
 
         return {
@@ -365,23 +354,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function updateLabels() {
         const categoryDisplayMap = {
-            all: 'Semua Kategori',
-            hoax: 'Hoax',
-            fakta: 'Fakta',
+            all: "Semua Kategori",
+            hoax: "Hoax",
+            fakta: "Fakta",
         };
-        const categoryDisplay = categoryDisplayMap[state.category] || 'Semua Kategori';
-        
+        const categoryDisplay =
+            categoryDisplayMap[state.category] || "Semua Kategori";
+
         if (categoryLabel) {
             categoryLabel.textContent = categoryDisplay;
         }
         if (periodLabel) {
             periodLabel.textContent = state.period;
         }
-        
+
         // Update trigger buttons in title
-        const categoryTrigger = document.querySelector('[data-filter-trigger="category"]');
-        const periodTrigger = document.querySelector('[data-filter-trigger="period"]');
-        
+        const categoryTrigger = document.querySelector(
+            '[data-filter-trigger="category"]',
+        );
+        const periodTrigger = document.querySelector(
+            '[data-filter-trigger="period"]',
+        );
+
         if (categoryTrigger) {
             categoryTrigger.textContent = categoryDisplay;
         }
@@ -392,63 +386,74 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function renderGrid() {
         // Filter items by selected period first
-        const itemsForPeriod = popularItems.filter(item => item.period === state.period);
+        const itemsForPeriod = popularItems.filter(
+            (item) => item.period === state.period,
+        );
 
         let itemsToDisplay = [];
 
-        if (state.category === 'all') {
+        if (state.category === "all") {
             // across all categories, show top 3 by count
-            itemsToDisplay = itemsForPeriod.slice().sort((a, b) => b.count - a.count).slice(0, 3);
+            itemsToDisplay = itemsForPeriod
+                .slice()
+                .sort((a, b) => b.count - a.count)
+                .slice(0, 3);
         } else {
             // specific category (popular/hoax/fakta) show top 3 in that category
-            itemsToDisplay = itemsForPeriod.filter(item => item.category === state.category)
+            itemsToDisplay = itemsForPeriod
+                .filter((item) => item.category === state.category)
                 .slice()
                 .sort((a, b) => b.count - a.count)
                 .slice(0, 3);
         }
 
         if (countLabel) {
-            countLabel.textContent = `${itemsToDisplay.length.toLocaleString('id-ID')} hasil ditemukan`;
+            countLabel.textContent = `${itemsToDisplay.length.toLocaleString("id-ID")} hasil ditemukan`;
         }
 
         renderedItems = itemsToDisplay;
 
         emptyState.hidden = itemsToDisplay.length > 0;
 
-        grid.innerHTML = itemsToDisplay.map((item, idx) => {
-            const displayRank = idx + 1;
-            const rankClass = item.category === 'hoax' ? 'rank-hoax' : 'rank-fakta';
-            
-            // Perbaikan: Ambil confidence dan pastikan dalam rentang 0-100
-            const rawConf = item.confidence || 50;
-            const score = (rawConf <= 1) ? Math.round(rawConf * 100) : Math.round(rawConf);
+        grid.innerHTML = itemsToDisplay
+            .map((item, idx) => {
+                const displayRank = idx + 1;
+                const rankClass =
+                    item.category === "hoax" ? "rank-hoax" : "rank-fakta";
 
+                // Perbaikan: Ambil confidence dan pastikan dalam rentang 0-100
+                const rawConf = item.confidence || 0;
+                const score =
+                    rawConf <= 1
+                        ? Math.round(rawConf * 100)
+                        : Math.round(rawConf);
 
-            // Tentukan class berdasarkan kategori
-            const isFakta = String(item.category).toLowerCase().includes('fakta');
-            const isHoax = String(item.category).toLowerCase().includes('hoax');
-            const displayPercentage = isFakta ? score : (100 - score);
+                // Tentukan class berdasarkan kategori
+               const isFakta = String(item.category).toLowerCase().includes("fakta");
+                const isHoax = String(item.category).toLowerCase().includes("hoax");
 
-            let badgeClass = 'lh-popular-card__badge--with-pct';
-            if (isFakta) {
-                badgeClass += ' lh-popular-card__badge--fakta';
-            } else if (isHoax) {
-                badgeClass += ' lh-popular-card__badge--hoax';
-            }
+                const displayPercentage = score;
 
-            const badgeHtml = `
+                let badgeClass = "lh-popular-card__badge--with-pct";
+                if (isFakta) {
+                    badgeClass += " lh-popular-card__badge--fakta";
+                } else if (isHoax) {
+                    badgeClass += " lh-popular-card__badge--hoax";
+                }
+
+                const badgeHtml = `
                 <span class="${badgeClass}">
                     <span class="lh-popular-card__badge-pct">${displayPercentage}%</span>
                     <span class="lh-popular-card__badge-label">${escapeHtml(item.badge)}</span>
                 </span>`;
 
-            return `
+                return `
                 <article class="lh-popular-card">
                     <div class="lh-popular-card__rank ${rankClass}" data-rank="${displayRank}">#${displayRank} ${item.badge}</div>
                     <div class="lh-popular-card__excerpt">${escapeHtml(item.excerpt)}</div>
                     <div class="lh-popular-card__content">
                         <div class="lh-popular-card__meta">
-                            <p class="lh-popular-card__count"><strong>${item.count.toLocaleString('id-ID')}</strong> orang mencari informasi serupa</p>
+                            <p class="lh-popular-card__count"><strong>${item.count.toLocaleString("id-ID")}</strong> orang mencari informasi serupa</p>
                         </div>
 
                         <div class="lh-popular-card__bottom">
@@ -460,48 +465,57 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                 </article>
             `;
-        }).join('');
+            })
+            .join("");
     }
 
     function escapeHtml(text) {
         return String(text)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
     }
 
-    triggerButtons.forEach(button => {
-        button.addEventListener('click', function () {
+    triggerButtons.forEach((button) => {
+        button.addEventListener("click", function () {
             openModal(this.dataset.filterTrigger);
         });
     });
 
-    closeButtons.forEach(button => {
-        button.addEventListener('click', closeModal);
+    closeButtons.forEach((button) => {
+        button.addEventListener("click", closeModal);
     });
 
-    modal.addEventListener('click', function (event) {
-        if (event.target === modal || event.target.classList.contains('lh-filter-modal__overlay')) {
+    modal.addEventListener("click", function (event) {
+        if (
+            event.target === modal ||
+            event.target.classList.contains("lh-filter-modal__overlay")
+        ) {
             closeModal();
         }
     });
 
     if (detailModal) {
-        detailModal.addEventListener('click', function (event) {
-            if (event.target === detailModal || event.target.classList.contains('lh-popular-detail-modal__overlay')) {
+        detailModal.addEventListener("click", function (event) {
+            if (
+                event.target === detailModal ||
+                event.target.classList.contains(
+                    "lh-popular-detail-modal__overlay",
+                )
+            ) {
                 closeDetailModal();
             }
         });
     }
 
-    detailCloseButtons.forEach(button => {
-        button.addEventListener('click', closeDetailModal);
+    detailCloseButtons.forEach((button) => {
+        button.addEventListener("click", closeDetailModal);
     });
 
-    grid.addEventListener('click', function (event) {
-        const detailButton = event.target.closest('[data-detail-index]');
+    grid.addEventListener("click", function (event) {
+        const detailButton = event.target.closest("[data-detail-index]");
         if (!detailButton) return;
 
         const index = Number(detailButton.dataset.detailIndex);
@@ -509,21 +523,21 @@ document.addEventListener('DOMContentLoaded', function () {
         openDetailModal(renderedItems[index]);
     });
 
-    modalOptions.addEventListener('click', function (event) {
-        const periodNavButton = event.target.closest('[data-period-nav]');
+    modalOptions.addEventListener("click", function (event) {
+        const periodNavButton = event.target.closest("[data-period-nav]");
         if (periodNavButton) {
             const direction = periodNavButton.dataset.periodNav;
-            shiftPeriodYear(direction === 'next' ? 1 : -1);
+            shiftPeriodYear(direction === "next" ? 1 : -1);
             return;
         }
 
-        const optionButton = event.target.closest('[data-option-value]');
+        const optionButton = event.target.closest("[data-option-value]");
         if (!optionButton) return;
 
         const value = optionButton.dataset.optionValue;
         const type = optionButton.dataset.optionType;
 
-        if (type === 'category') {
+        if (type === "category") {
             state.category = value;
         } else {
             state.periodYear = parsePeriod(value).year;
@@ -535,17 +549,17 @@ document.addEventListener('DOMContentLoaded', function () {
         closeModal();
     });
 
-    document.addEventListener('keydown', function (event) {
-        if (event.key !== 'Escape') {
+    document.addEventListener("keydown", function (event) {
+        if (event.key !== "Escape") {
             return;
         }
 
-        if (detailModal && !detailModal.hasAttribute('hidden')) {
+        if (detailModal && !detailModal.hasAttribute("hidden")) {
             closeDetailModal();
             return;
         }
 
-        if (!modal.hasAttribute('hidden')) {
+        if (!modal.hasAttribute("hidden")) {
             closeModal();
         }
     });

@@ -31,7 +31,7 @@ class RiwayatController extends Controller
             $data = $histories->through(function ($history) {
             
             $isImageSearch = $history->request && $history->request->image_id != null;
-            $isHoax = strtolower($history->final_label) === 'hoax';
+            $isHoax = strtolower($history->final_label) === 'fake';
             $confidence = ($history->final_confidence ?? 0) * 100;
 
             $persenHoax = $isHoax ? $confidence : (100 - $confidence);

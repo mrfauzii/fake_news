@@ -80,7 +80,6 @@ Route::prefix('auth/google')->group(function () {
     Route::get('/callback', [GoogleAuthController::class, 'callback'])->name('google.callback');
 });
 
-
 // Route::get('/pencarian-terpopuler', function () {
 //     return view('user.pencarian-terpopuler');
 // })->name('pencarian.populer');
@@ -97,7 +96,7 @@ Route::post('/telusuri-gambar', [PencarianController::class, 'telusuriGambar'])-
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
     // Dashboard
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 
     // User Management
     Route::get('/user', [UserController::class, 'index']);
@@ -124,10 +123,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::delete('/history-management/hard-delete/{id}', [HistoryManagementController::class, 'hardDelete']);
 
     Route::get('/pencarian', [AdminController::class, 'pencarian'])->name('admin.pencarian');
+    Route::get('/setting', [AdminController::class, 'setting'])->name('admin.setting');
+    Route::get('/setting/scrape', [AdminController::class, 'settingScrape'])->name('admin.setting.scrape');
+    Route::post('/setting/schedule-scrape', [ApiController::class, 'setScrapeSchedule'])->name('admin.setting.schedule-scrape');
 });
 
-// Admin - Cek Berita
-Route::get('/admin/cekberita', [PencarianController::class, 'adminIndex']);
 
 
 // Admin logout 
@@ -140,9 +140,6 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::any('/wa-webhook', [WaController::class, 'webhook']);
 Route::post('/detect-hoax', [ApiController::class, 'detectHoax']);
-
-// API untuk menyimpan jadwal scrape
-Route::post('/scrape-schedule', [ApiController::class, 'setScrapeSchedule']);
 
 //route trigger scrapee
 Route::get('/trigger-scraper', [ScraperController::class, 'triggerScraper']);

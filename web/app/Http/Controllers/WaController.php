@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\MessageCache;
 use App\Models\Users;
+use App\Models\UserInteractions;
+use App\Models\Feedbacks;
+use App\Models\Images;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -253,14 +256,10 @@ class WaController extends Controller
         }
     }
 
-    public function linkWhatsApp(Request $request)
+    public function linkWhatsApp($wa_number)
     {
-        // Validasi inputan form dari web
-        $request->validate([
-            'wa_number' => 'required'
-        ]);
-
-        $waNumberRaw = trim($request->wa_number);
+        
+        $waNumberRaw = trim($wa_number);
         
         $waNumberFonnte = $waNumberRaw;
         if (str_starts_with($waNumberRaw, '0')) {
@@ -296,14 +295,8 @@ class WaController extends Controller
                 'target' => $waNumberFonnte,
                 'message' => $waMessage
             ]);
-
-            if ($response->successful()) {
-                return back()->with('success', 'Link verifikasi telah dikirim ke nomor WhatsApp Anda. Silakan cek dan klik link tersebut dalam 10 menit ke depan.');
-            } else {
-                return back()->with('error', 'Gagal mengirim pesan WhatsApp. Pastikan nomor benar dan aktif.');
-            }
         } catch (\Exception $e) {
-            return back()->with('error', 'Terjadi kesalahan saat menghubungi server WhatsApp: ' . $e->getMessage());
+            Log::info('Merge ERROR: ' . $e->getMessage());
         }
     }
 
@@ -337,13 +330,13 @@ class WaController extends Controller
             if ($existingWaUser && $existingWaUser->id !== $currentUser->id) {
                 
                 // Pindahkan history ke akun utama (Gmail)
-                \App\Models\UserInteractions::where('user_id', $existingWaUser->id)
+                UserInteractions::where('user_id', $existingWaUser->id)
                     ->update(['user_id' => $currentUser->id]);
 
-                \App\Models\Images::where('uploaded_by', $existingWaUser->id)
+                Images::where('uploaded_by', $existingWaUser->id)
                     ->update(['uploaded_by' => $currentUser->id]);
 
-                \App\Models\Feedbacks::where('user_id', $existingWaUser->id)
+                Feedbacks::where('user_id', $existingWaUser->id)
                     ->update(['user_id' => $currentUser->id]);
 
                 // Hapus akun lama biar nggak duplikat
@@ -363,6 +356,7 @@ class WaController extends Controller
             return redirect()->route('beranda')->with('success', 'Nomor WhatsApp berhasil dihubungkan ke akun Anda!');
             
         } catch (\Exception $e) {
+            dd($e);
             DB::rollBack();
             return redirect()->route('beranda')->with('error', 'Gagal memverifikasi akun: ' . $e->getMessage());
         }

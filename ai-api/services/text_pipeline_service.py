@@ -64,6 +64,7 @@ def process_fake_news_pipeline(
                 raw_text,
                 client
             )
+            query = query["query"]
 
             s2_retry = run_stage3_online_search(
                 query,

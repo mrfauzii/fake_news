@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Users;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\WaController;
 
 class UserController extends Controller
 {
@@ -73,14 +74,14 @@ class UserController extends Controller
         $validated = $validator->validated();
 
         if (!empty($validated['phone_number'])) {
-            $registeredPhone = Users::where('phone_number', $validated['phone_number'])->first();
 
-            if (!$registeredPhone) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Nomor ini belum terdaftar. Silakan cek via WhatsApp pada menu Dapatkan Melalui WhatsApp.'
-                ], 422);
-            }
+            $link_wa = new WaController();
+            $link_wa->linkWhatsApp($validated['phone_number']);
+            return response()->json([
+                'success' => true,
+                'message' => 'Link validasi WhatsApp berhasil dikirim ke ' . $validated['phone_number'],
+            ], 200);
+
         }
 
         // Update user

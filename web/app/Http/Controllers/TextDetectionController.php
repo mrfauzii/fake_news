@@ -92,11 +92,23 @@ class TextDetectionController extends Controller
                 'user_id'    => ($wa == 1) ? $user_wa : $userId,
                 'request_id' => $requestId,
             ]);
+            Log::info('AI API Request: ' . $inputText);
             $response = Http::timeout(120)->post('http://127.0.0.1:8004/text-detection', [
                 'query' => $inputText,
                 'id_request' => $requestId
             ]);
             Log::info('AI API Response: ' . $response->body());
+            $data = $response->json();
+
+            if (isset($data['feature_vector'])) {
+                $features = $data['feature_vector'];
+
+                Log::info("=== FEATURE VECTOR ===");
+
+                foreach ($features as $feature => $value) {
+                    Log::info("$feature : $value");
+                }
+            }
 
             if (!$response->successful()) {
                 throw new \Exception('Gagal terhubung ke AI API');

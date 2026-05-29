@@ -179,3 +179,39 @@
     background: #b8201d;
     color: white;
 }
+
+/* ALERT SUCCESS */
+.success-alert {
+    position: fixed;
+    top: 85px; 
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #e8f8ee;
+    color: #1f7a45;
+    padding: 14px 18px;
+    border-radius: 14px;
+    font-weight: 600;
+    border: 1px solid #b7ebc8;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    z-index: 9999;
+    animation: slideDown .3s ease forwards;
+}
+
+.success-alert i {
+    font-size: 18px;
+}
+
+/* ANIMASI SLIDE DOWN */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -20px); 
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}

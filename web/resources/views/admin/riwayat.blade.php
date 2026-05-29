@@ -37,10 +37,6 @@
 
     </div>
 
-    <p class="page-subtitle">
-        Daftar lengkap seluruh verifikasi berita yang telah dilakukan oleh sistem dan moderator.
-    </p>
-
     <!-- GRID -->
     <div class="riwayat-grid">
         @foreach ($data as $item)

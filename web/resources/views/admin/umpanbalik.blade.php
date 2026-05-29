@@ -9,6 +9,7 @@
 
 @section('content')
 
+{{-- 1. BAGIAN HEADER & FORM PENCARIAN --}}
 <div class="page-header-top">
     <div class="page-title-box">
         <h1>Manajemen Umpan Balik</h1>
@@ -30,6 +31,7 @@
     </form>
 </div>
 
+{{-- 2. DAFTAR KARTU UMPAN BALIK (TARGET AJAX) --}}
 <div class="umpanbalik-list" id="feedbackList">
 
     @forelse($feedbacks as $item)
@@ -42,7 +44,7 @@
 
                     <div class="umpanbalik-actions">
                         <button
-                            class=" btn-detail"
+                            class="btn-detail"
                             data-username="{{ $item->username }}"
                             data-date="{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('l, j F Y') }}"
                             data-feedback="{{ rawurlencode($item->feedback) }}"
@@ -63,6 +65,7 @@
 
 </div>
 
+{{-- 3. KOMPONEN TOMBOL NAVIGASI HALAMAN (PAGINATION) --}}
 <div class="pagination-wrapper">
     @if ($feedbacks->lastPage() > 1)
 
@@ -91,6 +94,7 @@
     @endif
 </div>
 
+{{-- 4. MODAL POPUP DETAIL UMPAN BALIK --}}
 <div id="feedbackPopup" class="popup-overlay" style="display:none;">
     <div class="popup-box">
         <button id="closePopup" class="popup-close">✕</button>
@@ -123,12 +127,86 @@
     </div>
 </div>
 
+{{-- 5. LOGIKA JAVASCRIPT (AJAX LIVE SEARCH, PAGINATION & POPUP) --}}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const popup = document.getElementById('feedbackPopup');
     const closeBtn = document.getElementById('closePopup');
+    const searchInput = document.getElementById('searchFeedback');
+    const searchForm = document.querySelector('.search-wrapper');
+    
+    let debounceTimeout;
 
-    /* Handler klik tombol Detail menggunakan Event Delegation */
+    // A. Fungsi Ambil Data Menggunakan Fetch API (AJAX)
+    function fetchLiveData(url) {
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // Timpa list lama dengan list umpan balik yang baru
+            const newFeedbackList = doc.getElementById('feedbackList');
+            const currentFeedbackList = document.getElementById('feedbackList');
+            if (newFeedbackList && currentFeedbackList) {
+                currentFeedbackList.innerHTML = newFeedbackList.innerHTML;
+            }
+
+            // Timpa pagination lama dengan pagination yang baru
+            const newPagination = doc.querySelector('.pagination-wrapper');
+            const currentPagination = document.querySelector('.pagination-wrapper');
+            if (currentPagination) {
+                currentPagination.innerHTML = newPagination ? newPagination.innerHTML : '';
+            }
+        })
+        .catch(error => console.error('Terjadi kesalahan saat memuat data:', error));
+    }
+
+    // B. Fitur Live Search Otomatis (Debounce 300ms)
+    if (searchInput) {
+        searchInput.addEventListener('input', function () {
+            clearTimeout(debounceTimeout);
+            const keyword = this.value;
+
+            debounceTimeout = setTimeout(() => {
+                const url = new URL(window.location.origin + window.location.pathname);
+                
+                if (keyword) {
+                    url.searchParams.set('search', keyword);
+                }
+                url.searchParams.delete('page'); // Kembali ke halaman 1 saat mengetik kata kunci baru
+
+                window.history.pushState({}, '', url); // Ubah URL browser tanpa reload
+                fetchLiveData(url);
+            }, 300);
+        });
+    }
+
+    // Mencegah submit form konvensional agar tidak memicu reload halaman
+    if (searchForm) {
+        searchForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+        });
+    }
+
+    // C. Interseptor Tombol Navigasi Angka Halaman (Pagination AJAX)
+    document.addEventListener('click', function (e) {
+        const targetAnchor = e.target.closest('.pagination-wrapper a');
+        
+        if (targetAnchor && !targetAnchor.classList.contains('disabled') && !targetAnchor.classList.contains('active')) {
+            e.preventDefault();
+            
+            const targetUrl = targetAnchor.getAttribute('href');
+            window.history.pushState({}, '', targetUrl); // Update URL browser
+            fetchLiveData(targetUrl); // Muat data halaman baru
+        }
+    });
+
+    // D. Handler Klik Tombol Detail (Event Delegation untuk Element Dinamis)
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('btn-detail')) {
             document.getElementById('popupUser').innerText = e.target.dataset.username;
@@ -141,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    /* Handler Menutup Popup */
+    // E. Menutup Popup Modal
     closeBtn.addEventListener('click', () => popup.style.display = 'none');
     popup.addEventListener('click', function(e) {
         if (e.target === popup) { popup.style.display = 'none'; }

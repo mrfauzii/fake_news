@@ -23,8 +23,8 @@ class GoogleAuthController extends Controller
     {
         try {
             $googleUser = Socialite::driver('google')
-            ->setHttpClient(new \GuzzleHttp\Client(['verify' => false]))
-            ->user();
+                ->setHttpClient(new \GuzzleHttp\Client(['verify' => false]))
+                ->user();
 
             // Cek apakah email dari Google udah ada di database kita?
             $user = Users::where('email', $googleUser->getEmail())->first();
@@ -45,15 +45,14 @@ class GoogleAuthController extends Controller
                 return redirect('pencarian');
             }
 
-            return redirect('/admin/dashboard');
-
+            return redirect(route('admin.dashboard'));
         } catch (\Exception $e) {
             dd([
-    'message' => $e->getMessage(),
-    'file' => $e->getFile(),
-    'line' => $e->getLine(),
-    'trace' => $e->getTraceAsString(),
-]);
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             return redirect('/')->with('error', 'Gagal login pakai Google!');
         }
     }

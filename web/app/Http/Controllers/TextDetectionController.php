@@ -28,47 +28,52 @@ class TextDetectionController extends Controller
         $request->validate([
             'query' => 'required|string'
         ]);
+        $inputText = trim($request->input('query'));
+        $skipSimilarity = $request->input('skip_similarity', 0);
+        $detection = new TextDetectionController();
+        return $detection->detect($inputText, $skipSimilarity);
+    }
+    public function detect($inputText, $wa = 0, $user_wa = 0, $skipSimilarity = 0)
+    {
 
-        $inputText = $request->input('query');
         $userId = Auth::check() ? Auth::id() : 2;
-        
+
         try {
             // ========================================================
             // A. CEK SIMILARITY SEARCH TERLEBIH DAHULU
             // ========================================================
-            if ($request->input('skip_similarity') === 0) {
-            $simResponse = Http::timeout(60)->post('http://127.0.0.1:8004/similarity-search', [
-                'query' => $inputText
-            ]);
-            
-            if ($simResponse->successful()) {
-                $simData = $simResponse->json();
+            if ($skipSimilarity === 0) {
+                $simResponse = Http::timeout(60)->post('http://127.0.0.1:8004/similarity-search', [
+                    'query' => $inputText
+                ]);
 
-                // Cek jika status success dari Python API
-                if (isset($simData['status']) && $simData['status'] === 'success' && !empty($simData['request_id'])) {
+                if ($simResponse->successful()) {
+                    $simData = $simResponse->json();
 
-                    $matchedId = $simData['request_id'];
-                    $similarityScore = $simData['similarity'] ?? 0;
+                    // Cek jika status success dari Python API
+                    if (isset($simData['status']) && $simData['status'] === 'success' && !empty($simData['request_id'])) {
 
-                    $oldRequest = Requests::find($matchedId);
+                        $matchedId = $simData['request_id'];
+                        $similarityScore = $simData['similarity'] ?? 0;
 
-                    if ($oldRequest) {
-                        // HANYA tambah UserInteraction baru yang mengarah ke request lama
-                        UserInteractions::create([
-                            'user_id'    => $userId,
-                            'request_id' => $matchedId,
-                        ]);
+                        $oldRequest = Requests::find($matchedId);
 
-                        // Format data lama agar persis dengan output frontend
-                        $responseData = $this->formatMatchedResponse($oldRequest, $matchedId);
+                        if ($oldRequest) {
+                            // HANYA tambah UserInteraction baru yang mengarah ke request lama
+                            UserInteractions::create([
+                                'user_id'    => ($wa == 1) ? $user_wa : $userId,
+                                'request_id' => $matchedId,
+                            ]);
+                            // Format data lama agar persis dengan output frontend
+                            $responseData = $this->formatMatchedResponse($oldRequest, $matchedId);
 
-                        return response()->json([
-                            'status' => $oldRequest->status === 'stage1' ? 'stage1' : 'stage2',
-                            'data' => $responseData
-                        ]);
+                            return response()->json([
+                                'status' => $oldRequest->status === 'stage1' ? 'stage1' : 'stage2',
+                                'data' => $responseData
+                            ]);
+                        }
                     }
                 }
-            }
             }
 
             // ========================================================
@@ -84,10 +89,9 @@ class TextDetectionController extends Controller
             $requestId = $requestData->id;
 
             UserInteractions::create([
-                'user_id'    => $userId,
+                'user_id'    => ($wa == 1) ? $user_wa : $userId,
                 'request_id' => $requestId,
             ]);
-
             $response = Http::timeout(120)->post('http://127.0.0.1:8004/text-detection', [
                 'query' => $inputText,
                 'id_request' => $requestId
@@ -141,7 +145,6 @@ class TextDetectionController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
-    
     }
 
     /**
@@ -262,9 +265,12 @@ class TextDetectionController extends Controller
         // ==========================================
         $verdict = ($finalLabel === 'fake') ? 'fake' : 'valid';
 
+        // Ubah juga bagian ini di formatMatchedResponse:
         $summaryText = $this->generateSummaryText(
             $featureVector['mean_entailment'] ?? null,
-            $featureVector['mean_contradiction'] ?? null
+            $featureVector['mean_contradiction'] ?? null,
+            $verdict,
+            $confidencePercentage
         );
 
         // Anda bisa melempar $summaryText ini ke view atau menyimpannya ke database
@@ -357,9 +363,12 @@ class TextDetectionController extends Controller
                 'std_contradiction' => $stage2Result->std_contradiction,
             ] : [];
 
+            // Ubah juga bagian ini di formatMatchedResponse:
             $summaryText = $this->generateSummaryText(
                 $featureVector['mean_entailment'] ?? null,
-                $featureVector['mean_contradiction'] ?? null
+                $featureVector['mean_contradiction'] ?? null,
+                $verdict,
+                $confidencePercentage
             );
 
             return [
@@ -378,28 +387,35 @@ class TextDetectionController extends Controller
         }
     }
 
-    private function generateSummaryText(?float $meanEntailment, ?float $meanContradiction): string
+    private function generateSummaryText(?float $meanEntailment, ?float $meanContradiction, string $verdict, float $globalConfidence): string
     {
-        // Berikan nilai default 0 jika datanya null
         $entailment = $meanEntailment ?? 0.0;
         $contradiction = $meanContradiction ?? 0.0;
 
-        if ($entailment >= 0.6 && $contradiction <= 0.3) {
+        // 1. JIKA FINAL VERDICT ADALAH FAKTA (VALID)
+        if ($verdict === 'valid') {
             $statusTeks = "Fakta";
-            $confidence = round($entailment * 100);
-            $alasan = "tingginya keselarasan informasi dengan sumber referensi";
-        } elseif ($contradiction >= 0.5) {
+            // Gunakan global confidence dari API jika threshold dalam tidak terpenuhi
+            $confidence = ($entailment >= 0.6) ? round($entailment * 100) : $globalConfidence;
+            $alasan = "tingginya keselarasan informasi dengan sumber referensi resmi yang ditemukan";
+        }
+        // 2. JIKA FINAL VERDICT ADALAH HOAKS (FAKE)
+        elseif ($verdict === 'fake') {
             $statusTeks = "Hoaks";
-            $confidence = round($contradiction * 100);
-            $alasan = "ditemukannya kontradiksi yang kuat antara klaim dengan sumber berita";
-        } elseif ($contradiction > $entailment && $contradiction >= 0.2) {
-            $statusTeks = "Misinformasi";
-            $confidence = round($contradiction * 100);
-            $alasan = "adanya beberapa ketidaksesuaian fakta dari sumber yang ditemukan";
-        } else {
-            $statusTeks = "Tidak Terverifikasi";
-            $confidence = round(max($entailment, $contradiction) * 100) ?: 50;
-            $alasan = "minimnya bukti untuk membenarkan atau menyanggah klaim tersebut";
+            $confidence = ($contradiction >= 0.5) ? round($contradiction * 100) : $globalConfidence;
+            $alasan = "ditemukannya kontradiksi yang kuat antara klaim dengan sumber berita terkait";
+        }
+        // 3. JIKA JALUR TENGAH (MISINFORMASI / AMBIGU)
+        else {
+            if ($contradiction > $entailment && $contradiction >= 0.2) {
+                $statusTeks = "Misinformasi";
+                $confidence = round($contradiction * 100);
+                $alasan = "adanya beberapa ketidaksesuaian fakta dari sumber yang ditemukan";
+            } else {
+                $statusTeks = "Tidak Terverifikasi";
+                $confidence = $globalConfidence;
+                $alasan = "minimnya bukti kuat untuk membenarkan atau menyanggah klaim tersebut";
+            }
         }
 
         return "Hasil penelusuran menyimpulkan informasi ini sebagai {$statusTeks} dengan tingkat keyakinan {$confidence}%. Kesimpulan ini diambil berdasarkan {$alasan}.";

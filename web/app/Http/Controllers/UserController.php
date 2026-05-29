@@ -23,8 +23,9 @@ class UserController extends Controller
             });
         })
         ->orderBy('name', 'asc') // Menambahkan sorting agar susunan tabel teratur rapi
-        ->paginate(2)          // Mengganti batasan menjadi 10 baris per halaman demi kenyamanan UI
         ->withQueryString();     // Mengunci query parameter agar filter pencarian tidak hilang saat klik link page
+        ->paginate(25)
+        ->appends(['search' => $search]);
 
         // 3. Mapping data koleksi pagination tanpa memutus rantai pagination-nya
         $usersFromDb->through(function ($user) {

@@ -114,11 +114,24 @@
             </div>
 
             <div class="info-card">
-                <div class="info-title">Berita yang dicari</div>
-                <div class="info-value" id="popupLink"></div>
 
-                <div class="info-title">Hasil Deteksi</div>
-                <div class="info-value" id="popupResult"></div>
+                <div class="info-title">
+                    Berita yang dicari
+                </div>
+
+                <div
+                class="info-value"
+                id="popupinput">
+                </div>
+
+                <div class="info-title">
+                    Hasil Deteksi
+                </div>
+
+                <div class="info-value"
+                id="popupResult">
+                </div>
+
             </div>
         </div>
 
@@ -155,6 +168,64 @@ document.addEventListener('DOMContentLoaded', function() {
             if (newFeedbackList && currentFeedbackList) {
                 currentFeedbackList.innerHTML = newFeedbackList.innerHTML;
             }
+document.addEventListener('DOMContentLoaded',function(){
+
+    const container=
+    document.getElementById('feedbackList');
+
+    const popup=
+    document.getElementById('feedbackPopup');
+
+    const closeBtn=
+    document.getElementById('closePopup');
+
+    fetch('/admin/umpanbalik-data')
+
+    .then(response=>response.json())
+
+    .then(result=>{
+
+        container.innerHTML='';
+        console.log(result);
+
+        result.data.forEach(item=>{
+
+            container.innerHTML += `
+            <div class="umpanbalik-item new feedback-item"
+                data-user="${item.username.toLowerCase()}"
+                data-feedback="${item.feedback.toLowerCase()}"
+                >
+
+                <div class="umpanbalik-left">
+
+
+                    <div>
+
+                        <h4>${item.username}</h4>
+
+                        <span>${item.date}</span>
+
+                        <p>${item.feedback}</p>
+
+                        <div class="umpanbalik-actions">
+
+                            <button
+                            class="btn-outline btn-detail"
+                            data-username="${item.username}"
+                            data-date="${item.date}"
+                            data-feedback="${encodeURIComponent(item.feedback)}"
+                            data-input_text="${encodeURIComponent(item.input_text)}"
+                            data-images="${item.images}"
+                            data-result="${item.result}"
+                            >
+                            Detail
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
 
             // Timpa pagination lama dengan pagination yang baru
             const newPagination = doc.querySelector('.pagination-wrapper');
@@ -191,6 +262,67 @@ document.addEventListener('DOMContentLoaded', function() {
         searchForm.addEventListener('submit', function (e) {
             e.preventDefault();
         });
+
+    });
+
+    document.addEventListener('click',function(e){
+
+    if(e.target.classList.contains('btn-detail')){
+        document.getElementById(
+            'popupUser'
+        ).innerText =
+        e.target.dataset.username;
+
+        document.getElementById(
+            'popupDate'
+        ).innerText =
+        e.target.dataset.date;
+
+        document.getElementById(
+            'popupFeedback'
+        ).innerText =
+        decodeURIComponent(
+            e.target.dataset.feedback
+        );
+        //img or text
+        const el = document.getElementById('popupinput');
+        const data = e.target.dataset;
+
+        const inputText =
+            data.input_text && data.input_text !== "null"
+                ? decodeURIComponent(data.input_text)
+                : null;
+
+        const image =
+            data.images && data.images !== "null"
+                ? data.images
+                : null;
+
+        // RESET mode
+        el.classList.remove('image-mode');
+        el.innerHTML = "";
+
+        // TEXT MODE
+        if (inputText) {
+            el.innerText = inputText;
+
+        // IMAGE MODE
+        } else if (image) {
+            el.classList.add('image-mode');
+            el.innerHTML = `<img src="${image}">`;
+
+        // EMPTY
+        } else {
+            el.innerText = "-";
+        }
+
+
+        document.getElementById(
+        'popupResult'
+        ).innerText =
+        e.target.dataset.result;
+
+        popup.style.display='flex';
     }
 
     // C. Interseptor Tombol Navigasi Angka Halaman (Pagination AJAX)
@@ -226,5 +358,28 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+<style>
+#popupinput {
+    max-height: 150px;
+    overflow-y: auto;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
 
+/* mode gambar */
+#popupinput.image-mode {
+    max-height: none;
+    overflow: visible;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#popupinput.image-mode img {
+    max-width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+</style>
 @endsection

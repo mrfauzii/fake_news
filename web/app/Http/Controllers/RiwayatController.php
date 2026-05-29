@@ -18,14 +18,16 @@ class RiwayatController extends Controller
 
         $search = request('search');
 
-        $histories = history_view::with('request')
-            ->when($search, function ($query) use ($search) {
-                $query->where('username', 'like', "%{$search}%")
-                    ->orWhere('input_text', 'like', "%{$search}%");
-            })
-            ->orderBy('created_at', 'desc')
-            ->paginate(2)
-            ->appends(['search' => $search]);
+        $histories = history_view::with('request.image')
+    ->when($search, function ($query) use ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('username', 'like', "%{$search}%")
+              ->orWhere('input_text', 'like', "%{$search}%");
+        });
+    })
+    ->orderBy('created_at', 'desc')
+    ->paginate(10)
+    ->appends(['search' => $search]);
             $data = $histories->through(function ($history) {
             
             $isImageSearch = $history->request && $history->request->image_id != null;

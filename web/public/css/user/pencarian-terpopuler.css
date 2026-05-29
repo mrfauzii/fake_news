@@ -151,8 +151,8 @@
 
 .lh-popular-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
     width: 100%;
     align-items: start;
     box-sizing: border-box;
@@ -162,15 +162,17 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    min-height: 360px;
-    height: 100%;
-    padding: 24px 20px 20px;
-    border: 1px solid rgba(139,17,18,0.14);
-    border-radius: 12px;
-    background: linear-gradient(180deg, #fffdfd 0%, #fff7f7 100%);
-    box-shadow: 0 10px 18px rgba(114, 16, 19, 0.06);
+    min-height: 280px;
+    width: 100%;
+    max-width: 360px;
+    padding: 20px;
+    border: 1px solid rgba(176, 26, 28, 0.06);
+    border-radius: 14px;
+    background: linear-gradient(180deg, #ffffff 0%, #fff9f8 100%);
+    box-shadow: 0 10px 30px rgba(157, 20, 21, 0.06);
     overflow: visible;
     box-sizing: border-box;
+    transition: transform 0.18s cubic-bezier(.2,.9,.3,1), box-shadow 0.18s ease;
 }
 
 .lh-popular-card__medal {
@@ -178,29 +180,49 @@
 }
 
 .lh-popular-card__excerpt {
-    min-height: 200px;
-    padding: 20px;
-    border: 1px solid rgba(143,74,77,0.08);
+    min-height: 120px;
+    max-height: 140px;
+    padding: 16px 14px;
+    border: 1px solid rgba(200, 200, 200, 0.08);
     border-radius: 10px;
-    background: #fff8f8;
+    background: #ffffff;
     font-family: var(--font-poppins);
-    font-size: 15px;
-    line-height: 1.7;
-    color: #222;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #372323;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
     box-sizing: border-box;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-right: 12px; /* room for scrollbar */
+}
+
+/* subtle custom scrollbar for excerpt */
+.lh-popular-card__excerpt::-webkit-scrollbar {
+    width: 8px;
+}
+.lh-popular-card__excerpt::-webkit-scrollbar-thumb {
+    background: rgba(58,13,14,0.12);
+    border-radius: 6px;
+}
+.lh-popular-card__excerpt {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(58,13,14,0.12) transparent;
 }
 
 /* New compact rank badge in top-left corner */
 .lh-popular-card__rank {
     position: absolute;
-    top: 8px;
+    top: -12px;
     left: 12px;
     z-index: 5;
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 12px;
-    border-radius: 12px;
+    padding: 7px 12px;
+    border-radius: 10px;
     font-family: var(--font-dmsans);
     font-weight: 800;
     font-size: 12px;
@@ -224,57 +246,111 @@
 .lh-popular-card__rank.rank-fakta { background: linear-gradient(90deg,#1d7f45,#145a31); }
 
 @media (max-width: 720px) {
-    .lh-popular-card__rank { top: 6px; left: 10px; padding: 5px 8px; font-size: 11px; }
+    .lh-popular-card__rank { top: -9px; left: 10px; padding: 5px 8px; font-size: 11px; }
 }
 
 .lh-popular-card__content {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 14px 0 0;
-    padding-left: 10px; /* give some space from left badge */
+    gap: 14px;
+    padding: 12px 0 0;
     flex: 1 1 auto;
 }
 
 .lh-popular-card__row {
     display: flex;
-    align-items: flex-start;
-    gap: 10px;
+    gap: 8px;
+    align-items: center;
+}
+
+.lh-popular-card__bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 }
 
 .lh-popular-card__badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 96px;
-    height: 38px;
-    padding: 0 16px;
+    min-width: 88px;
+    height: 36px;
+    padding: 0 12px;
     border-radius: 10px;
-    border: 1px solid #8b1112;
-    background: #fff;
-    color: #c9221c;
+    border: 1px solid transparent;
+    background: rgba(255,255,255,0.92);
+    color: #9b0b0e;
     font-family: var(--font-dmsans);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 800;
     flex-shrink: 0;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+/* Badge variant that includes percentage inside the same pill */
+.lh-popular-card__badge--with-pct {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 6px 12px;
+    min-width: 120px;
+    height: 40px;
+    border-radius: 10px;
+    background: #fff;
+    color: #3a0d0e;
+    border: 2px solid #3a0d0e;
+    box-shadow: 0 6px 16px rgba(58,13,14,0.06);
+}
+
+.lh-popular-card__badge--with-pct .lh-popular-card__badge-pct {
+    font-family: var(--font-dmsans);
+    font-weight: 900;
+    font-size: 16px;
+    color: #3a0d0e;
+}
+
+.lh-popular-card__badge--with-pct .lh-popular-card__badge-label {
+    font-family: var(--font-dmsans);
+    font-weight: 900;
+    font-size: 14px;
+    color: #c9201c;
+    text-transform: uppercase;
+}
+
+/* Tighten spacing so badge and button align like design */
+.lh-popular-card__bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 }
 
 .lh-popular-card__headline {
-    margin: 10px 0 0;
+    margin: 0;
     font-family: var(--font-poppins);
-    font-size: 16px;
-    line-height: 1.35;
+    font-size: 15px;
+    line-height: 1.38;
     font-weight: 700;
     color: #352020;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
 }
 
 .lh-popular-card__count {
-    margin-top: 4px;
+    margin: 0;
     font-family: var(--font-poppins);
-    font-size: 12px;
+    font-size: 13px;
     line-height: 1.4;
     font-weight: 700;
-    color: #4d2225;
+    color: #51403f;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
 }
 
 .lh-popular-card__count strong {
@@ -282,34 +358,52 @@
 }
 
 .lh-popular-card__footer {
-    margin-top: auto;
+    margin: 0;
     display: flex;
     justify-content: flex-end;
-    padding-top: 6px;
+    align-items: center;
 }
 
 .lh-popular-card__btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 132px;
-    height: 34px;
-    padding: 0 14px;
-    border-radius: 8px;
+    min-width: 120px;
+    height: 40px;
+    padding: 0 16px;
+    border-radius: 10px;
     background: linear-gradient(180deg, #a40f12 0%, #8e0a0d 100%);
     color: #fff;
     font-family: var(--font-poppins);
-    font-size: 13px;
-    font-weight: 700;
-    box-shadow: 0 10px 18px rgba(126, 12, 15, 0.16);
-    transition: transform 0.18s ease, filter 0.18s ease;
+    font-size: 14px;
+    font-weight: 800;
+    box-shadow: 0 10px 22px rgba(137, 18, 20, 0.12);
+    transition: transform 0.18s cubic-bezier(.2,.9,.3,1), filter 0.18s ease, box-shadow 0.18s ease;
+    border: 0;
 }
 
 .lh-popular-card__btn:hover,
 .lh-popular-card__btn:focus-visible {
-    transform: translateY(-1px);
-    filter: brightness(1.05);
+    transform: translateY(-3px);
+    filter: brightness(1.06);
+    box-shadow: 0 14px 30px rgba(137, 18, 20, 0.16);
     outline: none;
+}
+
+@media (max-width: 520px) {
+    .lh-popular-card__bottom {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .lh-popular-card__badge--with-pct {
+        justify-content: flex-start;
+    }
+
+    .lh-popular-card__footer {
+        justify-content: stretch;
+    }
 }
 
 .lh-popular-empty {
@@ -756,7 +850,7 @@ body.lh-filter-lock {
     }
 
     .lh-popular-grid {
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
@@ -783,25 +877,48 @@ body.lh-filter-lock {
 
     .lh-popular-card {
         min-height: auto;
-        padding: 18px 14px 14px;
+        padding: 18px 12px 12px;
+        max-width: none;
     }
 
     .lh-popular-card__excerpt {
-        min-height: 170px;
-        padding: 14px;
+        min-height: 150px;
+        padding: 14px 12px;
         font-size: 14px;
     }
 
     .lh-popular-card__content {
-        padding-left: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding-top: 10px;
+    }
+
+    .lh-popular-card__bottom {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .lh-popular-card__footer {
+        justify-content: flex-start;
+    }
+
+    .lh-popular-card__btn {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .lh-popular-card__row {
+        align-items: center;
+    }
+
+    .lh-popular-card__count {
+        font-size: 12px;
     }
 
     .lh-popular-card__headline {
         font-size: 15px;
-    }
-
-    .lh-popular-card__btn {
-        min-width: 100%;
     }
 
     .lh-filter-modal__card {

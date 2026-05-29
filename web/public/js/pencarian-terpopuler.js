@@ -417,18 +417,27 @@ document.addEventListener('DOMContentLoaded', function () {
             const displayRank = idx + 1; // 1..3
             const rankClass = item.category === 'hoax' ? 'rank-hoax' : 'rank-fakta';
 
+            const percentages = resolvePercentages(item);
+            const hoaxPctDisplay = `${percentages.hoax}%`;
+
+            const badgeHtml = (item.category === 'hoax' || String(item.badge).toLowerCase().includes('hoax'))
+                ? `<span class="lh-popular-card__badge lh-popular-card__badge--with-pct"><span class="lh-popular-card__badge-pct">${escapeHtml(hoaxPctDisplay)}</span><span class="lh-popular-card__badge-label">${escapeHtml(item.badge)}</span></span>`
+                : `<span class="lh-popular-card__badge">${escapeHtml(item.badge)}</span>`;
+
             return `
                 <article class="lh-popular-card">
                     <div class="lh-popular-card__rank ${rankClass}" data-rank="${displayRank}">#${displayRank} ${item.badge}</div>
                     <div class="lh-popular-card__excerpt">${escapeHtml(item.excerpt)}</div>
                     <div class="lh-popular-card__content">
-                        <div class="lh-popular-card__row">
-                            <span class="lh-popular-card__badge">${escapeHtml(item.badge)}</span>
-                            <h3 class="lh-popular-card__headline">${escapeHtml(item.headline)}</h3>
+                        <div class="lh-popular-card__meta">
+                            <p class="lh-popular-card__count"><strong>${item.count.toLocaleString('id-ID')}</strong> orang mencari informasi serupa</p>
                         </div>
-                        <p class="lh-popular-card__count"><strong>${item.count.toLocaleString('id-ID')}</strong> orang mencari informasi serupa</p>
-                        <div class="lh-popular-card__footer">
-                            <button type="button" class="lh-popular-card__btn" data-detail-index="${idx}">Detail Lengkap</button>
+
+                        <div class="lh-popular-card__bottom">
+                            ${badgeHtml}
+                            <div class="lh-popular-card__footer">
+                                <button type="button" class="lh-popular-card__btn" data-detail-index="${idx}">Detail Lengkap</button>
+                            </div>
                         </div>
                     </div>
                 </article>

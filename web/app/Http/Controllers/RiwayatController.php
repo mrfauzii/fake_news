@@ -24,7 +24,7 @@ class RiwayatController extends Controller
                     ->orWhere('input_text', 'like', "%{$search}%");
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(10)
+            ->paginate(2)
             ->appends(['search' => $search]);
             $data = $histories->through(function ($history) {
             

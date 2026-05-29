@@ -44,7 +44,8 @@ class UmpanBalikController extends Controller
 
         // 5. Batasi 10 data per halaman & kunci parameter pencarian di URL saat klik pindah page
         $feedbacks = $query->orderBy('feedbacks.created_at', 'desc')
-            ->paginate(2)
+            ->paginate(1)
+            
             ->withQueryString();
 
         // 6. Kirim seluruh variabel ke view admin.umpanbalik

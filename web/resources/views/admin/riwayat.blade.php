@@ -4,529 +4,349 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/admin/riwayat-style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/components.css') }}">
 @endpush
 
 @section('content')
-    <!-- HEADER -->
-    <div class="page-header">
-
-        <h1>Riwayat Global</h1>
+    <div class="page-header-top">
+        <div class="page-title-box">
+            <h1>Riwayat Global</h1>
+            <p>Daftar lengkap seluruh verifikasi berita yang telah dilakukan oleh sistem dan moderator</p>
+        </div>
 
         <div class="page-header-right">
-
             <div class="search-wrapper">
-
-                <form action="{{ url()->current() }}" method="GET" class="search-wrapper">
-
+                <form action="{{ url()->current() }}" method="GET" class="search-wrapper" id="searchForm">
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Search..."
                         class="search-input" id="searchInput">
                     <button type="submit" class="search-btn">
                         <i class="fa fa-search"></i>
                     </button>
-
                 </form>
-
             </div>
 
             <button class="btn-export" onclick="window.location.href='{{ route('riwayat.unduh_csv') }}'">
                 <i class="fa fa-download"></i>
                 Export CSV
             </button>
-
         </div>
-
     </div>
 
-    <!-- GRID -->
-    <div class="riwayat-grid">
-        @foreach ($data as $item)
-            <div class="riwayat-card searchable-card {{ $item['gambar'] ? 'image-card' : '' }}"
-                data-title="{{ strtolower($item['judul']) }}" data-id="{{ $loop->index }}"
-                data-request-id="{{ $item['request_id'] }}" data-deleted="{{ $item['is_deleted'] ? 'true' : 'false' }}"
-                data-deleted-date="{{ $item['deleted_at'] ?? '' }}">
+    <div class="riwayat-grid" id="riwayatGrid">
+        @forelse ($data as $item)
+            @php
+                $imagePath = data_get($item, 'gambar');
 
-                {{-- JIKA ADA GAMBAR --}}
-                @if ($item['gambar'])
-                    <img src="{{ asset($item['gambar']) }}" class="card-img">
+                $userText = data_get($item, 'deskripsi', '(Tidak ada teks input)');
 
-                    {{-- JIKA TIDAK ADA GAMBAR --}}
-                @else
-                    <div class="card-header">
+                $hasImage = !empty($imagePath);
+            @endphp
 
-                        <div class="warning-title">
+            <div class="riwayat-card searchable-card {{ $hasImage ? 'image-card' : '' }}"
+                data-title="{{ strtolower(data_get($item, 'judul', '')) }}" 
+                data-id="{{ $loop->index }}"
+                data-request-id="{{ data_get($item, 'request_id') }}" 
+                data-deleted="{{ data_get($item, 'is_deleted') ? 'true' : 'false' }}"
+                data-deleted-date="{{ data_get($item, 'deleted_at') }}">
 
-                            <i class="fa fa-exclamation-triangle warning-icon"></i>
-
-                            {{ $item['judul'] }}
-
-                            <i class="fa fa-exclamation-triangle warning-icon"></i>
-
-                        </div>
-
-                        <p class="desc">
-                            {{ $item['deskripsi'] }}
-                        </p>
-
+                {{-- TAMPILKAN GAMBAR JIKA USER MENGUPLOAD GAMBAR --}}
+                @if ($hasImage && is_string($imagePath))
+                    <div class="card-image-wrapper" style="text-align: center; padding: 10px;">
+                        <img src="{{ asset($imagePath) }}" class="card-img" style="max-height: 180px; object-fit: contain; width: 100%; border-radius: 4px;" onerror="this.parentNode.style.display='none'">
                     </div>
                 @endif
 
-                <!-- GARIS -->
+                {{-- TAMPILKAN TEKS INPUT / JUDUL --}}
+                <div class="card-header">
+                    <div class="warning-title" style="font-weight: bold; font-size: 14px; margin-bottom: 5px; color: #b8201d;">
+                        @if (!$hasImage)
+                            <i class="fa fa-exclamation-triangle warning-icon"></i>
+                        @endif
+
+                        {{ data_get($item, 'judul') }}
+
+                        @if (!$hasImage)
+                            <i class="fa fa-exclamation-triangle warning-icon"></i>
+                        @endif
+                    </div>
+
+                    {{-- Menampilkan isi input_text dari user --}}
+                    <p class="desc" style="color: #444; font-size: 13px; line-height: 1.4; margin-top: 8px;">
+                        {{ $userText }}
+                    </p>
+                </div>
+
                 <div class="divider"></div>
 
-                <!-- BOTTOM -->
                 <div class="card-bottom">
-
-                    <!-- PROGRESS -->
                     <div class="progress-circle">
-
                         <svg viewBox="0 0 120 60">
-
-                            <!-- background -->
                             <path d="M10 60 A50 50 0 0 1 110 60" class="bg" />
-
-                            <!-- merah -->
                             <path d="M10 60 A50 50 0 0 1 110 60" class="progress-red" />
-
-                            <!-- hijau -->
                             <path d="M10 60 A50 50 0 0 1 110 60" class="progress-green" />
-
                         </svg>
-
-                        <span>{{ $item['hoax'] }}%</span>
-
+                        <span>{{ data_get($item, 'hoax', 0) }}%</span>
                     </div>
 
-                    <!-- LEGEND -->
                     <div class="legend">
-
-                        <p>
-                            <span class="dot red"></span>
-                            Data terdeteksi hoax sebesar {{ $item['hoax'] }}%
-                        </p>
-
-                        <p>
-                            <span class="dot green"></span>
-                            Data terdeteksi benar sebesar {{ $item['benar'] }}%
-                        </p>
-
+                        <p><span class="dot red"></span> Hoax: {{ data_get($item, 'hoax', 0) }}%</p>
+                        <p><span class="dot green"></span> Benar: {{ data_get($item, 'benar', 0) }}%</p>
                     </div>
 
-                    <!-- BUTTON -->
-                    <button class="btn-detail open-popup" data-judul="{{ $item['judul'] }}"
-                        data-deskripsi="{{ $item['deskripsi'] }}" data-penjelasan="{{ $item['penjelasan'] }}"
-                        data-hoax="{{ $item['hoax'] }}" data-benar="{{ $item['benar'] }}" data-user="{{ $item['user'] }}"
-                        data-date="{{ $item['date'] }}">
+                    <button class="btn-detail open-popup" 
+                        data-judul="{{ data_get($item, 'judul') }}"
+                        data-deskripsi="{{ $userText }}" 
+                        data-penjelasan="{{ data_get($item, 'penjelasan') }}"
+                        data-hoax="{{ data_get($item, 'hoax', 0) }}" 
+                        data-benar="{{ data_get($item, 'benar', 0) }}" 
+                        data-user="{{ data_get($item, 'user') }}"
+                        data-date="{{ data_get($item, 'date') }}">
                         Selengkapnya
                     </button>
-
                 </div>
-
             </div>
-        @endforeach
-
+        @empty
+            <div style="grid-column: 1 / -1; padding: 40px; text-align: center; color: #999;">
+                Tidak ada data riwayat yang ditemukan.
+            </div>
+        @endforelse
     </div>
 
-    <!-- POPUP -->
+    <div class="pagination-wrapper">
+        @if ($data->lastPage() > 1)
+            @if($data->currentPage() > 1)
+                <a href="{{ $data->previousPageUrl() }}">Previous</a>
+            @else
+                <a class="disabled">Previous</a>
+            @endif
+
+            @for ($i = 1; $i <= $data->lastPage(); $i++)
+                <a href="{{ $data->url($i) }}" class="page-number {{ $data->currentPage() == $i ? 'active' : '' }}">
+                    {{ $i }}
+                </a>
+            @endfor
+
+            @if($data->hasMorePages())
+                <a href="{{ $data->nextPageUrl() }}">Next</a>
+            @else
+                <a class="disabled">Next</a>
+            @endif
+        @endif
+    </div>
+
+    {{-- POPUP OVERLAY --}}
     <div class="popup-overlay" id="popupOverlay">
-
         <div class="popup-box">
-
-            <!-- ACTION BUTTON -->
             <div class="popup-actions">
-
-                <!-- DELETE -->
-                <button id="deletePopup">
-                    <i class="fa fa-trash"></i>
-                </button>
-
-                <button id="permanentDeletePopup" style="display:none;">
-                    <i class="fa fa-trash-can"></i>
-                </button>
-
-                <button id="closePopup">
-                    <i class="fa fa-times"></i>
-                </button>
-
+                <button id="deletePopup"><i class="fa fa-trash"></i></button>
+                <button id="permanentDeletePopup" style="display:none;"><i class="fa fa-trash-can"></i></button>
+                <button id="closePopup"><i class="fa fa-times"></i></button>
             </div>
 
-            <!-- HEADER -->
             <div class="popup-top">
-
                 <p class="popup-user" id="popupUser"></p>
-
                 <p class="popup-date" id="popupDate"></p>
-
-                <div id="popupDeleteStatus" class="popup-delete-status popup-tag">
-                </div>
-
+                <div id="popupDeleteStatus" class="popup-delete-status popup-tag"></div>
             </div>
 
-            <!-- CONTENT -->
             <div class="popup-content">
-
-                <div class="popup-title" id="popupTitle">
-                    Judul
-                </div>
-
-                <p class="popup-desc" id="popupDesc">
-                    Isi berita
-                </p>
-
+                <div class="popup-title" id="popupTitle">Judul</div>
+                <p class="popup-desc" id="popupDesc">Isi berita</p>
             </div>
 
-            <!-- LINE -->
             <div class="popup-divider"></div>
 
-            <!-- BOTTOM -->
             <div class="popup-bottom">
-
-                <!-- LEFT -->
                 <div class="popup-legend">
-
-                    <p>
-                        <span class="dot red"></span>
-                        Data terdeteksi hoax sebesar
-                        <strong id="popupHoax">70%</strong>
-                    </p>
-
-                    <p>
-                        <span class="dot green"></span>
-                        Data terdeteksi benar sebesar
-                        <strong id="popupBenar">30%</strong>
-                    </p>
-
+                    <p><span class="dot red"></span> Data terdeteksi hoax sebesar <strong id="popupHoax">0%</strong></p>
+                    <p><span class="dot green"></span> Data terdeteksi benar sebesar <strong id="popupBenar">0%</strong></p>
                 </div>
-
-                <!-- RIGHT -->
                 <div class="popup-result">
-
                     <p class="popup-penjelasan" id="popupPenjelasan"></p>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
-    <!-- DELETE POPUP -->
     <div class="permanent-overlay" id="permanentOverlay">
-
         <div class="permanent-popup">
-
             <h2>Hapus Riwayat</h2>
-
-            <p>
-                Apakah anda yakin ingin menghapus
-                riwayat ini?
-            </p>
-
+            <p>Apakah anda yakin ingin menghapus riwayat ini secara permanen?</p>
             <div class="permanent-actions">
-
-                <button id="confirmPermanentDelete" class="btn-permanent-delete">
-                    Hapus
-                </button>
-
-                <button id="cancelPermanentDelete" class="btn-permanent-cancel">
-                    Batal
-                </button>
-
+                <button id="confirmPermanentDelete" class="btn-permanent-delete">Hapus</button>
+                <button id="cancelPermanentDelete" class="btn-permanent-cancel">Batal</button>
             </div>
-
         </div>
-
     </div>
 
-    <!-- SEARCH JS -->
     <script>
-        document.getElementById('searchInput').addEventListener('keyup', function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const searchForm = document.getElementById('searchForm');
+            const popupOverlay = document.getElementById('popupOverlay');
+            const closePopup = document.getElementById('closePopup');
+            const deletePopup = document.getElementById('deletePopup');
+            const permanentDeletePopup = document.getElementById('permanentDeletePopup');
+            const permanentOverlay = document.getElementById('permanentOverlay');
+            const confirmPermanentDelete = document.getElementById('confirmPermanentDelete');
+            const cancelPermanentDelete = document.getElementById('cancelPermanentDelete');
 
-            let keyword = this.value.toLowerCase();
+            const popupTitle = document.getElementById('popupTitle');
+            const popupDesc = document.getElementById('popupDesc');
+            const popupHoax = document.getElementById('popupHoax');
+            const popupBenar = document.getElementById('popupBenar');
+            const popupDeleteStatus = document.getElementById('popupDeleteStatus');
+            const popupUser = document.getElementById('popupUser');
+            const popupDate = document.getElementById('popupDate');
+            const popupPenjelasan = document.getElementById('popupPenjelasan');
 
-            let cards = document.querySelectorAll('.searchable-card');
+            let currentCard = null;
+            let debounceTimeout;
 
-            cards.forEach(card => {
+            function fetchLiveData(url) {
+                fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    
+                    const newGrid = doc.getElementById('riwayatGrid');
+                    const currentGrid = document.getElementById('riwayatGrid');
+                    if (newGrid && currentGrid) { currentGrid.innerHTML = newGrid.innerHTML; }
 
-                let text = card.innerText.toLowerCase();
+                    const newPagination = doc.querySelector('.pagination-wrapper');
+                    const currentPagination = document.querySelector('.pagination-wrapper');
+                    if (currentPagination) { currentPagination.innerHTML = newPagination ? newPagination.innerHTML : ''; }
+                })
+                .catch(error => console.error('Error loading data:', error));
+            }
 
-                if (text.includes(keyword)) {
+            if (searchInput) {
+                searchInput.addEventListener('input', function () {
+                    clearTimeout(debounceTimeout);
+                    const keyword = this.value;
+                    debounceTimeout = setTimeout(() => {
+                        const url = new URL(window.location.origin + window.location.pathname);
+                        if (keyword) { url.searchParams.set('search', keyword); }
+                        url.searchParams.delete('page');
+                        window.history.pushState({}, '', url);
+                        fetchLiveData(url);
+                    }, 300);
+                });
+            }
 
-                    card.style.display = 'block';
+            if (searchForm) { searchForm.addEventListener('submit', (e) => e.preventDefault()); }
 
-                } else {
-
-                    card.style.display = 'none';
-
+            document.addEventListener('click', function (e) {
+                const targetAnchor = e.target.closest('.pagination-wrapper a');
+                if (targetAnchor && !targetAnchor.classList.contains('disabled') && !targetAnchor.classList.contains('active')) {
+                    e.preventDefault();
+                    const targetUrl = targetAnchor.getAttribute('href');
+                    window.history.pushState({}, '', targetUrl);
+                    fetchLiveData(targetUrl);
                 }
-
             });
 
-        });
-    </script>
+            document.addEventListener('click', function(e) {
+                const openBtn = e.target.closest('.open-popup');
+                if (openBtn) {
+                    currentCard = openBtn.closest('.riwayat-card');
 
-    <script>
-        const popupOverlay = document.getElementById('popupOverlay');
-        const closePopup = document.getElementById('closePopup');
+                    popupTitle.innerHTML = `⚠️ ${openBtn.dataset.judul} ⚠️`;
+                    popupDesc.innerText = openBtn.dataset.deskripsi;
+                    popupPenjelasan.innerText = openBtn.dataset.penjelasan;
+                    popupUser.innerText = openBtn.dataset.user;
+                    popupDate.innerText = openBtn.dataset.date;
+                    popupHoax.innerText = openBtn.dataset.hoax + '%';
+                    popupBenar.innerText = openBtn.dataset.benar + '%';
 
-        const deletePopup = document.getElementById('deletePopup');
-        const permanentDeletePopup = document.getElementById('permanentDeletePopup');
+                    if (currentCard.dataset.deleted === "true") {
+                        popupDeleteStatus.style.display = 'flex';
+                        const deletedDate = new Date(currentCard.dataset.deletedDate);
+                        popupDeleteStatus.textContent = `Dihapus • ${deletedDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+                        deletePopup.innerHTML = '<i class="fa fa-undo"></i>';
+                        permanentDeletePopup.style.display = 'block';
+                    } else {
+                        popupDeleteStatus.style.display = 'none';
+                        deletePopup.innerHTML = '<i class="fa fa-trash"></i>';
+                        permanentDeletePopup.style.display = 'none';
+                    }
+                    popupOverlay.classList.add('active');
+                }
+            });
 
-        const permanentOverlay =
-            document.getElementById('permanentOverlay');
+            closePopup.addEventListener('click', () => popupOverlay.classList.remove('active'));
+            popupOverlay.addEventListener('click', (e) => { if (e.target === popupOverlay) popupOverlay.classList.remove('active'); });
 
-        const confirmPermanentDelete =
-            document.getElementById('confirmPermanentDelete');
+            // notif 
+            deletePopup.addEventListener('click', function() {
+                if (!currentCard) return;
+                const requestId = currentCard.dataset.requestId;
 
-        const cancelPermanentDelete =
-            document.getElementById('cancelPermanentDelete');
+                if (currentCard.dataset.deleted === "true") {
+                    fetch(`/admin/history-management/restore/${requestId}`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json'
+                        }
+                    }).then(response => response.json())
+                    .then(data => {
 
-        let currentCard = null;
-
-        const popupTitle = document.getElementById('popupTitle');
-        const popupDesc = document.getElementById('popupDesc');
-        const popupHoax = document.getElementById('popupHoax');
-        const popupBenar = document.getElementById('popupBenar');
-        const popupDeleteStatus =
-            document.getElementById('popupDeleteStatus');
-
-        const popupUser =
-            document.getElementById('popupUser');
-
-        const popupDate =
-            document.getElementById('popupDate');
-
-        const popupPenjelasan =
-            document.getElementById('popupPenjelasan');
-
-
-        // BUKA DETAIL
-        document.querySelectorAll('.open-popup')
-            .forEach(button => {
-
-                button.addEventListener(
-                    'click',
-                    function() {
-
-                        currentCard =
-                            this.closest('.riwayat-card');
-
-                        popupTitle.innerHTML =
-                            `⚠️ ${this.dataset.judul} ⚠️`;
-
-                        popupDesc.innerText =
-                            this.dataset.deskripsi;
-
-                        popupPenjelasan.innerText =
-                            this.dataset.penjelasan;
-
-                        popupUser.innerText =
-                            this.dataset.user;
-
-                        popupDate.innerText =
-                            this.dataset.date;
-
-                        popupHoax.innerText =
-                            this.dataset.hoax + '%';
-
-                        popupBenar.innerText =
-                            this.dataset.benar + '%';
-
-
-                        // STATUS DELETE
-                        if (currentCard.dataset.deleted === "true") {
-
-                            popupDeleteStatus.style.display = 'flex';
-
-                            const deletedDate =
-                                new Date(
-                                    currentCard.dataset.deletedDate
-                                );
-
-                            popupDeleteStatus.textContent =
-                                `Dihapus • ${
-deletedDate.toLocaleDateString(
-'id-ID',
-{
-day:'numeric',
-month:'long',
-year:'numeric'
-}
-)
-}`;
-
-                            deletePopup.innerHTML =
-                                '<i class="fa fa-undo"></i>';
-
-                            permanentDeletePopup.style.display =
-                                'block';
-
+                        if (data.status === 'success') {
+                            alert(data.message); // tampilkan pesan
+                            location.reload();
                         } else {
-
-                            popupDeleteStatus.style.display =
-                                'none';
-
-                            deletePopup.innerHTML =
-                                '<i class="fa fa-trash"></i>';
-
-                            permanentDeletePopup.style.display =
-                                'none';
-
+                            alert('Terjadi kesalahan');
                         }
 
-                        popupOverlay.classList.add(
-                            'active'
-                        );
-
+                    })
+                    .catch(err => {
+                        console.error('Fetch error:', err);
+                        alert('Gagal menghubungi server');
                     });
-
-            });
-
-
-        // TUTUP POPUP
-        closePopup.addEventListener(
-            'click',
-            () => popupOverlay.classList.remove(
-                'active'
-            )
-        );
-
-        popupOverlay.addEventListener(
-            'click',
-            function(e) {
-
-                if (e.target === popupOverlay) {
-
-                    popupOverlay.classList.remove(
-                        'active'
-                    );
-
-                }
-
-            });
-
-
-        // HAPUS / RESTORE
-        deletePopup.addEventListener(
-            'click',
-            function() {
-
-                if (!currentCard) return;
-
-                const requestId =
-                    currentCard.dataset.requestId;
-
-
-                // RESTORE
-                if (
-                    currentCard.dataset.deleted === "true"
-                ) {
-
-                    fetch(
-                            `/admin/history-management/restore/${requestId}`, {
-
-                                method: 'POST',
-
-                                headers: {
-                                    'X-CSRF-TOKEN': document.querySelector(
-                                        'meta[name="csrf-token"]'
-                                    ).content
-                                }
-
-                            }
-                        )
-                        .then(r => r.json())
-                        .then(() => {
-
-                            location.reload();
-
-                        });
-
                     return;
-
                 }
-
-
-                // HAPUS PERTAMA
-                permanentOverlay.classList.add(
-                    'active'
-                );
-
+                permanentOverlay.classList.add('active');
             });
 
+            cancelPermanentDelete.addEventListener('click', () => permanentOverlay.classList.remove('active'));
+            permanentDeletePopup.addEventListener('click', () => permanentOverlay.classList.add('active'));
 
+            confirmPermanentDelete.addEventListener('click', function () {
+                if (!currentCard) return;
+                const requestId = currentCard.dataset.requestId;
+                let url = `/admin/history-management/soft-delete/${requestId}`;
+                let method = 'POST';
 
-        // BATAL HAPUS
-        cancelPermanentDelete
-            .addEventListener(
-                'click',
-                function() {
+                if (currentCard.dataset.deleted === "true") {
+                    url = `/admin/history-management/hard-delete/${requestId}`;
+                    method = 'DELETE';
+                }
 
-                    permanentOverlay.classList.remove(
-                        'active'
-                    );
+                fetch(url, {
+                    method: method,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
 
+                    if (data.status === 'success') {
+                        alert(data.message); // tampilkan pesan
+                        location.reload();
+                    } else {
+                        alert('Terjadi kesalahan');
+                    }
+
+                })
+                .catch(err => {
+                    console.error('Fetch error:', err);
+                    alert('Gagal menghubungi server');
                 });
-
-
-
-        // KONFIRMASI HAPUS
-       confirmPermanentDelete.addEventListener('click', function () {
-
-    if (!currentCard) return;
-
-    const requestId = currentCard.dataset.requestId;
-
-    let url = `/admin/history-management/soft-delete/${requestId}`;
-    let method = 'POST';
-
-    // JIKA SUDAH DIHAPUS
-    if (currentCard.dataset.deleted === "true") {
-        url = `/admin/history-management/hard-delete/${requestId}`;
-        method = 'DELETE';
-    }
-
-    fetch(url, {
-        method: method,
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector(
-                'meta[name="csrf-token"]'
-            ).content,
-            'Accept': 'application/json'
-        }
-    })
-    .then(async (response) => {
-
-        console.log('status:', response.status);
-
-        const text = await response.text();
-        console.log('response:', text);
-
-        return text ? JSON.parse(text) : {};
-    })
-    .then((data) => {
-
-        console.log('success:', data);
-
-        location.reload();
-    })
-    .catch((err) => {
-        console.error('fetch error:', err);
-    });
-
-});
-       
-        // BUKA HAPUS PERMANEN
-        permanentDeletePopup
-            .addEventListener(
-                'click',
-                function() {
-
-                    permanentOverlay.classList.add(
-                        'active'
-                    );
-
-                });
+            });
+        });
     </script>
-
 @endsection

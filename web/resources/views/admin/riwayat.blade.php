@@ -5,9 +5,19 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/admin/riwayat-style.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin/components.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 @endpush
 
 @section('content')
+    {{-- CONTAINER UNTUK MENAMPILKAN ALERT FORMAT BANNER SETTING --}}
+    <div id="alertContainer"></div>
+        @if(session('success'))
+            <div id="successAlert" style="background-color: #28a745; color: white; padding: 15px 25px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; min-width: 300px; font-weight: 500; transition: 0.5s; opacity: 1;">
+                <i class="fa fa-check-circle"></i>
+                <span>{{ session('success') }}</span>
+            </div>
+        @endif
+
     <div class="page-header-top">
         <div class="page-title-box">
             <h1>Riwayat Global</h1>
@@ -36,9 +46,7 @@
         @forelse ($data as $item)
             @php
                 $imagePath = data_get($item, 'gambar');
-
                 $userText = data_get($item, 'deskripsi', '(Tidak ada teks input)');
-
                 $hasImage = !empty($imagePath);
             @endphp
 
@@ -49,14 +57,12 @@
                 data-deleted="{{ data_get($item, 'is_deleted') ? 'true' : 'false' }}"
                 data-deleted-date="{{ data_get($item, 'deleted_at') }}">
 
-                {{-- TAMPILKAN GAMBAR JIKA USER MENGUPLOAD GAMBAR --}}
                 @if ($hasImage && is_string($imagePath))
                     <div class="card-image-wrapper" style="text-align: center; padding: 10px;">
                         <img src="{{ asset($imagePath) }}" class="card-img" style="max-height: 180px; object-fit: contain; width: 100%; border-radius: 4px;" onerror="this.parentNode.style.display='none'">
                     </div>
                 @endif
 
-                {{-- TAMPILKAN TEKS INPUT / JUDUL --}}
                 <div class="card-header">
                     <div class="warning-title" style="font-weight: bold; font-size: 14px; margin-bottom: 5px; color: #b8201d;">
                         @if (!$hasImage)
@@ -70,7 +76,6 @@
                         @endif
                     </div>
 
-                    {{-- Menampilkan isi input_text dari user --}}
                     <p class="desc" style="color: #444; font-size: 13px; line-height: 1.4; margin-top: 8px;">
                         {{ $userText }}
                     </p>
@@ -80,13 +85,35 @@
 
                 <div class="card-bottom">
                     <div class="progress-circle">
-                        <svg viewBox="0 0 120 60">
-                            <path d="M10 60 A50 50 0 0 1 110 60" class="bg" />
-                            <path d="M10 60 A50 50 0 0 1 110 60" class="progress-red" />
-                            <path d="M10 60 A50 50 0 0 1 110 60" class="progress-green" />
-                        </svg>
-                        <span>{{ data_get($item, 'hoax', 0) }}%</span>
-                    </div>
+    @php
+        // Mengambil data persentase (Default 0 jika kosong)
+        $hoaxPercent = data_get($item, 'hoax', 0);
+        $benarPercent = data_get($item, 'benar', 0);
+        
+        // Total panjang busur setengah lingkaran (r = 50) adalah ~157
+        $totalLength = 157; 
+        
+        // Kalkulasi panjang masing-masing warna berdasarkan persentase database
+        $redStroke = ($hoaxPercent / 100) * $totalLength;
+        $greenStroke = ($benarPercent / 100) * $totalLength;
+    @endphp
+
+    <svg viewBox="0 0 120 60">
+        <path d="M10 60 A50 50 0 0 1 110 60" class="bg" />
+        
+        @if($hoaxPercent > 0)
+            <path d="M10 60 A50 50 0 0 1 110 60" class="progress-red" 
+                  style="stroke-dasharray: {{ $redStroke }} {{ $totalLength - $redStroke }};" />
+        @endif
+              
+        @if($benarPercent > 0)
+            <path d="M10 60 A50 50 0 0 1 110 60" class="progress-green" 
+                  style="stroke-dasharray: {{ $greenStroke }} {{ $totalLength - $greenStroke }}; 
+                         stroke-dashoffset: -{{ $redStroke }};" />
+        @endif
+    </svg>
+    <span>{{ $hoaxPercent }}%</span>
+</div>
 
                     <div class="legend">
                         <p><span class="dot red"></span> Hoax: {{ data_get($item, 'hoax', 0) }}%</p>
@@ -146,7 +173,7 @@
             <div class="popup-top">
                 <p class="popup-user" id="popupUser"></p>
                 <p class="popup-date" id="popupDate"></p>
-                <div id="popupDeleteStatus" class="popup-delete-status popup-tag"></div>
+                <p class="popup-deleted" id="popupDeleteStatus" style="display: none;"></p>
             </div>
 
             <div class="popup-content">
@@ -168,6 +195,7 @@
         </div>
     </div>
 
+    {{-- MODAL KONFIRMASI HAPUS PERMANEN --}}
     <div class="permanent-overlay" id="permanentOverlay">
         <div class="permanent-popup">
             <h2>Hapus Riwayat</h2>
@@ -202,6 +230,48 @@
 
             let currentCard = null;
             let debounceTimeout;
+
+            // ==========================================
+            // LOGIK FUNGSI BANNER ALERT ALA SETTING
+            // ==========================================
+            function triggerSettingAlert(message, type = 'success') {
+                const container = document.getElementById('alertContainer');
+
+                container.innerHTML = `
+                    <div id="successAlert" class="success-alert">
+                        <i class="fa ${
+                            type === 'success'
+                                ? 'fa-circle-check'
+                                : 'fa-circle-exclamation'
+                        }"></i>
+                        ${message}
+                    </div>
+                `;
+
+                setTimeout(() => {
+                    const alert = document.getElementById('successAlert');
+
+                    if (alert) {
+                        alert.style.transition = '0.5s';
+                        alert.style.opacity = '0';
+
+                        setTimeout(() => {
+                            alert.remove();
+                        }, 500);
+                    }
+                }, 5000);
+            }
+
+            // Jalankan fungsi auto-hide untuk session flash biasa jika ada saat load
+            const initialSuccessAlert = document.getElementById('successAlert');
+            if (initialSuccessAlert) {
+                setTimeout(() => {
+                    initialSuccessAlert.style.transition = '0.5s';
+                    initialSuccessAlert.style.opacity = '0';
+                    setTimeout(() => { initialSuccessAlert.remove(); }, 500);
+                }, 5000);
+            }
+            // ==========================================
 
             function fetchLiveData(url) {
                 fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
@@ -261,7 +331,7 @@
                     popupBenar.innerText = openBtn.dataset.benar + '%';
 
                     if (currentCard.dataset.deleted === "true") {
-                        popupDeleteStatus.style.display = 'flex';
+                        popupDeleteStatus.style.display = 'block';
                         const deletedDate = new Date(currentCard.dataset.deletedDate);
                         popupDeleteStatus.textContent = `Dihapus • ${deletedDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`;
                         deletePopup.innerHTML = '<i class="fa fa-undo"></i>';
@@ -278,7 +348,7 @@
             closePopup.addEventListener('click', () => popupOverlay.classList.remove('active'));
             popupOverlay.addEventListener('click', (e) => { if (e.target === popupOverlay) popupOverlay.classList.remove('active'); });
 
-            // notif 
+            // PROSES AJAX RESTORE
             deletePopup.addEventListener('click', function() {
                 if (!currentCard) return;
                 const requestId = currentCard.dataset.requestId;
@@ -290,20 +360,21 @@
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                             'Accept': 'application/json'
                         }
-                    }).then(response => response.json())
+                    })
+                    .then(response => response.json())
                     .then(data => {
-
                         if (data.status === 'success') {
-                            alert(data.message); // tampilkan pesan
-                            location.reload();
+                            popupOverlay.classList.remove('active');
+                            // Panggil banner alert pengganti browser alert bawaan
+                            triggerSettingAlert(data.message, 'success');
+                            setTimeout(() => { location.reload(); }, 1200);
                         } else {
-                            alert('Terjadi kesalahan');
+                            triggerSettingAlert('Terjadi kesalahan', 'error');
                         }
-
                     })
                     .catch(err => {
                         console.error('Fetch error:', err);
-                        alert('Gagal menghubungi server');
+                        triggerSettingAlert('Gagal menghubungi server', 'error');
                     });
                     return;
                 }
@@ -313,6 +384,7 @@
             cancelPermanentDelete.addEventListener('click', () => permanentOverlay.classList.remove('active'));
             permanentDeletePopup.addEventListener('click', () => permanentOverlay.classList.add('active'));
 
+            // PROSES AJAX SOFT-DELETE & HARD-DELETE
             confirmPermanentDelete.addEventListener('click', function () {
                 if (!currentCard) return;
                 const requestId = currentCard.dataset.requestId;
@@ -333,18 +405,19 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-
                     if (data.status === 'success') {
-                        alert(data.message); // tampilkan pesan
-                        location.reload();
+                        permanentOverlay.classList.remove('active');
+                        popupOverlay.classList.remove('active');
+                        // Panggil banner alert pengganti browser alert bawaan
+                        triggerSettingAlert(data.message, 'success');
+                        setTimeout(() => { location.reload(); }, 1200);
                     } else {
-                        alert('Terjadi kesalahan');
+                        triggerSettingAlert('Terjadi kesalahan', 'error');
                     }
-
                 })
                 .catch(err => {
                     console.error('Fetch error:', err);
-                    alert('Gagal menghubungi server');
+                    triggerSettingAlert('Gagal menghubungi server', 'error');
                 });
             });
         });

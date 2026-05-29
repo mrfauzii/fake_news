@@ -17,14 +17,15 @@
 /* =========================
    CARD
 ========================= */
-.riwayat-card {
-    background: #fff;
-    border: 1px solid #b8201d;
-    border-radius: 12px;
-    padding: 15px;
+.riwayat-card{
+    background:#fff;
+    border:1px solid #b8201d;
+    border-radius:12px;
+    padding:15px;
 
-    height: auto;        /* ⬅️ WAJIB */
-    min-height: unset;   /* ⬅️ HAPUS batas minimum */
+    height:215px; /* ukuran tetap */
+    display:flex;
+    flex-direction:column;
 }
 
 .riwayat-card:hover {
@@ -38,21 +39,33 @@
     margin-bottom: 8px;
 }
 
-.desc {
-    font-size: 13px;
-    color: #333;
+.desc{
+    font-size:13px;
+    color:#333;
+
+    height:72px;       /* sekitar 4 baris */
+    line-height:18px;
+
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    word-break:break-word;
 }
 
 /* =========================
    IMAGE
 ========================= */
-.card-img {
-    display: block;
-    width: 250px;          /* ⬅️ ukuran kecil */
-    max-width: 100%;
-    height: auto;
-    margin: 0 auto 15px;  /* ⬅️ bikin tengah */
-    border-radius: 10px;
+.card-img{
+    width:100%;
+    max-width:180px;
+    height:80px;
+
+    object-fit:cover;
+
+    display:block;
+    margin:0 auto 10px;
+
+    border-radius:8px;
 }
 
 .image-card {
@@ -62,11 +75,11 @@
 /* =========================
    BOTTOM
 ========================= */
-.card-bottom {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 10px;
+.card-bottom{
+    margin-top:auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
 }
 
 /* =========================
@@ -96,9 +109,7 @@
     stroke: #b8201d;
     stroke-width: 10;
     stroke-linecap: round;
-
-    stroke-dasharray: 120 37; 
-    stroke-dashoffset: 0; /* ⬅️ 70% */
+    /* HAPUS stroke-dasharray dan stroke-dashoffset statis di sini */
 }
 
 /* hijau kecil */
@@ -107,9 +118,7 @@
     stroke: #7ed6a7;
     stroke-width: 10;
     stroke-linecap: round;
-
-    stroke-dasharray: 37 120;
-    stroke-dashoffset: -120;   /* posisi kanan */
+    /* HAPUS stroke-dasharray dan stroke-dashoffset statis di sini */
 }
 
 /* teks */
@@ -205,11 +214,11 @@
 }
 
 /* GARIS PEMBATAS */
-.divider {
-    height: 2px;
-    background: #b8201d;
-    margin: 10px 0;
-    border-radius: 2px;
+.divider{
+    height:2px;
+    background:#b8201d;
+    margin:10px 0; 
+    border-radius:2px;
 }
 
 /* RAPIIIN LEGEND */
@@ -221,11 +230,11 @@
 }
 
 /* POSISI BOTTOM BIAR LEBIH RAPI */
-.card-bottom {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
+.card-bottom{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:0;
 }
 
 /* BIAR BUTTON GA KEPENTOK */
@@ -534,25 +543,30 @@
     color: white;
 }
 
-.popup-delete-status{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-
-    background: linear-gradient(to bottom,#d71919,#a50000);
-    color:white;
-
-    padding:15px 25px;
-    border-radius:10px;
-
-    font-size:14px;
-    font-weight:bold;
-
-    min-height:50px;
+.popup-delete-status.active{
+    display:block;
 }
 
 .popup-delete-status i{
     display:none;
+}
+
+/* Menyamakan style status dihapus dengan popup-user dan popup-date */
+.popup-user,
+.popup-date,
+.popup-deleted {
+    background: linear-gradient(#c71f1f, #8d0000);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 10px 10px 0 0;
+    font-weight: 600;
+    margin: 0; /* Memastikan tidak ada margin tambahan yang merusak baris */
+}
+
+/* Memastikan display menggunakan flex saat statusnya muncul di JavaScript */
+.popup-deleted {
+    display: inline-flex;
+    align-items: center;
 }
 
 .popup-tag{
@@ -696,17 +710,11 @@ flex-shrink:0;
 }
 
 .btn-permanent-cancel{
-
     background:#eee;
-
     border:none;
-
     padding:14px 35px;
-
     border-radius:12px;
-
     font-size:18px;
     font-weight:bold;
-
     cursor:pointer;
 }

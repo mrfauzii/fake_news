@@ -9,31 +9,21 @@ use Illuminate\Support\Facades\Log;
 
 class UmpanBalikController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // ambil total sesuai data yang benar-benar tampil
+        // Set locale Carbon ke Indonesia agar format hari & bulan otomatis berbahasa Indonesia
+        Carbon::setLocale('id');
+
+        // 1. Ambil kata kunci pencarian dari URL (?search=...)
+        $search = $request->input('search');
+
+        // 2. Hitung total feedback keseluruhan di database untuk mengisi komponen Stats Card
         $totalFeedback = DB::table('feedbacks')
             ->join('users', 'feedbacks.user_id', '=', 'users.id')
             ->count();
 
-        /*
-        // sementara dinonaktifkan
-        $belumDibaca = $totalFeedback;
-        */
-
-        return view(
-            'admin.umpanbalik',
-            compact(
-                'totalFeedback'
-            )
-        );
-    }
-
-    public function getFeedbackData()
-    {
-        Carbon::setLocale('id');
-
-        $feedbacks = DB::table('feedbacks')
+        // 3. Siapkan query dasar untuk mengambil list data umpan balik
+        $query = DB::table('feedbacks')
             ->join('users', 'feedbacks.user_id', '=', 'users.id')
             
              // TAMBAHAN
@@ -78,11 +68,15 @@ class UmpanBalikController extends Controller
 
                 ];
             });
+        }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Data umpan balik berhasil dimuat.',
-            'data' => $feedbacks
-        ]);
+        // 5. Batasi 10 data per halaman & kunci parameter pencarian di URL saat klik pindah page
+        $feedbacks = $query->orderBy('feedbacks.created_at', 'desc')
+            ->paginate(1)
+            
+            ->withQueryString();
+
+        // 6. Kirim seluruh variabel ke view admin.umpanbalik
+        return view('admin.umpanbalik', compact('totalFeedback', 'feedbacks'));
     }
 }

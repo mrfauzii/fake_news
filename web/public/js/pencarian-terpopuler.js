@@ -235,6 +235,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function resolvePercentages(item) {
         const hoaxCandidates = [
+            item.confidence,
             item.hoaxPercentage,
             item.hoax_percentage,
             item.fakePercentage,
@@ -245,6 +246,7 @@ document.addEventListener('DOMContentLoaded', function () {
             item.fake_score,
         ];
         const factCandidates = [
+            item.confidence,
             item.factPercentage,
             item.fact_percentage,
             item.faktaPercentage,
@@ -414,15 +416,31 @@ document.addEventListener('DOMContentLoaded', function () {
         emptyState.hidden = itemsToDisplay.length > 0;
 
         grid.innerHTML = itemsToDisplay.map((item, idx) => {
-            const displayRank = idx + 1; // 1..3
+            const displayRank = idx + 1;
             const rankClass = item.category === 'hoax' ? 'rank-hoax' : 'rank-fakta';
+            
+            // Perbaikan: Ambil confidence dan pastikan dalam rentang 0-100
+            const rawConf = item.confidence || 50;
+            const score = (rawConf <= 1) ? Math.round(rawConf * 100) : Math.round(rawConf);
 
-            const percentages = resolvePercentages(item);
-            const hoaxPctDisplay = `${percentages.hoax}%`;
 
-            const badgeHtml = (item.category === 'hoax' || String(item.badge).toLowerCase().includes('hoax'))
-                ? `<span class="lh-popular-card__badge lh-popular-card__badge--with-pct"><span class="lh-popular-card__badge-pct">${escapeHtml(hoaxPctDisplay)}</span><span class="lh-popular-card__badge-label">${escapeHtml(item.badge)}</span></span>`
-                : `<span class="lh-popular-card__badge">${escapeHtml(item.badge)}</span>`;
+            // Tentukan class berdasarkan kategori
+            const isFakta = String(item.category).toLowerCase().includes('fakta');
+            const isHoax = String(item.category).toLowerCase().includes('hoax');
+            const displayPercentage = isFakta ? score : (100 - score);
+
+            let badgeClass = 'lh-popular-card__badge--with-pct';
+            if (isFakta) {
+                badgeClass += ' lh-popular-card__badge--fakta';
+            } else if (isHoax) {
+                badgeClass += ' lh-popular-card__badge--hoax';
+            }
+
+            const badgeHtml = `
+                <span class="${badgeClass}">
+                    <span class="lh-popular-card__badge-pct">${displayPercentage}%</span>
+                    <span class="lh-popular-card__badge-label">${escapeHtml(item.badge)}</span>
+                </span>`;
 
             return `
                 <article class="lh-popular-card">

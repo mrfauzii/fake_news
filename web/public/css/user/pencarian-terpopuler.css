@@ -305,6 +305,33 @@
     border: 2px solid #3a0d0e;
     box-shadow: 0 6px 16px rgba(58,13,14,0.06);
 }
+/* Pastikan badge fakta memiliki warna hijau secara keseluruhan */
+.lh-popular-card__badge--fakta {
+    border: 2px solid #145a31 !important;
+    background-color: #eafaf1 !important;
+}
+
+/* Khusus untuk TULISAN/LABEL "FAKTA" */
+.lh-popular-card__badge--fakta .lh-popular-card__badge-label {
+    color: #145a31 !important; /* Warna hijau untuk tulisan FAKTA */
+    font-weight: bold;
+}
+
+/* Badge Hoax - MERAH */
+.lh-popular-card__badge--hoax {
+    border: 2px solid #8e0e10 !important;
+    background-color: #fcebeb !important;
+}
+
+/* Tulisan "HOAX" jadi merah */
+.lh-popular-card__badge--hoax .lh-popular-card__badge-label {
+    color: #8e0e10 !important;
+    font-weight: bold;
+}
+
+
+
+/* Khusus untuk ANGKA PERSENTASE (Jika ingin tetap warna lain, ubah di sini) */
 
 .lh-popular-card__badge--with-pct .lh-popular-card__badge-pct {
     font-family: var(--font-dmsans);

@@ -10,7 +10,7 @@
 
 <div class="feedback-title">
     <h1>Dashboard Utama</h1>
-    <p>Data terakhir diperbarui: {{ now()->translatedFormat('d F Y') }} WIB</p>
+    <p>Data terakhir diperbarui: {{ $lastDate }} </p>
 </div>
 
 <!-- STATS -->

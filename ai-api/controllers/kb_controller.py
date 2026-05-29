@@ -1,4 +1,3 @@
-import pandas as pd
 from services.scraper_service import *
 import pandas as pd
 from services.db_service import insert_to_mysql, get_latest_title

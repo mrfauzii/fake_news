@@ -11,16 +11,24 @@ class PopulerHistoryController extends Controller
     public function index()
     {
         // 1. Ambil dan hitung (grouping) pencarian yang sama berdasarkan teks dan bulan
-        $histories = DB::table('history_view')
+        $histories = DB::table('user_interactions as ui')
+            ->join('requests as r', 'ui.request_id', '=', 'r.id')
             ->select(
-                'input_text',
-                'final_label',
-                DB::raw('YEAR(created_at) as year'),
-                DB::raw('MONTH(created_at) as month'),
+                'r.input_text',
+                'r.final_label',
+                'r.final_confidence',
+                DB::raw('YEAR(r.created_at) as year'),
+                DB::raw('MONTH(r.created_at) as month'),
                 DB::raw('COUNT(*) as count')
             )
-            ->whereNotNull('final_label') // Hanya ambil yang sudah selesai dideteksi
-            ->groupBy('input_text', 'final_label', 'year', 'month')
+            ->whereNotNull('r.final_label')
+            ->groupBy(
+                'r.input_text',
+                'r.final_label',
+                'r.final_confidence',
+                'year',
+                'month'
+            )
             ->orderByDesc('count')
             ->get();
 
@@ -52,6 +60,7 @@ class PopulerHistoryController extends Controller
                 'category'  => $category,
                 'period'    => $period,
                 'badge'     => $badge,
+                'confidence' => $row->final_confidence,
                 'count'     => $row->count,
                 'headline'  => Str::limit($row->input_text, 60), // Potong teks untuk judul
                 'excerpt'   => $row->input_text, // Teks utuh untuk penjelasan

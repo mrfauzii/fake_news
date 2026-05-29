@@ -101,9 +101,13 @@ class AdminController extends Controller
             'last_updated'       => Carbon::now()->translatedFormat('d F Y, H:i') . ' WIB',
         ];
 
-        
-        return view('admin.dashboard', compact('dashboardPopular', 'dashboardStats'));
-    }
+        $lastDate = DB::table('knowledge_base')
+            ->max('created_at');
+
+        $lastDate = Carbon::parse($lastDate)
+            ->translatedFormat('l, d F Y H:i');
+            return view('admin.dashboard', compact('dashboardPopular', 'dashboardStats','lastDate'));
+        }
 
     /**
      * Fungsi Helper untuk menghitung persentase kenaikan/penurunan bulan ini vs bulan lalu

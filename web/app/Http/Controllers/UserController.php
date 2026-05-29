@@ -24,7 +24,7 @@ class UserController extends Controller
             });
         })
         ->orderBy('name', 'asc') // Menambahkan sorting agar susunan tabel teratur rapi
-        ->withQueryString();     // Mengunci query parameter agar filter pencarian tidak hilang saat klik link page
+        ->withQueryString()     // Mengunci query parameter agar filter pencarian tidak hilang saat klik link page
         ->paginate(25)
         ->appends(['search' => $search]);
 

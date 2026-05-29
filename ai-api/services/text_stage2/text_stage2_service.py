@@ -93,11 +93,9 @@ async def run_stage2_web_check(query,klaim,transformer,nli_model,client,browser)
 
     # ambil chunks saja
     selected_chunks = [{"text": f["text"]} for f in filtered]
-    print("SELECTED CHUNKS:", selected_chunks)
 
     # 3. NLI
     chunks_with_nli = apply_nli(nli_model, klaim, selected_chunks)
-    print("CHUNKS WITH NLI:", chunks_with_nli)
 
     # 4. Validasi NLI
     if not is_nli_valid(chunks_with_nli):

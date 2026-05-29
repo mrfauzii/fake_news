@@ -65,10 +65,8 @@ def insert_to_chroma(df, list_id, model, knowledge_base, batch_size=32):
     print("🎉 Semua proses selesai! Data tersinkronisasi di MySQL dan ChromaDB.")
     
 def input_text_request(text_request, vector, request_id):
-    print(f"🔍 Menerima request_id {request_id} dengan vektor: {vector}")
     if vector is None or len(vector) == 0:
         raise ValueError("Vector tidak boleh kosong")
-    print(f"🧠 Menyisipkan vektor untuk request_id {request_id} ke ChromaDB...")
 
     text_request.add(
         ids=[str(request_id)],

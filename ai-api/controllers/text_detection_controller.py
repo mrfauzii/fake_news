@@ -10,6 +10,7 @@ def detect_text_fake_news_controller(text_request, knowledge_base, transformer, 
             return {"error": "Query tidak ditemukan"}
 
         query = clean_text_light(data["query"])
+        print(query)
         id_request = data["id_request"]
 
         result = process_fake_news_pipeline(

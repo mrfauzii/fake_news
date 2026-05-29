@@ -2,12 +2,21 @@ import joblib
 import numpy as np
 
 # load model
-model = joblib.load("./models/rf_model.pkl")
+model = joblib.load("./models/rf_model (4).pkl")
+print(type(model))
 
+if hasattr(model, "feature_names_in_"):
+    print(model.feature_names_in_)
+
+if hasattr(model, "feature_names_"):
+    print(model.feature_names_)
+
+if hasattr(model, "n_features_in_"):
+    print(model.n_features_in_)
 
 # susun fitur (HARUS urut sesuai training)
 X = [[
-        0.6967,	0.0513,	0.043902,	0.856553,	0.059734
+        0.044,	0.5541,	5.0, 0.3242067575410226, 0.28137783094200997
 ]]
 
 # prediksi

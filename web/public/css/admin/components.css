@@ -1,7 +1,158 @@
+/* ==========================================================================
+   GLOBAL COMPONENT 1: TYPOGRAPHY & PAGE HEADER (Judul & Deskripsi)
+   Bisa digunakan di semua halaman Admin (Data Pengguna, Umpan Balik, dll.)
+   ========================================================================== */
+.page-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Menjaga Judul dan Search Bar sejajar lurus secara vertikal */
+    gap: 30px;
+    margin-bottom: 25px;
+}
+
+.page-title-box {
+    flex: 1;
+}
+
+.page-title-box h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e1e1e;
+    margin: 0;
+}
+
+.page-title-box p {
+    margin-top: 6px;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* ==========================================================================
+   GLOBAL COMPONENT 2: SEARCH BAR
+   Komponen pencarian server-side yang konsisten
+   ========================================================================== */
+.search-wrapper {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid #dcdcdc;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    width: 380px; /* Lebar standar proporsional di sisi kanan */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    transition: border-color 0.2s ease;
+}
+
+.search-wrapper:focus-within {
+    border-color: #b8201d; /* Berubah warna khas LensaHoax saat diklik */
+}
+
+.search-input {
+    border: none;
+    padding: 12px 16px;
+    outline: none;
+    width: 100%;
+    font-size: 14px;
+    color: #333;
+    background: transparent;
+}
+
+.search-btn {
+    background: #b8201d;
+    border: none;
+    color: #ffffff;
+    padding: 12px 18px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-btn:hover {
+    background: #990f0c;
+}
+
+/* ==========================================================================
+   GLOBAL COMPONENT 3: PAGINATION
+   Mendukung elemen <a> maupun <button> bawaan Laravel pagination
+   ========================================================================== */
+.pagination-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 25px;
+}
+
+.pagination-wrapper a, 
+.pagination-wrapper button {
+    padding: 12px 18px;
+    border: 1px solid #ddd;
+    text-decoration: none;
+    color: #444;
+    background: #fff;
+    transition: 0.3s;
+    margin-left: -1px; /* Membuat border antar tombol menyatu */
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagination-wrapper a:first-child, 
+.pagination-wrapper button:first-child {
+    border-radius: 10px 0 0 10px;
+}
+
+.pagination-wrapper a:last-child, 
+.pagination-wrapper button:last-child {
+    border-radius: 0 10px 10px 0;
+}
+
+.pagination-wrapper a:hover:not(.disabled), 
+.pagination-wrapper button:hover:not(.disabled) {
+    background: #b8201d; /* Warna merah LensaHoax */
+    color: white;
+    border-color: #b8201d;
+}
+
+/* State Aktif (Halaman aktif) */
+.pagination-wrapper .page-number.active,
+.pagination-wrapper button.active {
+    background: #b8201d;
+    color: white;
+    border-color: #b8201d;
+    cursor: default;
+    pointer-events: none; /* Mencegah klik ulang */
+}
+
+/* State Disabled (Tombol Previous/Next mati) */
+.pagination-wrapper .disabled,
+.pagination-wrapper button:disabled {
+    pointer-events: none;
+    background: #f3f3f3;
+    color: #999;
+    cursor: not-allowed;
+    border-color: #ddd;
+}
+
+/* Ukuran khusus tombol teks Previous/Next agar lebih lebar */
+.pagination-wrapper a:not(.page-number), 
+.pagination-wrapper button:not(.page-number) {
+    padding: 12px 20px;
+}
+
+/* ==========================================================================
+   GLOBAL COMPONENT 4: BADGES & BUTTON OUTLINE
+   ========================================================================== */
 .badge {
     font-size: 12px;
     padding: 5px 10px;
     border-radius: 10px;
+    display: inline-block;
 }
 
 .new-badge {
@@ -15,9 +166,16 @@
 }
 
 .btn-outline {
-    border: 1px solid #b30000;
-    color: #b30000;
+    border: 1px solid #b8201d;
+    color: #b8201d;
     padding: 6px 12px;
     border-radius: 6px;
     background: white;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-outline:hover {
+    background: #b8201d;
+    color: white;
 }

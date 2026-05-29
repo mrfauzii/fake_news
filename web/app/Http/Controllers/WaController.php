@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\MessageCache;
 use App\Models\Users;
+use App\Models\UserInteractions;
+use App\Models\Feedbacks;
+use App\Models\Images;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -327,13 +330,13 @@ class WaController extends Controller
             if ($existingWaUser && $existingWaUser->id !== $currentUser->id) {
                 
                 // Pindahkan history ke akun utama (Gmail)
-                \App\Models\UserInteractions::where('user_id', $existingWaUser->id)
+                UserInteractions::where('user_id', $existingWaUser->id)
                     ->update(['user_id' => $currentUser->id]);
 
-                \App\Models\Images::where('uploaded_by', $existingWaUser->id)
+                Images::where('uploaded_by', $existingWaUser->id)
                     ->update(['uploaded_by' => $currentUser->id]);
 
-                \App\Models\Feedbacks::where('user_id', $existingWaUser->id)
+                Feedbacks::where('user_id', $existingWaUser->id)
                     ->update(['user_id' => $currentUser->id]);
 
                 // Hapus akun lama biar nggak duplikat

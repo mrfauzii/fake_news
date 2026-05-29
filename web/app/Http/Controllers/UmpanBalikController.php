@@ -71,10 +71,22 @@ class UmpanBalikController extends Controller
         
 
         // 5. Batasi 10 data per halaman & kunci parameter pencarian di URL saat klik pindah page
-        $feedbacks = $query->orderBy('feedbacks.created_at', 'desc')
-            ->paginate(1)
-            
-            ->withQueryString();
+        $feedbacks = DB::table('feedbacks')
+    ->join('users', 'feedbacks.user_id', '=', 'users.id')
+    ->leftJoin('requests', 'feedbacks.request_id', '=', 'requests.id')
+    ->leftJoin('images', 'requests.image_id', '=', 'images.id')
+    ->select(
+        'feedbacks.id',
+        'users.name as username',
+        'feedbacks.feedback',
+        'feedbacks.created_at',
+        'requests.input_text as input_text',
+        'requests.final_label',
+        'images.file_path as images'
+    )
+    ->orderBy('feedbacks.created_at', 'desc')
+    ->paginate(1)
+    ->withQueryString();
 
         // 6. Kirim seluruh variabel ke view admin.umpanbalik
         return view('admin.umpanbalik', compact('totalFeedback', 'feedbacks'));

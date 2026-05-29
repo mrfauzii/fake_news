@@ -96,7 +96,7 @@ Route::post('/telusuri-gambar', [PencarianController::class, 'telusuriGambar'])-
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
     // Dashboard
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 
     // User Management
     Route::get('/user', [UserController::class, 'index']);

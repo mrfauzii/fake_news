@@ -3,42 +3,44 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Models\ScrapeSchedule;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
+use App\Models\ScrapeSchedule;
 
 class RunScraper extends Command
 {
-    // nama command
-    protected $signature = 'scrape:run';
-    protected $description = 'Menjalankan HTTP GET ke URL scrape sesuai jadwal';
+    protected $signature = 'app:run-scraper';
+    protected $description = 'Menjalankan scraper sesuai jadwal jam di database';
 
     public function handle()
     {
-        // 1. Cari data yang statusnya 'pending' dan waktunya udah lewat atau pas saat ini
-        $schedules = ScrapeSchedule::where('status', 'pending')
-                        ->where('scheduled_at', '<=', now())
-                        ->get();
+        // 1. Ambil jadwal dari database
+        $schedule = \App\Models\ScrapeSchedule::find(1);
 
-        foreach ($schedules as $schedule) {
+        if (!$schedule || !$schedule->scheduled_at) {
+            $this->info('Jadwal belum diatur di database.');
+            return;
+        }
+
+        // 2. Ambil jam & menit sekarang, lalu cocokan dengan jadwal
+        $now = Carbon::now()->format('H:i');
+        $scheduledTime = Carbon::parse($schedule->scheduled_at)->format('H:i');
+
+        $this->info("Mengecek jadwal... Sekarang: $now | Jadwal: $scheduledTime");
+
+        // 3. Kalau waktunya sama, eksekusi!
+        if ($now === $scheduledTime) {
+            $this->info('Waktu cocok! Menembak server scraper...');
+
             try {
-                // 2. Tembak URL-nya mek!
-                $response = Http::timeout(60)->get('http://127.0.0.1:8004/scrape');
-
-                if ($response->successful()) {
-                    // 3. Kalau sukses, ubah status jadi success
-                    $schedule->update(['status' => 'success']);
-                    Log::info("Scrape sukses untuk ID: " . $schedule->id);
-                } else {
-                    $schedule->update(['status' => 'failed']);
-                    Log::error("Scrape gagal (Bukan 200 OK) untuk ID: " . $schedule->id);
-                }
-
+                Http::timeout(1)->get('http://127.0.0.1:8004/scrape');
+                
             } catch (\Exception $e) {
-                // Kalau URL-nya mati atau error
-                $schedule->update(['status' => 'failed']);
-                Log::error("Scrape error untuk ID: " . $schedule->id . " - " . $e->getMessage());
             }
+
+            $this->info('Status Success: Perintah scraping berhasil dikirim ke server!');
+        } else {
+            $this->info('Belum waktunya scraping.');
         }
     }
 }

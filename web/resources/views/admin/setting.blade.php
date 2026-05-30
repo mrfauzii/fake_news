@@ -23,7 +23,7 @@
     @endif
 
     <div class="setting-box">
-        <form action="/admin/setting/save" method="POST">
+        <form action="{{ route("admin.setting.schedule-scrape") }}" method="POST">
             @csrf
 
             <div class="input-group-setting">
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
             btnUpdateNow.style.opacity = '0.7';
             icon.classList.add('fa-spin');
             
-            fetch('{{ route("admin.setting.updateNow") }}', {
+            fetch('{{ route("admin.setting.schedule-scrape") }}', {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',

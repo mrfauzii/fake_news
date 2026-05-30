@@ -101,9 +101,6 @@ class AdminController extends Controller
             'last_updated'       => Carbon::now()->translatedFormat('d F Y, H:i') . ' WIB',
         ];
 
-        // AMBIL DATA REAL-TIME: Membaca cache waktu klik terakhir. Jika belum ada, default pakai jam sekarang.
-        $lastUpdatedTime = Cache::get('last_kb_actual_update', Carbon::now()->format('Y-m-d H:i:s'));
-        $formattedLastUpdate = Carbon::parse($lastUpdatedTime)->translatedFormat('d F Y, H:i') . ' WIB';
         
         return view('admin.dashboard', compact('dashboardPopular', 'dashboardStats'));
     }

@@ -49,6 +49,7 @@ def run_stage3_online_search(
 
         # limit input biar stabil
         top_results = results[:10]
+        print(top_results)
 
         features_dict = extract_features(query, top_results, nli, transformer)
 

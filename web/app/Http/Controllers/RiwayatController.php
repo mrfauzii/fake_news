@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\history_view;
-use App\Models\UserInteractions;
 use App\Models\Requests;
-use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Auth;
+use App\Models\UserInteractions;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Response;
 
 class RiwayatController extends Controller
 {
@@ -19,39 +20,36 @@ class RiwayatController extends Controller
         $search = request('search');
 
         $histories = history_view::with('request.image')
-    ->when($search, function ($query) use ($search) {
-        $query->where(function ($q) use ($search) {
-            $q->where('username', 'like', "%{$search}%")
-              ->orWhere('input_text', 'like', "%{$search}%");
-        });
-    })
-    ->orderBy('created_at', 'desc')
-    ->paginate(10)
-    ->appends(['search' => $search]);
-            $data = $histories->through(function ($history) {
-            
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('username', 'like', "%{$search}%")->orWhere('input_text', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->appends(['search' => $search]);
+        $data = $histories->through(function ($history) {
             $isImageSearch = $history->request && $history->request->image_id != null;
             $isHoax = strtolower($history->final_label) === 'fake';
             $confidence = ($history->final_confidence ?? 0) * 100;
 
-            $persenHoax = $isHoax ? $confidence : (100 - $confidence);
-            $persenBenar = $isHoax ? (100 - $confidence) : $confidence;
+            $persenHoax = $isHoax ? $confidence : 100 - $confidence;
+            $persenBenar = $isHoax ? 100 - $confidence : $confidence;
 
             return [
                 'request_id' => $history->request_id,
                 'deleted_at' => $history->deleted_at ?? null,
                 'is_deleted' => $history->deleted_at !== null,
-                'judul'      => $isImageSearch ? '[GAMBAR] Pencarian oleh: ' . $history->username : '[TEKS] Pencarian oleh: ' . $history->username,
-                'penjelasan' => $isHoax ? "Hasil verifikasi menunjukkan bahwa sebagian besar informasi ini, yakni sekitar " . round($persenHoax) . "%, mengandung unsur hoaks atau ketidaksesuaian fakta. Mohon untuk memvalidasi kembali sumber informasi sebelum menyebarkannya." : "Hasil verifikasi menunjukkan bahwa informasi ini memiliki tingkat kebenaran sekitar " . round($persenBenar) . "% dan termasuk informasi yang valid berdasarkan hasil analisis sistem.",
-                'user'       => $history->username,
-                'date'       => $history->created_at ? Carbon::parse($history->created_at)->translatedFormat('l, j F Y') : '-',
-                'deskripsi'  => $isImageSearch ? null : $history->input_text,
-                'gambar'     => $isImageSearch && $history->request->image ? $history->request->image->file_path : null,
-                'hoax'       => round($persenHoax),
-                'benar'      => round($persenBenar),
+                'judul' => $isImageSearch ? '[GAMBAR] Pencarian oleh: ' . $history->username : '[TEKS] Pencarian oleh: ' . $history->username,
+                'penjelasan' => $isHoax ? 'Hasil verifikasi menunjukkan bahwa sebagian besar informasi ini, yakni sekitar ' . round($persenHoax) . '%, mengandung unsur hoaks atau ketidaksesuaian fakta. Mohon untuk memvalidasi kembali sumber informasi sebelum menyebarkannya.' : 'Hasil verifikasi menunjukkan bahwa informasi ini memiliki tingkat kebenaran sekitar ' . round($persenBenar) . '% dan termasuk informasi yang valid berdasarkan hasil analisis sistem.',
+                'user' => $history->username,
+                'date' => $history->created_at ? Carbon::parse($history->created_at)->translatedFormat('l, j F Y') : '-',
+                'deskripsi' => $isImageSearch ? null : $history->input_text,
+                'gambar' => $isImageSearch && $history->request->image ? $history->request->image->file_path : null,
+                'hoax' => round($persenHoax),
+                'benar' => round($persenBenar),
             ];
-            
-        }); 
+        });
         return view('admin.riwayat', compact('data'));
     }
 
@@ -81,21 +79,21 @@ class RiwayatController extends Controller
         // 3. Eksekusi pencarian
         $histories = $query->get();
 
-        // 4. Olah datanya 
+        // 4. Olah datanya
         $data = $histories->map(function ($history) {
             $userCount = UserInteractions::where('request_id', $history->request_id)->count();
 
             return [
                 'input_text' => $history->input_text,
                 'user_count' => $userCount,
-                'status'     => $history->status,
+                'status' => $history->status,
             ];
         });
 
         // 5. Kembalikan berupa JSON
         return response()->json([
             'status' => 'success',
-            'data'   => $data
+            'data' => $data,
         ]);
     }
 
@@ -106,19 +104,18 @@ class RiwayatController extends Controller
         $request->delete();
 
         return response()->json([
-            'success'=>true
+            'success' => true,
         ]);
     }
 
     public function restore($id)
     {
-        $request = Requests::withTrashed()
-            ->findOrFail($id);
+        $request = Requests::withTrashed()->findOrFail($id);
 
         $request->restore();
 
         return response()->json([
-            'success'=>true
+            'success' => true,
         ]);
     }
 
@@ -129,88 +126,117 @@ class RiwayatController extends Controller
     {
         Carbon::setLocale('id');
 
-        // Pastikan user sudah login (jika guest, bisa diarahkan login dulu atau kembalikan data kosong)
-        $userId = Auth::check() ? Auth::id() : 2; // Jika guest pakai ID 2
+        $userId = Auth::check() ? Auth::id() : 2;
 
-        // Ambil riwayat khusus milik user ini
-       $histories = history_view::with([
-    'request.image',
-    'request.stage1Results',
-    'request.stage2Results',
-    'request.feedbacks'
-])
-->where('user_id', $userId)
-->orderBy('created_at', 'desc')
-->get();
+        $histories = UserInteractions::with(['request.image', 'request.stage1Results', 'request.stage2Results', 'request.feedbacks'])
+            ->where('user_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-        $data = $histories->map(function ($history) {
+        $data = $histories
+            ->map(function ($history) {
+                if (!$history->request) {
+                    return null;
+                }
 
-            $isImageSearch = $history->request && $history->request->image_id != null;
-            $isHoax = strtolower($history->final_label) === 'hoax' || strtolower($history->final_label) === 'fake';
-            $confidence = ($history->final_confidence ?? 0) * 100;
+                $request = $history->request;
 
-            // Format deskripsi hasil pencarian (meniru JS lama)
-            if ($isHoax) {
-                $statusStr = 'hoax';
-                $description = "Investigasi mendalam menunjukkan bahwa informasi ini mengandung elemen yang telah dilebih-lebihkan atau tidak sesuai dengan fakta sebenarnya. Berdasarkan analisis, klaim ini diklasifikasikan sebagai informasi yang menyesatkan dengan tingkat hoaks " . round($confidence) . "%.";
-            } else {
-                $statusStr = 'benar';
-                $description = "Hasil verifikasi menunjukkan bahwa informasi ini memiliki tingkat kebenaran sekitar " . round($confidence) . "% dan termasuk informasi yang valid berdasarkan hasil analisis sistem.";
-            }
+                // URL gambar Cloudinary
+                $imageUrl = $request->image?->file_path;
 
-            // Ambil URL referensi jika dari Stage 2
-            $urlsText = "";
-            if ($history->request && $history->request->stage2Results->isNotEmpty()) {
-                $urls = $history->request->stage2Results->first()->url;
-                if (!empty($urls)) {
-                    $urlArr = is_string($urls) ? json_decode($urls, true) : $urls;
-                    if (is_array($urlArr)) {
-                        $urlsText = " Sumber referensi: " . implode(" | ", $urlArr);
-                        $description .= $urlsText;
+                // Deteksi pencarian gambar
+                $isImageSearch = !empty($request->image_id);
+
+                /*
+        |--------------------------------------------------------------------------
+        | Label & Confidence
+        |--------------------------------------------------------------------------
+        | Jika field final_label dan final_confidence ada di requests
+        | gunakan $request->xxx.
+        |
+        | Jika ternyata masih ada di UserInteractions,
+        | ganti kembali ke $history->xxx.
+        */
+                $finalLabel = strtolower($request->final_label ?? '');
+                $confidence = ($request->final_confidence ?? 0) * 100;
+
+                $isHoax = in_array($finalLabel, ['hoax', 'fake']);
+
+                if ($isHoax) {
+                    $statusStr = 'hoax';
+                    $description = 'Investigasi mendalam menunjukkan bahwa informasi ini mengandung elemen yang telah dilebih-lebihkan atau tidak sesuai dengan fakta sebenarnya. Berdasarkan analisis, klaim ini diklasifikasikan sebagai informasi yang menyesatkan dengan tingkat hoaks ' . round($confidence) . '%.';
+                } else {
+                    // JANGAN diubah jadi "fakta" kalau frontend masih cek "benar"
+                    $statusStr = 'benar';
+
+                    $description = 'Hasil verifikasi menunjukkan bahwa informasi ini memiliki tingkat kebenaran sekitar ' . round($confidence) . '% dan termasuk informasi yang valid berdasarkan hasil analisis sistem.';
+                }
+
+                // Stage 2 URL Referensi
+                if ($request->stage2Results->isNotEmpty()) {
+                    $urls = $request->stage2Results->first()->url;
+
+                    if (!empty($urls)) {
+                        $urlArr = is_string($urls) ? json_decode($urls, true) : $urls;
+
+                        if (is_array($urlArr) && count($urlArr)) {
+                            $description .= ' Sumber referensi: ' . implode(' | ', $urlArr);
+                        }
                     }
                 }
-            }
 
-            // Jika ada fact_text dari KnowledgeBase (Stage 1)
-            if ($history->request && $history->request->stage1Results->isNotEmpty()) {
-                $kbId = $history->request->stage1Results->first()->knowledge_id;
-                $kb = \App\Models\KnowledgeBase::find($kbId);
-                if ($kb && !empty($kb->fact_text)) {
-                    $description = ltrim($kb->fact_text, ', ');
+                // Stage 1 Knowledge Base
+                if ($request->stage1Results->isNotEmpty()) {
+                    $kbId = $request->stage1Results->first()->knowledge_id;
+
+                    $kb = \App\Models\KnowledgeBase::find($kbId);
+
+                    if ($kb && !empty($kb->fact_text)) {
+                        $description = ltrim($kb->fact_text, ', ');
+                    }
                 }
-            }
 
-            // Ambil umpan balik jika ada (hanya feedback milik user ini untuk request)
-           $feedback = null;
+                // Feedback User
+                $feedback = null;
 
-if (Auth::check()) {
+                if (Auth::check()) {
+                    $fb = $request->feedbacks->where('user_id', Auth::id())->first();
 
-    $fb = $history->request->feedbacks
-        ->where('user_id', Auth::id())
-        ->first();
+                    if ($fb) {
+                        $feedback = [
+                            'id' => $fb->id,
+                            'feedback' => $fb->feedback,
+                            'created_at' => $fb->created_at,
+                        ];
+                    }
+                }
 
-    if ($fb) {
-        $feedback = [
-            'id' => $fb->id,
-            'feedback' => $fb->feedback,
-            'created_at' => $fb->created_at,
-        ];
-    }
-}
+                return [
+                    // ID interaksi
+                    'id' => $history->id,
 
-            return [
-                'id'          => $history->request_id,
-                'query'       => $isImageSearch ? '[Pencarian Berupa Gambar]' : $history->input_text,
-                'status'      => $statusStr,
-                'description' => $description,
-                'date'        => $history->created_at, // Format Y-m-d H:i:s
-                'confidence'  => round($confidence),
-                'feedback'    => $feedback
-            ];
-        })->toArray();
+                    // ID request
+                    'request_id' => $history->request_id,
 
-        // Return ke view 'user.riwayat' sambil membawa array JSON dari data
-        // Pastikan view kamu sesuai ya namanya (misal: 'user.riwayat-pencarian')
+                    'query' => $isImageSearch ? '[Pencarian Berupa Gambar]' : $request->input_text ?? '-',
+
+                    'status' => $statusStr,
+
+                    'description' => $description,
+
+                    'date' => $history->created_at,
+
+                    'confidence' => round($confidence),
+
+                    'image_url' => $imageUrl,
+
+                    'feedback' => $feedback,
+                ];
+            })
+            ->filter()
+            ->values()
+            ->toArray();
+
         return view('user.riwayat', compact('data'));
     }
 
@@ -219,28 +245,14 @@ if (Auth::check()) {
      */
     public function destroyUserHistory($id)
     {
-        $userId = Auth::check() ? Auth::id() : 2;
+        $interaction = UserInteractions::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
 
-        // Cari riwayat interaksi user dengan request_id tersebut
-        $interaction = UserInteractions::where('user_id', $userId)
-            ->where('request_id', $id)
-            ->first();
-
-        if ($interaction) {
-            // Hapus interaksinya saja (Soft Delete riwayat user)
-            // Data asli di tabel 'requests' akan tetap aman
-            $interaction->delete();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Riwayat berhasil dihapus.'
-            ]);
-        }
+        $interaction->delete();
 
         return response()->json([
-            'success' => false,
-            'message' => 'Riwayat tidak ditemukan.'
-        ], 404);
+            'success' => true,
+            'message' => 'Riwayat berhasil dihapus.',
+        ]);
     }
 
     /**
@@ -255,7 +267,7 @@ if (Auth::check()) {
 
         return response()->json([
             'success' => true,
-            'message' => 'Semua riwayat pencarian Anda berhasil dibersihkan.'
+            'message' => 'Semua riwayat pencarian Anda berhasil dibersihkan.',
         ]);
     }
 }

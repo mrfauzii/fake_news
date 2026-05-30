@@ -13,6 +13,7 @@ class PopulerHistoryController extends Controller
         // 1. Ambil dan hitung (grouping) pencarian yang sama berdasarkan teks dan bulan
         $histories = DB::table('user_interactions as ui')
             ->join('requests as r', 'ui.request_id', '=', 'r.id')
+            ->whereNull('r.deleted_at')
             ->select(
                 'r.input_text',
                 'r.final_label',

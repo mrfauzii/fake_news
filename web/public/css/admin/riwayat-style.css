@@ -5,27 +5,32 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
-
-    align-items: start; 
+    align-items: stretch; /* Biar tingginya rata kiri-kanan */
 }
 
 .warning-icon {
     color: #f4b400; /* kuning */
     margin: 0 5px;
 }
+.warning-title {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: #b8201d;
+    flex-shrink: 0; /* Supaya judul tidak ikut menyusut ketekan gambar/teks */
+}
 
 /* =========================
    CARD
 ========================= */
-.riwayat-card{
-    background:#fff;
-    border:1px solid #b8201d;
-    border-radius:12px;
-    padding:15px;
-
-    height:215px; /* ukuran tetap */
-    display:flex;
-    flex-direction:column;
+.riwayat-card {
+    background: #fff;
+    border: 1px solid #b8201d;
+    border-radius: 12px;
+    padding: 15px;
+    height: 260px; /* Ukuran yang sudah diperbesar */
+    display: flex;
+    flex-direction: column;
 }
 
 .riwayat-card:hover {
@@ -39,19 +44,71 @@
     margin-bottom: 8px;
 }
 
-.desc{
-    font-size:13px;
-    color:#333;
-
-    height:72px;       /* sekitar 4 baris */
-    line-height:18px;
-
-    overflow-y:auto;
-    overflow-x:hidden;
-
-    word-break:break-word;
+.desc {
+    font-size: 13px;
+    color: #333;
+    line-height: 18px;
+    word-break: break-word;
+    
+    /* HAPUS height: 72px; LALU GANTI JADI INI: */
+    flex-grow: 1;
+    overflow-y: auto; /* Memunculkan scroll kalau teksnya panjang */
+    margin: 0;
+    padding-right: 5px; /* Jarak untuk bar scroll */
 }
 
+.desc::-webkit-scrollbar {
+    width: 4px;
+}
+.desc::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+.card-image-wrapper {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.card-img {
+    width: 100%;
+    height: 100%; /* Mengisi penuh ruang wrapper yang tersedia */
+    object-fit: contain; /* Memastikan gambar tidak terpotong (menyesuaikan kotak) */
+    display: block;
+    border-radius: 8px;
+}
+
+.card-header {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Mengisi semua ruang kosong di atas divider */
+    overflow: hidden; /* Mencegah isi luber menabrak divider */
+    margin-bottom: 10px;
+}
+.popup-content {
+    /* HAPUS max-height: 55vh; DAN GANTI JADI flex-grow: 1; */
+    flex-grow: 1; 
+    
+    overflow-y: auto;
+    padding-right: 15px; 
+    text-align: left; 
+}
+
+#popupImage {
+    max-width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+    border-radius: 8px;
+    
+    /* PASTIKAN 2 BARIS INI ADA BIAR GAMBAR TETAP DI TENGAH */
+    display: block; 
+    margin: 15px auto; 
+    
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
 /* =========================
    IMAGE
 ========================= */
@@ -286,16 +343,22 @@
 }
 
 .popup-box {
-    width: 90%;
+    /* UBAH WIDTH NYA: Kasih jarak aman 60px biar tombol di kanan nggak kepotong layar */
+    width: calc(100% - 60px); 
     max-width: 1050px;
+    
+    /* TAMBAHKAN INI: Batasi tinggi maksimal kotak 85% dari layar biar tombol atas aman */
+    max-height: 85vh; 
+    
+    /* JADIKAN FLEX: Supaya isinya bisa kita atur dinamis */
+    display: flex;
+    flex-direction: column;
+    
     z-index: 9999;
     background: #fff;
-
     border: 2px solid #b8201d;
     border-radius: 10px;
-
     padding: 25px;
-
     position: relative;
 }
 

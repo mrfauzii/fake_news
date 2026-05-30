@@ -10,7 +10,9 @@ class RiwayatManager {
 
     // Hapus umpan balik milik pengguna untuk sebuah request (frontend)
     deleteFeedback(item) {
-        const requestId = item.id;
+        // PERBAIKAN: Gunakan item.request_id (bukan item.id) untuk dikirim ke backend
+        const requestId = item.request_id; 
+        const userIntId = item.id;
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
 
         this.showStatusModal({
@@ -26,7 +28,7 @@ class RiwayatManager {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': csrfToken
             },
-            body: JSON.stringify({ request_id: requestId })
+            body: JSON.stringify({ request_id: requestId }) // Pastikan pakai request_id
         })
         .then(resp => resp.json())
         .then(data => {
@@ -84,10 +86,23 @@ class RiwayatManager {
         this.attachItemEventListeners();
     }
 
-    renderItem(item) {
-        const hoaxPercent = item.status === 'fakta' ? 0 : (Number(item.confidence) || 0);
+   renderItem(item) {
+        const hoaxPercent = Number(item.confidence) || 0;
+        
+        // PERBAIKAN CLASS CSS: Memastikan warna kembali muncul sesuai file CSS lama
+        const isFakta = item.status === 'fakta' || item.status === 'benar';
+        const cssClass = isFakta ? 'benar' : 'hoax';
+        const resultLabel = isFakta ? 'Fakta' : 'Hoax';
+        
         const queryPreview = this.truncateText(item.query, 88);
-        const resultLabel = item.status === 'benar' ? 'fakta' : item.status === 'palsu' ? 'Palsu' : 'Hoax';
+        
+        // Tampilan Gambar jika ada
+        const imageHtml = item.image_url 
+            ? `<div style="margin-top: 12px; text-align: center;">
+                 <img src="${item.image_url}" alt="Gambar pencarian" style="max-width: 100%; max-height: 250px; border-radius: 8px; border: 1px solid #eee;" />
+               </div>` 
+            : '';
+
         const feedbackHtml = item.feedback && item.feedback.feedback
             ? `
                 <div class="riwayat-feedback-display">
@@ -129,6 +144,7 @@ class RiwayatManager {
                         </button>
                         <div class="riwayat-section-panel" id="query-${item.id}" hidden>
                             <p class="riwayat-query">${this.escapeHtml(item.query)}</p>
+                            ${imageHtml}
                         </div>
                     </div>
 
@@ -139,13 +155,15 @@ class RiwayatManager {
                                 <span class="riwayat-box-title">Klik untuk lihat ringkasan dan tautan</span>
                             </span>
                             <span class="riwayat-section-toggle-meta">
-                                <span class="riwayat-result-chip ${item.status}">${hoaxPercent}% ${resultLabel}</span>
+                                <!-- MENGGUNAKAN cssClass DISINI -->
+                                <span class="riwayat-result-chip ${cssClass}">${hoaxPercent}% ${resultLabel}</span>
                                 <iconify-icon icon="mdi:chevron-down" width="18" height="18" class="riwayat-section-chevron"></iconify-icon>
                             </span>
                         </button>
                         <div class="riwayat-section-panel" id="result-${item.id}" hidden>
                             <div class="riwayat-result-content">
-                                <div class="riwayat-result-percent ${item.status}">
+                                <!-- MENGGUNAKAN cssClass DISINI -->
+                                <div class="riwayat-result-percent ${cssClass}">
                                     <span class="riwayat-result-percent-value">${hoaxPercent}%</span>
                                     <span class="riwayat-result-percent-label">${resultLabel}</span>
                                 </div>
@@ -164,13 +182,11 @@ class RiwayatManager {
                         <button class="riwayat-action-btn hapus" title="Hapus dari riwayat" data-id="${item.id}">
                             <iconify-icon icon="mdi:trash" width="16" height="16"></iconify-icon>
                         </button>
-       
                     </div>
                 </div>
             </div>
         `;
     }
-
     escapeHtml(text) {
         if (!text) return '';
         const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
@@ -528,9 +544,9 @@ class RiwayatManager {
                     'X-CSRF-TOKEN': csrfToken,
                 },
                 body: JSON.stringify({
-                    feedback: text,
-                    request_id: item.id
-                }),
+                feedback: text,
+                request_id: item.request_id // Ubah item.id menjadi item.request_id di sini
+            }),
             })
             .then(resp => resp.json())
             .then(resdata => {

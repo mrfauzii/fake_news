@@ -50,40 +50,41 @@
                 $hasImage = !empty($imagePath);
             @endphp
 
-            <div class="riwayat-card searchable-card {{ $hasImage ? 'image-card' : '' }}"
-                data-title="{{ strtolower(data_get($item, 'judul', '')) }}" 
-                data-id="{{ $loop->index }}"
-                data-request-id="{{ data_get($item, 'request_id') }}" 
-                data-deleted="{{ data_get($item, 'is_deleted') ? 'true' : 'false' }}"
-                data-deleted-date="{{ data_get($item, 'deleted_at') }}">
+            <div class="riwayat-card searchable-card"
+    data-title="{{ strtolower(data_get($item, 'judul', '')) }}" 
+    data-id="{{ $loop->index }}"
+    data-request-id="{{ data_get($item, 'request_id') }}" 
+    data-deleted="{{ data_get($item, 'is_deleted') ? 'true' : 'false' }}"
+    data-deleted-date="{{ data_get($item, 'deleted_at') }}">
 
-                @if ($hasImage && is_string($imagePath))
-                    <div class="card-image-wrapper" style="text-align: center; padding: 10px;">
-                        <img src="{{ asset($imagePath) }}" class="card-img" style="max-height: 180px; object-fit: contain; width: 100%; border-radius: 4px;" onerror="this.parentNode.style.display='none'">
-                    </div>
-                @endif
+    {{-- SEMUA ISI ATAS DIJADIKAN SATU WADAH FLEXBOX --}}
+    <div class="card-header">
+        
+        {{-- 1. JUDUL (SELALU DI ATAS) --}}
+        <div class="warning-title">
+            @if (!$hasImage) <i class="fa fa-exclamation-triangle warning-icon"></i> @endif
+            {{ data_get($item, 'judul') }}
+            @if (!$hasImage) <i class="fa fa-exclamation-triangle warning-icon"></i> @endif
+        </div>
 
-                <div class="card-header">
-                    <div class="warning-title" style="font-weight: bold; font-size: 14px; margin-bottom: 5px; color: #b8201d;">
-                        @if (!$hasImage)
-                            <i class="fa fa-exclamation-triangle warning-icon"></i>
-                        @endif
+        {{-- 2. KONTEN (GAMBAR ATAU TEKS) --}}
+        @if ($hasImage && is_string($imagePath))
+            {{-- Jika ada gambar --}}
+            <div class="card-image-wrapper">
+                <img src="{{ asset($imagePath) }}" class="card-img" onerror="this.parentNode.style.display='none'">
+            </div>
+        @else
+            {{-- Jika tidak ada gambar (Tampilkan Teks) --}}
+            <p class="desc">
+                {{ $userText }}
+            </p>
+        @endif
+        
+    </div>
 
-                        {{ data_get($item, 'judul') }}
+    <div class="divider"></div>
 
-                        @if (!$hasImage)
-                            <i class="fa fa-exclamation-triangle warning-icon"></i>
-                        @endif
-                    </div>
-
-                    <p class="desc" style="color: #444; font-size: 13px; line-height: 1.4; margin-top: 8px;">
-                        {{ $userText }}
-                    </p>
-                </div>
-
-                <div class="divider"></div>
-
-                <div class="card-bottom">
+    <div class="card-bottom">
                     <div class="progress-circle">
     @php
         // Mengambil data persentase (Default 0 jika kosong)
@@ -121,17 +122,18 @@
                     </div>
 
                     <button class="btn-detail open-popup" 
-                        data-judul="{{ data_get($item, 'judul') }}"
-                        data-deskripsi="{{ $userText }}" 
-                        data-penjelasan="{{ data_get($item, 'penjelasan') }}"
-                        data-hoax="{{ data_get($item, 'hoax', 0) }}" 
-                        data-benar="{{ data_get($item, 'benar', 0) }}" 
-                        data-user="{{ data_get($item, 'user') }}"
-                        data-date="{{ data_get($item, 'date') }}">
-                        Selengkapnya
-                    </button>
-                </div>
-            </div>
+            data-judul="{{ data_get($item, 'judul') }}"
+            data-deskripsi="{{ $userText }}" 
+            data-gambar="{{ $hasImage && is_string($imagePath) ? asset($imagePath) : '' }}"
+            data-penjelasan="{{ data_get($item, 'penjelasan') }}"
+            data-hoax="{{ data_get($item, 'hoax', 0) }}" 
+            data-benar="{{ data_get($item, 'benar', 0) }}" 
+            data-user="{{ data_get($item, 'user') }}"
+            data-date="{{ data_get($item, 'date') }}">
+            Selengkapnya
+        </button>
+    </div>
+</div>
         @empty
             <div style="grid-column: 1 / -1; padding: 40px; text-align: center; color: #999;">
                 Tidak ada data riwayat yang ditemukan.
@@ -177,9 +179,13 @@
             </div>
 
             <div class="popup-content">
-                <div class="popup-title" id="popupTitle">Judul</div>
-                <p class="popup-desc" id="popupDesc">Isi berita</p>
-            </div>
+    <div class="popup-title" id="popupTitle">Judul</div>
+    
+    {{-- Tambahan untuk nampilin gambar di popup --}}
+    <img id="popupImage" src="" alt="Gambar Berita" style="display: none;">
+    
+    <p class="popup-desc" id="popupDesc">Isi berita</p>
+</div>
 
             <div class="popup-divider"></div>
 
@@ -234,6 +240,7 @@
 
             const popupTitle = document.getElementById('popupTitle');
             const popupDesc = document.getElementById('popupDesc');
+            const popupImage = document.getElementById('popupImage');
             const popupHoax = document.getElementById('popupHoax');
             const popupBenar = document.getElementById('popupBenar');
             const popupDeleteStatus = document.getElementById('popupDeleteStatus');
@@ -342,6 +349,20 @@
                     popupDate.innerText = openBtn.dataset.date;
                     popupHoax.innerText = openBtn.dataset.hoax + '%';
                     popupBenar.innerText = openBtn.dataset.benar + '%';
+                    const imageUrl = openBtn.dataset.gambar;
+    
+                        if (imageUrl) {
+                            // Ada gambar -> Tampilkan gambar, sembunyikan teks
+                            popupImage.src = imageUrl;
+                            popupImage.style.display = 'block';
+                            popupDesc.style.display = 'none';
+                        } else {
+                            // Nggak ada gambar -> Sembunyikan tag gambar, tampilkan teks
+                            popupImage.src = '';
+                            popupImage.style.display = 'none';
+                            popupDesc.style.display = 'block';
+                            popupDesc.innerText = openBtn.dataset.deskripsi;
+                        }
 
                     if (currentCard.dataset.deleted === "true") {
                         popupDeleteStatus.style.display = 'block';

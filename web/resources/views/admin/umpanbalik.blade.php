@@ -44,15 +44,16 @@
 
                     <div class="umpanbalik-actions">
                         <button
-                            class="btn-detail"
-                            data-username="{{ $item->username }}"
-                            data-date="{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('l, j F Y') }}"
-                            data-feedback="{{ rawurlencode($item->feedback) }}"
-                            data-link="{{ rawurlencode($item->link ?? '-') }}"
-                            data-result="{{ ucfirst($item->final_label ?? '-') }}"
-                        >
-                            Detail
-                        </button>
+    class="btn-detail"
+    data-username="{{ $item->username }}"
+    data-date="{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('l, j F Y') }}"
+    data-feedback="{{ rawurlencode($item->feedback) }}"
+    data-input_text="{{ rawurlencode($item->input_text ?? '') }}"
+    data-images="{{ $item->images ?? '' }}"
+    data-result="{{ ucfirst($item->final_label ?? '-') }}"
+>
+    Detail
+</button>
                     </div>
                 </div>
             </div>
@@ -146,216 +147,89 @@ document.addEventListener('DOMContentLoaded', function() {
     const popup = document.getElementById('feedbackPopup');
     const closeBtn = document.getElementById('closePopup');
     const searchInput = document.getElementById('searchFeedback');
-    const searchForm = document.querySelector('.search-wrapper');
-    
     let debounceTimeout;
 
-    // A. Fungsi Ambil Data Menggunakan Fetch API (AJAX)
+    // --- FUNGSI UTAMA FETCH ---
     function fetchLiveData(url) {
-        fetch(url, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.text())
-        .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            
-            // Timpa list lama dengan list umpan balik yang baru
-            const newFeedbackList = doc.getElementById('feedbackList');
-            const currentFeedbackList = document.getElementById('feedbackList');
-            if (newFeedbackList && currentFeedbackList) {
-                currentFeedbackList.innerHTML = newFeedbackList.innerHTML;
-            }
-document.addEventListener('DOMContentLoaded',function(){
+    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+    .then(response => response.text())
+    .then(html => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        // 1. Update List Data
+        const newList = doc.getElementById('feedbackList');
+        const currentList = document.getElementById('feedbackList');
+        if (newList && currentList) currentList.innerHTML = newList.innerHTML;
 
-    const container=
-    document.getElementById('feedbackList');
+        // 2. Update Pagination (PENTING AGAR TOMBOL NEXT/PREV TERBARU TERPASANG)
+        const newPagination = doc.querySelector('.pagination-wrapper');
+        const currentPagination = document.querySelector('.pagination-wrapper');
+        if (currentPagination && newPagination) {
+            currentPagination.innerHTML = newPagination.innerHTML;
+        }
+    });
+}
 
-    const popup=
-    document.getElementById('feedbackPopup');
+    // --- EVENT DELEGATION (KUNCI AGAR TOMBOL AJAX BISA DIKLIK) ---
+    document.addEventListener('click', function(e) {
+        // 1. Logika Klik Detail
+        // Di dalam event listener 'click' pada bagian 'btn-detail'
+if (e.target.classList.contains('btn-detail')) {
+    const data = e.target.dataset;
+    const popupInput = document.getElementById('popupinput');
 
-    const closeBtn=
-    document.getElementById('closePopup');
+    // Isi teks biasa
+    document.getElementById('popupUser').innerText = data.username;
+    document.getElementById('popupDate').innerText = data.date;
+    document.getElementById('popupFeedback').innerText = decodeURIComponent(data.feedback);
+    document.getElementById('popupResult').innerText = data.result;
 
-    fetch('/admin/umpanbalik-data')
+    // Logika Khusus untuk Input Text atau Gambar
+    const rawInput = decodeURIComponent(data.input_text || '');
+    const imgUrl = data.images;
 
-    .then(response=>response.json())
+    popupInput.classList.remove('image-mode');
+    popupInput.innerHTML = ""; // Bersihkan konten lama
 
-    .then(result=>{
-
-        container.innerHTML='';
-        console.log(result);
-
-        result.data.forEach(item=>{
-
-            container.innerHTML += `
-            <div class="umpanbalik-item new feedback-item"
-                data-user="${item.username.toLowerCase()}"
-                data-feedback="${item.feedback.toLowerCase()}"
-                >
-
-                <div class="umpanbalik-left">
-
-
-                    <div>
-
-                        <h4>${item.username}</h4>
-
-                        <span>${item.date}</span>
-
-                        <p>${item.feedback}</p>
-
-                        <div class="umpanbalik-actions">
-
-                            <button
-                            class="btn-outline btn-detail"
-                            data-username="${item.username}"
-                            data-date="${item.date}"
-                            data-feedback="${encodeURIComponent(item.feedback)}"
-                            data-input_text="${encodeURIComponent(item.input_text)}"
-                            data-images="${item.images}"
-                            data-result="${item.result}"
-                            >
-                            Detail
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            // Timpa pagination lama dengan pagination yang baru
-            const newPagination = doc.querySelector('.pagination-wrapper');
-            const currentPagination = document.querySelector('.pagination-wrapper');
-            if (currentPagination) {
-                currentPagination.innerHTML = newPagination ? newPagination.innerHTML : '';
-            }
-        })
-        .catch(error => console.error('Terjadi kesalahan saat memuat data:', error));
+    if (imgUrl && imgUrl !== "") {
+        // Jika ada gambar
+        popupInput.classList.add('image-mode');
+        popupInput.innerHTML = `<img src="${imgUrl}" alt="Feedback Image">`;
+    } else if (rawInput !== "") {
+        // Jika ada teks
+        popupInput.innerText = rawInput;
+    } else {
+        // Jika kosong
+        popupInput.innerText = "-";
     }
 
-    // B. Fitur Live Search Otomatis (Debounce 300ms)
+    document.getElementById('feedbackPopup').style.display = 'flex';
+}
+
+        // 2. Logika Pagination
+        if (e.target.closest('.pagination-wrapper a')) {
+            e.preventDefault();
+            const url = e.target.closest('a').getAttribute('href');
+            fetchLiveData(url);
+        }
+    });
+
+    // --- CLOSE POPUP ---
+    closeBtn.addEventListener('click', () => popup.style.display = 'none');
+    window.onclick = (e) => { if (e.target === popup) popup.style.display = 'none'; };
+
+    // --- LIVE SEARCH ---
     if (searchInput) {
         searchInput.addEventListener('input', function () {
             clearTimeout(debounceTimeout);
-            const keyword = this.value;
-
             debounceTimeout = setTimeout(() => {
-                const url = new URL(window.location.origin + window.location.pathname);
-                
-                if (keyword) {
-                    url.searchParams.set('search', keyword);
-                }
-                url.searchParams.delete('page'); // Kembali ke halaman 1 saat mengetik kata kunci baru
-
-                window.history.pushState({}, '', url); // Ubah URL browser tanpa reload
+                const url = new URL(window.location.href);
+                url.searchParams.set('search', this.value);
                 fetchLiveData(url);
-            }, 300);
+            }, 500);
         });
     }
-
-    // Mencegah submit form konvensional agar tidak memicu reload halaman
-    if (searchForm) {
-        searchForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-        });
-
-    });
-
-    document.addEventListener('click',function(e){
-
-    if(e.target.classList.contains('btn-detail')){
-        document.getElementById(
-            'popupUser'
-        ).innerText =
-        e.target.dataset.username;
-
-        document.getElementById(
-            'popupDate'
-        ).innerText =
-        e.target.dataset.date;
-
-        document.getElementById(
-            'popupFeedback'
-        ).innerText =
-        decodeURIComponent(
-            e.target.dataset.feedback
-        );
-        //img or text
-        const el = document.getElementById('popupinput');
-        const data = e.target.dataset;
-
-        const inputText =
-            data.input_text && data.input_text !== "null"
-                ? decodeURIComponent(data.input_text)
-                : null;
-
-        const image =
-            data.images && data.images !== "null"
-                ? data.images
-                : null;
-
-        // RESET mode
-        el.classList.remove('image-mode');
-        el.innerHTML = "";
-
-        // TEXT MODE
-        if (inputText) {
-            el.innerText = inputText;
-
-        // IMAGE MODE
-        } else if (image) {
-            el.classList.add('image-mode');
-            el.innerHTML = `<img src="${image}">`;
-
-        // EMPTY
-        } else {
-            el.innerText = "-";
-        }
-
-
-        document.getElementById(
-        'popupResult'
-        ).innerText =
-        e.target.dataset.result;
-
-        popup.style.display='flex';
-    }
-
-    // C. Interseptor Tombol Navigasi Angka Halaman (Pagination AJAX)
-    document.addEventListener('click', function (e) {
-        const targetAnchor = e.target.closest('.pagination-wrapper a');
-        
-        if (targetAnchor && !targetAnchor.classList.contains('disabled') && !targetAnchor.classList.contains('active')) {
-            e.preventDefault();
-            
-            const targetUrl = targetAnchor.getAttribute('href');
-            window.history.pushState({}, '', targetUrl); // Update URL browser
-            fetchLiveData(targetUrl); // Muat data halaman baru
-        }
-    });
-
-    // D. Handler Klik Tombol Detail (Event Delegation untuk Element Dinamis)
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('btn-detail')) {
-            document.getElementById('popupUser').innerText = e.target.dataset.username;
-            document.getElementById('popupDate').innerText = e.target.dataset.date;
-            document.getElementById('popupFeedback').innerText = decodeURIComponent(e.target.dataset.feedback);
-            document.getElementById('popupLink').innerText = decodeURIComponent(e.target.dataset.link);
-            document.getElementById('popupResult').innerText = e.target.dataset.result;
-
-            popup.style.display = 'flex';
-        }
-    });
-
-    // E. Menutup Popup Modal
-    closeBtn.addEventListener('click', () => popup.style.display = 'none');
-    popup.addEventListener('click', function(e) {
-        if (e.target === popup) { popup.style.display = 'none'; }
-    });
 });
 </script>
 <style>
@@ -381,5 +255,35 @@ document.addEventListener('DOMContentLoaded',function(){
     object-fit: cover;
     border-radius: 10px;
 }
+/* 1. Kontainer Utama: Berikan kemampuan scroll jika konten meluap */
+#popupinput {
+    text-align: left;      /* KUNCI: Paksa teks untuk selalu rata kiri */
+    word-wrap: break-word; /* Mencegah teks panjang menembus kotak */
+    white-space: pre-wrap; /* Mempertahankan spasi dan enter (baris baru) dari teks asli */
+}
+#popupinput img {
+    max-width: 100%;
+    max-height: 200px !important; /* PAKSA gambar agar tingginya maksimal 200px */
+    object-fit: contain;          /* Gambar menyesuaikan rasio asli, tidak akan gepeng */
+    border-radius: 8px;
+    display: block;
+    margin: 0 auto;
+}
+/* 2. Mode Gambar: Hapus batasan agar gambar bisa ditampilkan dalam ukuran aslinya */
+#popupinput.image-mode {
+    max-height: 400px; /* Batasi tinggi kontainer modal agar tidak terlalu panjang */
+    display: block;    /* Ubah dari flex ke block agar scroll berfungsi normal */
+    text-align: center;
+}
+
+/* 3. Gambar: Biarkan gambar mengikuti ukuran aslinya atau lebar kontainer */
+#popupinput.image-mode img {
+    max-width: 100%;   /* Gambar tidak akan lebih lebar dari modal */
+    height: auto;      /* Tinggi proporsional */
+    display: block;
+    margin: 0 auto;
+    border-radius: 10px;
+}
+
 </style>
 @endsection

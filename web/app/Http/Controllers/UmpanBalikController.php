@@ -85,7 +85,7 @@ class UmpanBalikController extends Controller
         'images.file_path as images'
     )
     ->orderBy('feedbacks.created_at', 'desc')
-    ->paginate(1)
+    ->paginate(25)
     ->withQueryString();
 
         // 6. Kirim seluruh variabel ke view admin.umpanbalik

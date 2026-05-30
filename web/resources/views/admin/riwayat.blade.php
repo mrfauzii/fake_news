@@ -206,7 +206,20 @@
             </div>
         </div>
     </div>
-
+<div class="permanent-overlay" id="restoreOverlay">
+    <div class="permanent-popup">
+        <h2>Pulihkan Riwayat</h2>
+        <p>Apakah anda yakin ingin memulihkan riwayat ini kembali ke daftar aktif?</p>
+        <div class="permanent-actions">
+            <button id="confirmRestore" class="btn-permanent-delete" style="background-color: #28a745;">Ya, Pulihkan</button>
+            <button id="cancelRestore" class="btn-permanent-cancel">Batal</button>
+        </div>
+    </div>
+</div>
+<div id="loadingOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.7); z-index:9999; text-align:center; padding-top:20%;">
+    <i class="fa fa-spinner fa-spin fa-3x"></i>
+    <p>Memproses data...</p>
+</div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('searchInput');
@@ -349,36 +362,55 @@
             popupOverlay.addEventListener('click', (e) => { if (e.target === popupOverlay) popupOverlay.classList.remove('active'); });
 
             // PROSES AJAX RESTORE
+            const restoreOverlay = document.getElementById('restoreOverlay');
+            const confirmRestore = document.getElementById('confirmRestore');
+            const cancelRestore = document.getElementById('cancelRestore');
+
+            // 1. Logika Trigger Restore (Ganti bagian fetch di dalam deletePopup)
             deletePopup.addEventListener('click', function() {
+                if (!currentCard) return;
+
+                if (currentCard.dataset.deleted === "true") {
+                    // Tampilkan konfirmasi, jangan langsung fetch
+                    restoreOverlay.classList.add('active'); 
+                    return;
+                }
+                
+                // Jika bukan deleted, lanjut ke logika hapus (soft-delete)
+                permanentOverlay.classList.add('active');
+            });
+
+            // 2. Tutup modal restore
+            cancelRestore.addEventListener('click', () => restoreOverlay.classList.remove('active'));
+
+            // 3. Eksekusi Restore
+            confirmRestore.addEventListener('click', function() {
                 if (!currentCard) return;
                 const requestId = currentCard.dataset.requestId;
 
-                if (currentCard.dataset.deleted === "true") {
-                    fetch(`/admin/history-management/restore/${requestId}`, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            'Accept': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            popupOverlay.classList.remove('active');
-                            // Panggil banner alert pengganti browser alert bawaan
-                            triggerSettingAlert(data.message, 'success');
-                            setTimeout(() => { location.reload(); }, 1200);
-                        } else {
-                            triggerSettingAlert('Terjadi kesalahan', 'error');
-                        }
-                    })
-                    .catch(err => {
-                        console.error('Fetch error:', err);
-                        triggerSettingAlert('Gagal menghubungi server', 'error');
-                    });
-                    return;
-                }
-                permanentOverlay.classList.add('active');
+                fetch(`/admin/history-management/restore/${requestId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        restoreOverlay.classList.remove('active');
+                        popupOverlay.classList.remove('active');
+                        triggerSettingAlert(data.message, 'success');
+                        document.getElementById('loadingOverlay').style.display = 'block';
+                        setTimeout(() => { location.reload(); }, 1200);
+                    } else {
+                        triggerSettingAlert('Gagal memulihkan data', 'error');
+                    }
+                })
+                .catch(err => {
+                    console.error('Fetch error:', err);
+                    triggerSettingAlert('Gagal menghubungi server', 'error');
+                });
             });
 
             cancelPermanentDelete.addEventListener('click', () => permanentOverlay.classList.remove('active'));
@@ -410,6 +442,7 @@
                         popupOverlay.classList.remove('active');
                         // Panggil banner alert pengganti browser alert bawaan
                         triggerSettingAlert(data.message, 'success');
+                        document.getElementById('loadingOverlay').style.display = 'block';
                         setTimeout(() => { location.reload(); }, 1200);
                     } else {
                         triggerSettingAlert('Terjadi kesalahan', 'error');

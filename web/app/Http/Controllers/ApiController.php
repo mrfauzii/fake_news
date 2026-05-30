@@ -18,21 +18,20 @@ class ApiController extends Controller
     }
 
     public function setScrapeSchedule(Request $request)
-{
-    // Validasi format waktu (contoh: "2026-05-20 14:30:00")
-    $request->validate([
-        'scheduled_time' => 'required|date'
-    ]);
+    {
+        // Validasi inputan form format jam
+        $request->validate([
+            'jam' => 'required|date_format:H:i' 
+        ]);
 
-    // Simpan ke database
-    ScrapeSchedule::create([
-        'scheduled_at' => $request->scheduled_time,
-        'status' => 'pending'
-    ]);
+        \App\Models\ScrapeSchedule::updateOrCreate(
+            ['id' => 1],
+            ['scheduled_at' => $request->jam]
+        );
 
-    return response()->json([
-        'success' => true,
-        'message' => 'Jadwal scrape berhasil disimpan.'
-    ]);
-}
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Jadwal scraper berhasil diubah. ' . $request->jam
+        ]);
+    }
 }

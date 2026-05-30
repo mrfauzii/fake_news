@@ -152,8 +152,14 @@ Route::get('/login-wa/verify', [AuthController::class, 'showTokenForm'])->name('
 Route::post('/login-wa/verify', [AuthController::class, 'verifyToken'])->name('login.wa.verify.post');
 
 //verifikasi nomer wa
-// Route untuk Verifikasi Nomor WA
 Route::get('/verify-wa/{token}', [App\Http\Controllers\WaController::class, 'verifyWaLink'])->name('wa.verify.link');
+
+//verifikasi email
+// Route nerima form submit dari user
+Route::post('/link-email', [App\Http\Controllers\EmailController::class, 'linkEmail'])->name('email.link');
+
+// Route diklik dari Inbox Email user
+Route::get('/verify-email/{token}', [App\Http\Controllers\EmailController::class, 'verifyEmailLink'])->name('email.verify.link');
 
 /*
 |--------------------------------------------------------------------------

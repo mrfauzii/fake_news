@@ -19,7 +19,7 @@ class RiwayatController extends Controller
 
         $search = request('search');
 
-        $histories = history_view::with('request.image')
+        $histories = history_view::with(['request.image', 'request.stage1Results', 'request.stage2Results'])
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('username', 'like', "%{$search}%")->orWhere('input_text', 'like', "%{$search}%");
@@ -35,13 +35,27 @@ class RiwayatController extends Controller
 
             $persenHoax = $isHoax ? $confidence : 100 - $confidence;
             $persenBenar = $isHoax ? 100 - $confidence : $confidence;
+            $penjelasan = null;
+
+            // Prioritas Stage 2
+            if ($history->request && $history->request->stage2Results->isNotEmpty()) {
+                $penjelasan = $history->request->stage2Results->first()->summary_text;
+            }
+            // Kalau tidak ada Stage 2, pakai Stage 1
+            elseif ($history->request && $history->request->stage1Results->isNotEmpty()) {
+                $kbId = $history->request->stage1Results->first()->knowledge_id;
+
+                $kb = \App\Models\KnowledgeBase::find($kbId);
+
+                $penjelasan = $kb?->fact_text;
+            }
 
             return [
                 'request_id' => $history->request_id,
                 'deleted_at' => $history->deleted_at ?? null,
                 'is_deleted' => $history->deleted_at !== null,
                 'judul' => $isImageSearch ? '[GAMBAR] Pencarian oleh: ' . $history->username : '[TEKS] Pencarian oleh: ' . $history->username,
-                'penjelasan' => $isHoax ? 'Hasil verifikasi menunjukkan bahwa sebagian besar informasi ini, yakni sekitar ' . round($persenHoax) . '%, mengandung unsur hoaks atau ketidaksesuaian fakta. Mohon untuk memvalidasi kembali sumber informasi sebelum menyebarkannya.' : 'Hasil verifikasi menunjukkan bahwa informasi ini memiliki tingkat kebenaran sekitar ' . round($persenBenar) . '% dan termasuk informasi yang valid berdasarkan hasil analisis sistem.',
+                'penjelasan' => $penjelasan,
                 'user' => $history->username,
                 'date' => $history->created_at ? Carbon::parse($history->created_at)->translatedFormat('l, j F Y') : '-',
                 'deskripsi' => $isImageSearch ? null : $history->input_text,
@@ -174,14 +188,32 @@ class RiwayatController extends Controller
 
                 // Stage 2 URL Referensi
                 if ($request->stage2Results->isNotEmpty()) {
-                    $urls = $request->stage2Results->first()->url;
+                    $stage2 = $request->stage2Results->first();
 
-                    if (!empty($urls)) {
-                        $urlArr = is_string($urls) ? json_decode($urls, true) : $urls;
+                    if (!empty($stage2->summary_text)) {
+                        $description = $stage2->summary_text; // FULL REPLACE
+                    }
+
+                    if (!empty($stage2->url)) {
+                        $urlArr = is_string($stage2->url)
+                            ? json_decode($stage2->url, true)
+                            : $stage2->url;
 
                         if (is_array($urlArr) && count($urlArr)) {
-                            $description .= ' Sumber referensi: ' . implode(' | ', $urlArr);
+                            $description .= "\n\nSumber Referensi:\n- " . implode("\n- ", $urlArr);
                         }
+                    }
+                }elseif ($request->stage1Results->isNotEmpty()) {
+                    $kbId = $request->stage1Results->first()->knowledge_id;
+
+                    $kb = \App\Models\KnowledgeBase::find($kbId);
+
+                    if ($kb && !empty($kb->fact_text)) {
+                        $description = $kb->fact_text; // FULL REPLACE
+                    }
+
+                    if ($kb && !empty($kb->source_url)) {
+                        $description .= "\n\nSumber Knowledge Base:\n- " . $kb->source_url;
                     }
                 }
 
@@ -192,7 +224,7 @@ class RiwayatController extends Controller
                     $kb = \App\Models\KnowledgeBase::find($kbId);
 
                     if ($kb && !empty($kb->fact_text)) {
-                        $description = ltrim($kb->fact_text, ', ');
+                        $description = nl2br(ltrim($kb->fact_text, ', '));
                     }
                 }
 

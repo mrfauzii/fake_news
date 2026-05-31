@@ -11,6 +11,7 @@ def process_fake_news_pipeline(
     client,
     browser,
     text_classifier,
+    explainer,
     searx_session,
     headers
 ):
@@ -45,7 +46,8 @@ def process_fake_news_pipeline(
             nli,
             searx_session,
             headers,
-            text_classifier
+            text_classifier,
+            explainer
         )
 
         # tempel embedding stage 1
@@ -72,7 +74,8 @@ def process_fake_news_pipeline(
                 nli,
                 searx_session,
                 headers,
-                text_classifier
+                text_classifier,
+                explainer
             )
 
             # tempel embedding juga

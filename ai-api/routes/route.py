@@ -20,6 +20,7 @@ def create_routes():
             request.app.state.searx_session,
             request.app.state.headers,
             request.app.state.text_classifier,
+            request.app.state.explainer
 
         )
 

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -13,20 +12,27 @@ class PopulerHistoryController extends Controller
         // 1. Ambil dan hitung (grouping) pencarian yang sama berdasarkan teks dan bulan
         $histories = DB::table('user_interactions as ui')
             ->join('requests as r', 'ui.request_id', '=', 'r.id')
+            ->leftJoin('stage1_results as s1', 'r.id', '=', 's1.request_id')
+            ->leftJoin('knowledge_base as kb', 's1.knowledge_id', '=', 'kb.id')
+            ->leftJoin('stage2_results as s2', 'r.id', '=', 's2.request_id')
             ->whereNull('r.deleted_at')
             ->select(
-                'r.input_text',
-                'r.final_label',
-                'r.final_confidence',
-                DB::raw('YEAR(r.created_at) as year'),
-                DB::raw('MONTH(r.created_at) as month'),
-                DB::raw('COUNT(*) as count')
-            )
+                    'r.input_text',
+                    'r.final_label',
+                    'r.final_confidence',
+                    'kb.fact_text as fact_text',
+                    's2.summary_text as summary_text',
+                    DB::raw('YEAR(r.created_at) as year'),
+                    DB::raw('MONTH(r.created_at) as month'),
+                    DB::raw('COUNT(*) as count')
+                )
             ->whereNotNull('r.final_label')
             ->groupBy(
                 'r.input_text',
                 'r.final_label',
                 'r.final_confidence',
+                'kb.fact_text',
+                's2.summary_text',
                 'year',
                 'month'
             )
@@ -63,6 +69,9 @@ class PopulerHistoryController extends Controller
                 'badge'     => $badge,
                 'confidence' => $row->final_confidence,
                 'count'     => $row->count,
+                'summary' => strtolower($row->final_label) === 'fake'
+                    ? ($row->summary_text ?? null)
+                    : ($row->fact_text ?? null),
                 'headline'  => Str::limit($row->input_text, 60), // Potong teks untuk judul
                 'excerpt'   => $row->input_text, // Teks utuh untuk penjelasan
                 'query'     => $row->input_text, // Teks yang akan di-parsing ke URL ?informasi=...

@@ -4,7 +4,7 @@ from services.chroma_service import input_text_request ,search_similar_input
 import traceback
 
 
-def detect_text_fake_news_controller(text_request, knowledge_base, transformer, nli,client,data,browser, searx_session, headers, text_classifier):
+def detect_text_fake_news_controller(text_request, knowledge_base, transformer, nli,client,data,browser, searx_session, headers, text_classifier,explainer):
     try:
         if not data or "query" not in data:
             return {"error": "Query tidak ditemukan"}
@@ -21,6 +21,7 @@ def detect_text_fake_news_controller(text_request, knowledge_base, transformer, 
             client=client,
             browser=browser,
             text_classifier=text_classifier,
+            explainer=explainer,
             searx_session=searx_session,
             headers=headers,
         )

@@ -199,11 +199,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!detailModal || !item) return;
 
         const percentages = resolvePercentages(item);
-        const summary = resolveVerificationSummary(
-            item,
-            percentages,
-            item.category,
-        );
+        const summary = item.summary || "-";
 
         if (detailDate) {
             detailDate.textContent = resolveDetailDateLabel(item.period);

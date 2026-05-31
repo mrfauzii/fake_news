@@ -16,6 +16,7 @@ from config.clasifier_config import get_text_classifier, get_img_classifier
 from config.config import Config
 from config.session_config import create_searx_session, get_headers
 from config.distance_model_config import get_distance_model
+from config.explainer import get_text_explainer
 
 from playwright.async_api import async_playwright
 
@@ -33,6 +34,7 @@ async def lifespan(app: FastAPI):
     app.state.transformer = get_transformer_model()
     app.state.nli = get_nli_model()
     app.state.text_classifier = get_text_classifier()
+    app.state.explainer = get_text_explainer(app.state.text_classifier)
     app.state.image_classifier = get_img_classifier()
     app.state.distance_model = get_distance_model()
     

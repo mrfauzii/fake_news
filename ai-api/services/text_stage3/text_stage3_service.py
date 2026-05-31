@@ -3,7 +3,7 @@ import numpy as np
 
 from .search_service import search_news
 from .feature_service import extract_features
-
+from services.explanation_service import generate_summary
 # FEATURE_ORDER = [
 #     "message_similarity_score",
 #     "time_consistency_score",
@@ -12,14 +12,25 @@ from .feature_service import extract_features
 #     "std_entailment",
 # ]
 
+# FEATURE_ORDER = [
+#     "time_consistency_score",
+#     "message_similarity_score",
+#     "len_results",
+#     "std_entailment",
+#     "std_contradiction",
+# ]
 FEATURE_ORDER = [
     "time_consistency_score",
     "message_similarity_score",
-    "len_results",
+    "mean_entailment",
+    "mean_neutral",
+    "mean_contradiction",
     "std_entailment",
+    "std_neutral",
     "std_contradiction",
-]
+    "len_results",
 
+]
 def _safe_extract_vector(features_dict):
     """
     memastikan semua feature ada, kalau tidak default 0.0
@@ -33,7 +44,8 @@ def run_stage3_online_search(
     nli,
     searx_session,
     headers,
-    text_classifier
+    text_classifier,
+    explainer
 ):
 
     try:
@@ -49,7 +61,6 @@ def run_stage3_online_search(
 
         # limit input biar stabil
         top_results = results[:10]
-        print(top_results)
 
         features_dict = extract_features(query, top_results, nli, transformer)
 
@@ -78,7 +89,15 @@ def run_stage3_online_search(
 
         prediction = int(np.argmax(proba))
         confidence = float(np.max(proba))
-
+        feature_vector = dict(
+            zip(FEATURE_ORDER, vector)
+        )
+        summary = generate_summary(
+                prediction,
+                confidence,
+                feature_vector,
+                explainer
+            )
         urls = list({
             r.get("url")
             for r in results
@@ -91,7 +110,8 @@ def run_stage3_online_search(
             "prediction": prediction,
             "confidence": confidence,
             "urls": urls,
-            "feature_vector": dict(zip(FEATURE_ORDER, vector))
+            "feature_vector": feature_vector,
+            "summary": summary
         }
 
     except Exception as e:

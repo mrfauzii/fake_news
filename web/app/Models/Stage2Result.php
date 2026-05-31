@@ -11,8 +11,13 @@ class Stage2Result extends Model
         'time_credibility',
         'title_credibility',
         'mean_entailment',
+        'mean_neutral',        
         'mean_contradiction',
+        'std_entailment',
+        'std_neutral',
         'std_contradiction',
+        'len_results',
+        'summary_text',
         'url'
     ];
 

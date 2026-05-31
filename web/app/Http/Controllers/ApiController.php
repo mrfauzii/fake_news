@@ -29,6 +29,6 @@ class ApiController extends Controller
             ['scheduled_at' => $request->jam]
         );
 
-        return redirect()->back()->with('success', 'Jadwal berhasil disimpan');
+    return redirect()->back()->with('success', 'Jadwal berhasil disimpan');
     }
 }

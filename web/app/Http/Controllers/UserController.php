@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Users;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\WaController;
+use App\Models\Users;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -17,22 +18,22 @@ class UserController extends Controller
 
         // 2. Query ke database dengan klausa pencarian dinamis (kondisional)
         $usersFromDb = Users::when($search, function ($query) use ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone_number', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone_number', 'like', "%{$search}%");
             });
         })
-        ->orderBy('name', 'asc') // Menambahkan sorting agar susunan tabel teratur rapi
-        ->paginate(2)
-        ->appends(['search' => $search]);
+            ->orderBy('name', 'asc') // Menambahkan sorting agar susunan tabel teratur rapi
+            ->paginate(2)
+            ->appends(['search' => $search]);
 
         // 3. Mapping data koleksi pagination tanpa memutus rantai pagination-nya
         $usersFromDb->through(function ($user) {
             return [
                 'nama' => $user->name,
                 'email' => $user->email,
-                'whatsapp' => $user->phone_number
+                'whatsapp' => $user->phone_number,
             ];
         });
 
@@ -50,51 +51,110 @@ class UserController extends Controller
         /** @var Users|null $user */
         $user = Auth::user();
 
+        Log::info('updateProfile request', $request->all());
+
         if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User tidak ditemukan'
-            ], 401);
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'User tidak ditemukan',
+                ],
+                401,
+            );
         }
 
-        // Validate input
+        // =========================
+        // VALIDATION
+        // =========================
         $validator = Validator::make($request->all(), [
             'name' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255|unique:users,email,' . $user->id,
-            'phone_number' => 'nullable|string|max:20'
+            'phone_number' => 'nullable|string|max:20',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => $validator->errors()->first()
-            ], 422);
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => $validator->errors()->first(),
+                ],
+                422,
+            );
         }
 
         $validated = $validator->validated();
 
-        if (!empty($validated['phone_number'])) {
+        $email = $validated['email'] ?? null;
+        $phone = $validated['phone_number'] ?? null;
 
-            $link_wa = new WaController();
-            $link_wa->linkWhatsApp($validated['phone_number']);
-            return response()->json([
-                'success' => true,
-                'message' => 'Link validasi WhatsApp berhasil dikirim ke ' . $validated['phone_number'],
-            ], 200);
+        // =========================
+        // RULE CHECK - PHONE INPUT
+        // =========================
+        if ($phone) {
+            $userWithPhone = Users::where('phone_number', $phone)->where('id', '!=', $user->id)->first();
 
+            if ($userWithPhone && !empty($userWithPhone->email)) {
+                return response()->json(
+                    [
+                        'success' => false,
+                        'message' => 'Nomor ini sudah terhubung dengan akun lengkap (email + WA), tidak bisa digunakan',
+                    ],
+                    409,
+                );
+            }
         }
 
-        // Update user
-        $user->name = $validated['name'] ?? $user->name;
-        $user->email = $validated['email'] ?? $user->email;
-        $user->phone_number = $validated['phone_number'] ?? $user->phone_number;
-        $user->save();
+        // =========================
+        // RULE CHECK - EMAIL INPUT
+        // =========================
+        if ($email) {
+            $userWithEmail = Users::where('email', $email)->where('id', '!=', $user->id)->first();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Profil berhasil diperbarui',
-            'user' => $user
+            if ($userWithEmail && !empty($userWithEmail->phone_number)) {
+                return response()->json(
+                    [
+                        'success' => false,
+                        'message' => 'Email ini sudah terhubung dengan nomor WA, tidak bisa digunakan',
+                    ],
+                    409,
+                );
+            }
+        }
+
+        // =========================
+        // UPDATE USER (MERGE)
+        // =========================
+        $user->update([
+            'name' => $email ? $request->name : $user->name,
+            'email' => $email ?? $user->email,
+            'phone_number' => $phone ?? $user->phone_number,
         ]);
+
+        // reload fresh data
+        $user->refresh();
+
+        // =========================
+        // TRIGGER VERIFICATION
+        // =========================
+        if ($phone) {
+            app(WaController::class)->linkWhatsApp($phone);
+        }
+
+        if ($email) {
+            app(EmailController::class)->linkEmail($email);
+        }
+
+        // =========================
+        // RESPONSE SUCCESS
+        // =========================
+        return response()->json(
+            [
+                'success' => true,
+                'message' => 'Profile berhasil diperbarui & verifikasi dikirim',
+                'user' => $user,
+            ],
+            200,
+        );
     }
 
     /**
@@ -108,14 +168,14 @@ class UserController extends Controller
             return [
                 'nama' => $user->name,
                 'email' => $user->email,
-                'whatsapp' => $user->phone_number
+                'whatsapp' => $user->phone_number,
             ];
         });
 
         return response()->json([
             'status' => 'success',
             'message' => 'Data pengguna berhasil dimuat.',
-            'data' => $userData
+            'data' => $userData,
         ]);
     }
 }

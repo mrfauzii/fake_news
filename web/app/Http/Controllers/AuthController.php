@@ -31,15 +31,14 @@ class AuthController extends Controller
         $token = rand(100000, 999999);
 
         $user->login_token = $token;
-        $user->token_expired_at = now()->addMinutes(5);
+        $user->token_expired_at = now()->addMinutes(1);
         $user->save();
-        // dd(env('FONNTE_TOKEN'));
         // kirim ke WA
         Http::withHeaders([
             'Authorization' => env('FONNTE_TOKEN')
         ])->post('https://api.fonnte.com/send', [
             'target' => $user->phone_number,
-            'message' => "Kode login kamu: $token"
+            'message' => "*$token* merupakan kode verifikasi (OTP) Anda untuk masuk ke Lensa Hoax. Waktu verifikasi berlaku 1 menit. Demi keamanan, mohon tidak menyebarkan kode ini."
         ]);
 
         // 🔥 SIMPAN NOMOR KE SESSION

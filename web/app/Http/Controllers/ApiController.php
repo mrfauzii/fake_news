@@ -29,9 +29,6 @@ class ApiController extends Controller
             ['scheduled_at' => $request->jam]
         );
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Jadwal scraper berhasil diubah. ' . $request->jam
-        ]);
+        return redirect()->back()->with('success', 'Jadwal berhasil disimpan');
     }
 }

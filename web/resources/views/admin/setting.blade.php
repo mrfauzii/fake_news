@@ -15,13 +15,22 @@
     </div>
 
     {{-- ALERT SUCCESS --}}
-    @if(session('success'))
-    <div class="success-alert" id="successAlert">
-       <i class="fa fa-circle-check"></i>
-        {{ session('success') }}
-    </div>
-    @endif
+   @if(session('success'))
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        showNotif("{{ session('success') }}", 'success');
+    });
+</script>
+@endif
 
+@if(session('error'))
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        showNotif("{{ session('error') }}", 'error');
+    });
+</script>
+@endif
+<div id="notif" class="notif hidden"></div>
     <div class="setting-box">
         <form action="{{ route("admin.setting.schedule-scrape") }}" method="POST">
             @csrf
@@ -30,9 +39,9 @@
                 <label>Jam Pembaruan Knowledge Base</label>
                 <input
                     type="time"
-                    name="knowledge_base_update_time"
+                    name="jam"
                     class="time-input"
-                    value="{{ \Cache::get('knowledge_base_update_time', '14:45') }}"
+                    value="{{ $time }}"
                 >
             </div>
 
@@ -76,34 +85,57 @@ document.addEventListener('DOMContentLoaded', function() {
             btnUpdateNow.style.opacity = '0.7';
             icon.classList.add('fa-spin');
             
-            fetch('{{ route("admin.setting.schedule-scrape") }}', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.status === 'success') {
-                    window.location.reload(); 
-                } else {
-                    // Mengganti alert error bawaan dengan log console atau kustom jika mau
-                    console.error('Gagal: ' + result.message);
-                    window.location.reload();
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            })
-            .finally(() => {
-                // Matikan status loading tombol jika proses selesai
-                btnUpdateNow.disabled = false;
-                btnUpdateNow.style.opacity = '1';
-                icon.classList.remove('fa-spin');
-            });
+            fetch('{{ route("admin.setting.scrape.now") }}', {
+    method: 'POST',
+    headers: {
+        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+})
+.then(async response => {
+
+    const text = await response.text();
+
+    try {
+        return JSON.parse(text);
+    } catch (e) {
+        throw new Error('Server bukan JSON: ' + text);
+    }
+
+})
+.then(result => {
+
+    if (result.status === 'success') {
+        showNotif(result.message, 'success');
+    } else {
+        showNotif(result.message, 'error');
+    }
+
+})
+.catch(error => {
+    showNotif('Terjadi kesalahan server', 'error');
+    console.error(error);
+})
+.finally(() => {
+    btnUpdateNow.disabled = false;
+    btnUpdateNow.style.opacity = '1';
+    icon.classList.remove('fa-spin');
+});
         });
     }
 });
+
+function showNotif(message, type = 'success') {
+    const notif = document.getElementById('notif');
+
+    notif.className = `notif ${type}`;
+    notif.textContent = message;
+
+    notif.classList.remove('hidden');
+
+    setTimeout(() => {
+        notif.classList.add('hidden');
+    }, 4000);
+}
 </script>

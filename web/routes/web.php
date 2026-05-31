@@ -124,10 +124,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
     Route::get('/pencarian', [AdminController::class, 'pencarian'])->name('admin.pencarian');
     Route::get('/setting', [AdminController::class, 'setting'])->name('admin.setting');
-    Route::get('/setting/scrape', [AdminController::class, 'settingScrape'])->name('admin.setting.scrape');
+    Route::post('/setting/scrape/now', [ScraperController::class, 'triggerScraper'])->name('admin.setting.scrape.now');
     Route::post('/setting/schedule-scrape', [ApiController::class, 'setScrapeSchedule'])->name('admin.setting.schedule-scrape');
+    
 });
-
+Route::get('/scraper/done/{token}', [ScraperController::class, 'markDone']);
 
 
 // Admin logout 

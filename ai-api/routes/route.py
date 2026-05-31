@@ -25,10 +25,11 @@ def create_routes():
         )
 
     @router.post("/scrape")
-    def scrape(request: Request):
+    def scrape(request: Request,data: dict):
         return update_knowledge_base_controller(
             request.app.state.transformer,
             request.app.state.knowledge_base,
+            data
         )
     
     @router.post("/similarity-search")

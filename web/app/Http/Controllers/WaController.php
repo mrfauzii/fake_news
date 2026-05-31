@@ -55,63 +55,96 @@ class WaController extends Controller
             // 🔥 3. PROSES COMMAND BERDASARKAN KEYWORD (#)
             switch (true) {
 
-                // ==========================================
-                // COMMAND: #detect
-                // ==========================================
-                case str_starts_with($message, '#detect'):
-                    $lastMessage = MessageCache::where('sender_number', $sender)
-                        ->where('created_at', '>=', \Carbon\Carbon::now()->subMinutes(5))
-                        ->latest()
-                        ->first();
+            // ==========================================
+            // COMMAND: #detect
+            // ==========================================
+            case str_starts_with($message, '#detect'):
+                $lastMessage = MessageCache::where('sender_number', $sender)
+                    ->where('created_at', '>=', \Carbon\Carbon::now()->subMinutes(5))
+                    ->latest()
+                    ->first();
 
-                    if ($lastMessage) {
-                        $text = $lastMessage->latest_message;
+                if ($lastMessage) {
+                    $text = $lastMessage->latest_message;
 
-                        // Panggil TextDetectionController secara Non-Static
-                        $detection = new TextDetectionController();
-                        Log::info("Processing #detect for user_id: " . $user->id . " with text: " . $text);
-                        $reply = $detection->detect($text, 1, $user->id); // Pastikan untuk passing user_id agar bisa tercatat di UserInteractions
-                        $result = json_decode($reply->getContent(), true);
+                    // 1. Instansiasi Controller secara Non-Static
+                    $detection = new TextDetectionController();
+                    Log::info("Processing #detect for user_id: " . $user->id . " with text: " . $text);
 
-                        if (isset($result['status']) && $result['status'] !== 'error') {
-                            $data = $result['data'];
-                            $verdict = strtolower($data['verdict'] ?? '');
+                    /**
+                     * 2. Panggil fungsi detect() sesuai parameter controller terbaru Anda:
+                     * parameter 1: $inputText = $text
+                     * parameter 2: $skipSimilarity = 0 (aktifkan pengecekan similarity agar hemat hit API)
+                     * parameter 3: $wa = 1 (tanda request masuk via WhatsApp)
+                     * parameter 4: $user_wa = $user->id (parsing ID user WA asli)
+                     */
+                    $reply = $detection->detect($text, 0, 1, $user->id);
+                    $result = json_decode($reply->getContent(), true);
 
-                            if ($verdict === 'fake') {
-                                $statusTeks = "🚨 *HOAKS* 🚨";
-                            } else {
-                                $statusTeks = "✅ *FAKTA* ✅";
-                            }
+                    // 3. Pengecekan status keberhasilan dari controller
+                    if (isset($result['status']) && $result['status'] !== 'error') {
 
-                            $waReply = "🔍 *HASIL CEK FAKTA AI* 🔍\n";
-                            $waReply .= "━━━━━━━━━━━━━━━━━━━\n\n";
-                            $waReply .= "📝 *Klaim Berita:*\n";
-                            $waReply .= "\"_" . $text . "_\"\n\n";
-                            $waReply .= "📊 *Kesimpulan:* " . $statusTeks . "\n";
-                            $waReply .= "🎯 *Keyakinan:* " . $data['confidence'] . "%\n\n";
-                            $waReply .= "📖 *Ringkasan Analisis:*\n";
-                            $waReply .= $data['summary'] . "\n\n";
+                        // Ambal data yang sudah diformat seragam (berlaku untuk data baru maupun data similarity)
+                        $data = $result['data'];
+                        $verdict = strtolower($data['verdict'] ?? '');
 
-                            if (!empty($data['sources'])) {
-                                $waReply .= "🌐 *Sumber Referensi Berita:* \n";
-                                foreach ($data['sources'] as $index => $source) {
-                                    $url = is_array($source) ? ($source['url'] ?: 'Database Sistem') : $source;
-                                    if (!empty($url)) {
-                                        $waReply .= ($index + 1) . ". " . $url . "\n";
-                                    }
+                        // Tentukan label status berdasarkan verdict final controller
+                        if ($verdict === 'fake') {
+                            $statusTeks = "🚨 *HOAKS* 🚨";
+                        } else {
+                            $statusTeks = "✅ *FAKTA* ✅";
+                        }
+
+                        // 4. Susun struktur response WhatsApp Lensa Hoax
+                        $waReply = "🔍 *HASIL CEK FAKTA AI* 🔍\n";
+                        $waReply .= "━━━━━━━━━━━━━━━━━━━\n\n";
+                        $waReply .= "📝 *Klaim Berita:*\n";
+                        $waReply .= "\"_" . $text . "_\"\n\n";
+                        $waReply .= "📊 *Kesimpulan:* " . $statusTeks . "\n";
+                        $waReply .= "🎯 *Keyakinan:* " . $data['confidence'] . "%\n\n";
+                        $waReply .= "📖 *Ringkasan Analisis:*\n";
+
+                        // Mengambil teks summary otomatis (bisa dari Database Knowledge Base atau Summary API Python)
+                        $waReply .= ($data['summary'] ?: 'Tidak ada ringkasan teks yang tersedia.') . "\n\n";
+
+                        // 5. Tampilkan Sumber Referensi Berita
+                        if (!empty($data['sources'])) {
+                            $waReply .= "🌐 *Sumber Referensi Berita:* \n";
+                            $sourceCounter = 1;
+
+                            foreach ($data['sources'] as $source) {
+                                /**
+                                 * Handle kecocokan data:
+                                 * Stage 1/Similarity Stage 1 berbentuk array [['title' => ..., 'url' => ...]]
+                                 * Stage 2/Similarity Stage 2 berbentuk string URL murni
+                                 */
+                                $url = is_array($source) ? ($source['url'] ?: '') : $source;
+
+                                // Jika data stage 1 knowledge basenya kosong, infokan dari internal sistem
+                                if (is_array($source) && empty($url)) {
+                                    $url = "Database Knowledge Base Anti-Hoax";
+                                }
+
+                                if (!empty($url)) {
+                                    $waReply .= $sourceCounter . ". " . $url . "\n";
+                                    $sourceCounter++;
                                 }
                             }
-
-                            $waReply .= "━━━━━━━━━━━━━━━━━━━\n";
-                            $waReply .= "💡 _Gunakan informasi secara bijak sebelum membagikannya._";
-                        } else {
-                            $errorMessage = $result['message'] ?? 'Terjadi kesalahan pada sistem internal.';
-                            $waReply = "❌ *Gagal Memproses Cek Fakta* ❌\n\nKeterangan: " . $errorMessage;
+                            $waReply .= "\n";
                         }
+
+                        $waReply .= "━━━━━━━━━━━━━━━━━━━\n";
+                        $waReply .= "💡 _Gunakan informasi secara bijak sebelum membagikannya._";
+
                     } else {
-                        $waReply = "⚠️ *Pesan Tidak Ditemukan*\n\nMaaf, sistem tidak menemukan pesan yang Anda kirimkan dalam 5 minut terakhir untuk dideteksi. Silakan kirim beritanya terlebih dahulu, lalu ketik `#detect`.";
+                        // Jika status dari controller bernilai 'error'
+                        $errorMessage = $result['message'] ?? 'Terjadi kesalahan pada sistem internal.';
+                        $waReply = "❌ *Gagal Memproses Cek Fakta* ❌\n\nKeterangan: " . $errorMessage;
                     }
-                    break;
+                } else {
+                    $waReply = "⚠️ *Pesan Tidak Ditemukan*\n\nMaaf, sistem tidak menemukan pesan yang Anda kirimkan dalam 5 menit terakhir untuk dideteksi. Silakan kirim beritanya terlebih dahulu, lalu ketik `#detect`.";
+                }
+                break;
 
                 // ==========================================
                 // COMMAND: #info
@@ -258,9 +291,9 @@ class WaController extends Controller
 
     public function linkWhatsApp($wa_number)
     {
-        
+
         $waNumberRaw = trim($wa_number);
-        
+
         $waNumberFonnte = $waNumberRaw;
         if (str_starts_with($waNumberRaw, '0')) {
             $waNumberFonnte = '62' . substr($waNumberRaw, 1);
@@ -328,7 +361,7 @@ class WaController extends Controller
         try {
             // SKENARIO 1: Nomor udah dipake di akun lain (MERGE DATA)
             if ($existingWaUser && $existingWaUser->id !== $currentUser->id) {
-                
+
                 // Pindahkan history ke akun utama (Gmail)
                 UserInteractions::where('user_id', $existingWaUser->id)
                     ->update(['user_id' => $currentUser->id]);
@@ -354,7 +387,7 @@ class WaController extends Controller
             Cache::forget("wa_verification_{$token}");
 
             return redirect()->route('beranda')->with('success', 'Nomor WhatsApp berhasil dihubungkan ke akun Anda!');
-            
+
         } catch (\Exception $e) {
             dd($e);
             DB::rollBack();

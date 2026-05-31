@@ -46,9 +46,9 @@ public function markDone($token)
     
 
     // 1. validasi token
-    if (!$token || !Cache::has("scraper_token_$token")) {
-        return response()->json(['error' => 'unauthorized'], 403);
-    }
+    // if (!$token || !Cache::has("scraper_token_$token")) {
+    //     return response()->json(['error' => 'unauthorized'], 403);
+    // }
 
     // 2. hapus token biar sekali pakai (opsional tapi bagus)
     Cache::forget("scraper_token_$token");

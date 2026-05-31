@@ -3,6 +3,10 @@ from config.db_config import get_connection
 import pandas as pd
 import json
 from contextlib import closing
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+now_wib = datetime.now(ZoneInfo("Asia/Jakarta"))
 
 def get_latest_title():
     """Ambil title terbaru dari knowledge_base"""
@@ -12,6 +16,10 @@ def get_latest_title():
         result = cursor.fetchone()
         return result[0].lower() if result else ""
 
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json
+
 def insert_to_mysql(df):
 
     list_id_chroma = []
@@ -20,9 +28,11 @@ def insert_to_mysql(df):
 
     insert_kb_query = """
         INSERT INTO knowledge_base 
-        (title, source_url, category, hoax_text, fact_text, link_counter)
-        VALUES (%s, %s, %s, %s, %s, %s)
+        (title, source_url, category, hoax_text, fact_text, link_counter, published_at, created_at, updated_at)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
+
+    now_wib = datetime.now(ZoneInfo("Asia/Jakarta"))
 
     with closing(get_connection()) as db, closing(db.cursor()) as cursor:
         for _, row in df.iterrows():
@@ -31,7 +41,6 @@ def insert_to_mysql(df):
 
             links = row.get('link_counter')
 
-            # handle string JSON
             if isinstance(links, str):
                 try:
                     links = json.loads(links)
@@ -47,7 +56,11 @@ def insert_to_mysql(df):
                 row.get('kategori_hoaks'),
                 teks_hoaks,
                 row.get('fakta'),
-                json.dumps(links)
+                json.dumps(links),
+
+                row.get('tanggal'),  # published_at
+                now_wib,  # created_at
+                now_wib   # updated_at
             ))
 
             kb_id = cursor.lastrowid

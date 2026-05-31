@@ -331,9 +331,16 @@
                 const targetAnchor = e.target.closest('.pagination-wrapper a');
                 if (targetAnchor && !targetAnchor.classList.contains('disabled') && !targetAnchor.classList.contains('active')) {
                     e.preventDefault();
-                    const targetUrl = targetAnchor.getAttribute('href');
-                    window.history.pushState({}, '', targetUrl);
-                    fetchLiveData(targetUrl);
+                    
+                    // URL yang diambil dari href (masih http://)
+                    const targetUrl = targetAnchor.getAttribute('href'); 
+                    
+                    // UBAH BAGIAN INI: Konversi URL agar mengikuti protocol HTTPS saat ini
+                    const secureUrl = new URL(targetUrl);
+                    secureUrl.protocol = window.location.protocol; 
+
+                    window.history.pushState({}, '', secureUrl.href); // Gunakan secureUrl
+                    fetchLiveData(secureUrl.href); // Gunakan secureUrl
                 }
             });
 

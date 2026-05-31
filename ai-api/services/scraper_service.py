@@ -21,7 +21,11 @@ def scrape_new_hoaxes(latest_title: str):
         )
         page = context.new_page()
 
-        page.goto("https://www.komdigi.go.id/berita/berita-hoaks")
+        page.goto(
+            "https://www.komdigi.go.id/berita/berita-hoaks",
+            wait_until="networkidle",
+            timeout=60000
+        )
         page.wait_for_timeout(3000)
 
         found = False

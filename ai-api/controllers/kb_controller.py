@@ -13,7 +13,7 @@ def update_knowledge_base_controller(model, collection, data, batch_size=32,):
     print(f"📌 Judul terbaru di database: '{latest_title}'")
     df = scrape_new_hoaxes(latest_title)
     df = scrape_all(df)
-    if ((len(df) == 0) & (df)):
+    if ((len(df) == 0) ):
         print("✅ knowledge base sudah paling baru")
         requests.get(url)
         return {

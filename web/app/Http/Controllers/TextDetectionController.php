@@ -125,7 +125,7 @@ class TextDetectionController extends Controller
             $aiApiResponse = $response->json();
 
             if (!isset($aiApiResponse['status']) || $aiApiResponse['status'] !== 'success') {
-                throw new \Exception('Response AI gagal atau tidak valid');
+                throw new \Exception('Berita tidak dapat diverifikasi. Pastikan teks berita yang dimasukkan cukup jelas dan memiliki isi yang relevan.');
             }
             // -----------------------
 
@@ -398,5 +398,4 @@ class TextDetectionController extends Controller
             ];
         }
     }
-
 }

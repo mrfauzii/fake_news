@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Users;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -28,18 +29,17 @@ class AuthController extends Controller
             return back()->with('error', 'Nomor ini belum terdaftar. Silakan cek via WhatsApp pada menu Dapatkan Melalui WhatsApp.');
         }
 
-        $token = rand(100000, 999999);
+        $token = (rand(100000, 999999));
 
-        $user->login_token = $token;
-        $user->token_expired_at = now()->addMinutes(5);
+        $user->login_token = Hash::make($token);
+        $user->token_expired_at = now()->addMinutes(1);
         $user->save();
-        // dd(env('FONNTE_TOKEN'));
         // kirim ke WA
         Http::withHeaders([
             'Authorization' => env('FONNTE_TOKEN')
         ])->post('https://api.fonnte.com/send', [
             'target' => $user->phone_number,
-            'message' => "Kode login kamu: $token"
+            'message' => "*$token* merupakan kode verifikasi (OTP) Anda untuk masuk ke Lensa Hoax. Waktu verifikasi berlaku 1 menit. Demi keamanan, mohon tidak menyebarkan kode ini."
         ]);
 
         // 🔥 SIMPAN NOMOR KE SESSION
@@ -62,14 +62,18 @@ class AuthController extends Controller
             'token' => 'required'
         ]);
 
+
         $phone = session('phone_number');
 
+        // 1. Cari user berdasarkan phone + pastikan token belum expired
         $user = Users::where('phone_number', $phone)
-            ->where('login_token', $request->token)
+            ->whereNotNull('login_token')
+            ->where('token_expired_at', '>', now())
             ->first();
 
-        if (!$user) {
-            return back()->with('error', 'Token salah');
+        // 2. Cek apakah user ada DAN token cocok
+        if (!$user || !Hash::check($request->token, $user->login_token)) {
+            return back()->with('error', 'Token salah atau sudah kadaluarsa');
         }
 
         if (now()->gt($user->token_expired_at)) {
@@ -95,7 +99,8 @@ class AuthController extends Controller
         return redirect()->route('beranda')->with('success', 'Login berhasil');
     }
 
-    public function logout(Request $request){
+    public function logout(Request $request)
+    {
         Auth::logout();
 
         $request->session()->invalidate();

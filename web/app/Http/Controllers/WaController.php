@@ -65,15 +65,29 @@ class WaController extends Controller
                         ->first();
 
                     if ($lastMessage) {
-                        $text = $lastMessage->latest_message;
+                        $text = trim($lastMessage->latest_message);
 
-                        // Panggil TextDetectionController secara Non-Static
+                        // 🔥 VALIDASI: Cek apakah panjang teks kurang dari 10 karakter
+                        if (strlen($text) < 10) {
+                            $waReply = "⚠️ *Pesan Terlalu Pendek* ⚠️\n\n";
+                            $waReply .= "Pesan yang Anda kirimkan sebelumnya hanya berisi *" . strlen($text) . " karakter*.\n\n";
+                            $waReply .= "Sistem Lensa Hoax AI membutuhkan klaim/berita minimal *10 karakter* agar dapat dianalisis secara akurat. Silakan kirim ulang berita yang lebih lengkap, lalu ketik `#detect`.";
+                            break; // Berhentikan proses di sini, jangan tembak AI
+                        }
+
+                        // 1. Instansiasi Controller secara Non-Static
                         $detection = new TextDetectionController();
                         Log::info("Processing #detect for user_id: " . $user->id . " with text: " . $text);
-                        $reply = $detection->detect($text, 1, $user->id); // Pastikan untuk passing user_id agar bisa tercatat di UserInteractions
+
+                        /**
+                         * 2. Panggil fungsi detect()
+                         */
+                        $reply = $detection->detect($text, 0, 1, $user->id);
                         $result = json_decode($reply->getContent(), true);
 
+                        // 3. Pengecekan status keberhasilan dari controller
                         if (isset($result['status']) && $result['status'] !== 'error') {
+
                             $data = $result['data'];
                             $verdict = strtolower($data['verdict'] ?? '');
 
@@ -83,6 +97,7 @@ class WaController extends Controller
                                 $statusTeks = "✅ *FAKTA* ✅";
                             }
 
+                            // 4. Susun struktur response WhatsApp Lensa Hoax
                             $waReply = "🔍 *HASIL CEK FAKTA AI* 🔍\n";
                             $waReply .= "━━━━━━━━━━━━━━━━━━━\n\n";
                             $waReply .= "📝 *Klaim Berita:*\n";
@@ -90,16 +105,27 @@ class WaController extends Controller
                             $waReply .= "📊 *Kesimpulan:* " . $statusTeks . "\n";
                             $waReply .= "🎯 *Keyakinan:* " . $data['confidence'] . "%\n\n";
                             $waReply .= "📖 *Ringkasan Analisis:*\n";
-                            $waReply .= $data['summary'] . "\n\n";
 
+                            $waReply .= ($data['summary'] ?: 'Tidak ada ringkasan teks yang tersedia.') . "\n\n";
+
+                            // 5. Tampilkan Sumber Referensi Berita
                             if (!empty($data['sources'])) {
                                 $waReply .= "🌐 *Sumber Referensi Berita:* \n";
-                                foreach ($data['sources'] as $index => $source) {
-                                    $url = is_array($source) ? ($source['url'] ?: 'Database Sistem') : $source;
+                                $sourceCounter = 1;
+
+                                foreach ($data['sources'] as $source) {
+                                    $url = is_array($source) ? ($source['url'] ?: '') : $source;
+
+                                    if (is_array($source) && empty($url)) {
+                                        $url = "Database Knowledge Base Anti-Hoax";
+                                    }
+
                                     if (!empty($url)) {
-                                        $waReply .= ($index + 1) . ". " . $url . "\n";
+                                        $waReply .= $sourceCounter . ". " . $url . "\n";
+                                        $sourceCounter++;
                                     }
                                 }
+                                $waReply .= "\n";
                             }
 
                             $waReply .= "━━━━━━━━━━━━━━━━━━━\n";
@@ -109,7 +135,7 @@ class WaController extends Controller
                             $waReply = "❌ *Gagal Memproses Cek Fakta* ❌\n\nKeterangan: " . $errorMessage;
                         }
                     } else {
-                        $waReply = "⚠️ *Pesan Tidak Ditemukan*\n\nMaaf, sistem tidak menemukan pesan yang Anda kirimkan dalam 5 minut terakhir untuk dideteksi. Silakan kirim beritanya terlebih dahulu, lalu ketik `#detect`.";
+                        $waReply = "⚠️ *Pesan Tidak Ditemukan*\n\nMaaf, sistem tidak menemukan pesan yang Anda kirimkan dalam 5 menit terakhir untuk dideteksi. Silakan kirim beritanya terlebih dahulu, lalu ketik `#detect`.";
                     }
                     break;
 
@@ -135,54 +161,63 @@ class WaController extends Controller
                     $waReply .= "━━━━━━━━━━━━━━━━━━━\n";
                     $waReply .= "💡 _Mari bersama-sama putus mata rantai hoaks!_";
                     break;
-                    // ==========================================
-                    // COMMAND: #trending
-                    // ==========================================
-                    case str_starts_with($message, '#trending'):
-                        // 1. Ambil data dari view database yang sama dengan website (Hanya yang HOAKS/FAKE)
-                        $trendingHoaxes = \Illuminate\Support\Facades\DB::table('history_view')
-                            ->select(
-                                'input_text',
-                                \Illuminate\Support\Facades\DB::raw('COUNT(*) as count')
-                            )
-                            ->where('final_label', 'fake') // Hanya ambil yang terindikasi hoaks
-                            ->groupBy('input_text')
-                            ->orderByDesc('count') // Urutkan dari yang paling banyak dicari/populer
-                            ->take(3) // Ambil 3 besar
-                            ->get();
+                // ==========================================
+                // COMMAND: #trending
+                // ==========================================
+                case str_starts_with($message, '#trending'):
+                    // 1. Ambil data dari view database yang sama dengan website (Hanya yang HOAKS/FAKE)
+                    $trendingHoaxes = \Illuminate\Support\Facades\DB::table('history_view')
+                        ->select(
+                            'input_text',
+                            \Illuminate\Support\Facades\DB::raw('COUNT(*) as count')
+                        )
+                        ->where('final_label', 'fake') // Hanya ambil yang terindikasi hoaks
+                        ->groupBy('input_text')
+                        ->orderByDesc('count') // Urutkan dari yang paling banyak dicari/populer
+                        ->take(3) // Ambil 3 besar
+                        ->get();
 
-                        // 2. Kamus Nama Bulan untuk mempercantik info periode saat ini
-                        $bulanIndo = [
-                            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-                            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-                            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
-                        ];
-                        $periodeSekarang = $bulanIndo[date('n')] . ' ' . date('Y');
+                    // 2. Kamus Nama Bulan untuk mempercantik info periode saat ini
+                    $bulanIndo = [
+                        1 => 'Januari',
+                        2 => 'Februari',
+                        3 => 'Maret',
+                        4 => 'April',
+                        5 => 'Mei',
+                        6 => 'Juni',
+                        7 => 'Juli',
+                        8 => 'Agustus',
+                        9 => 'September',
+                        10 => 'Oktober',
+                        11 => 'November',
+                        12 => 'Desember'
+                    ];
+                    $periodeSekarang = $bulanIndo[date('n')] . ' ' . date('Y');
 
-                        // 3. Susun struktur pesan WhatsApp
-                        $waReply = "🔥 *PENCARIAN HOAX TERPOPULER* 🔥\n";
-                        $waReply .= "📊 *Periode:* " . $periodeSekarang . "\n";
-                        $waReply .= "━━━━━━━━━━━━━━━━━━━\n";
-                        $waReply .= "Berikut adalah klaim hoaks yang paling banyak ditanyakan oleh pengguna minggu ini:\n\n";
+                    // 3. Susun struktur pesan WhatsApp
+                    $waReply = "🔥 *PENCARIAN HOAX TERPOPULER* 🔥\n";
+                    $waReply .= "📊 *Periode:* " . $periodeSekarang . "\n";
+                    $waReply .= "━━━━━━━━━━━━━━━━━━━\n";
+                    $waReply .= "Berikut adalah klaim hoaks yang paling banyak ditanyakan oleh pengguna minggu ini:\n\n";
 
-                        if ($trendingHoaxes->isNotEmpty()) {
-                            foreach ($trendingHoaxes as $index => $hoax) {
-                                $waReply .= ($index + 1) . ". *\"" . $hoax->input_text . "\"*\n";
-                                $waReply .= "📈 _Dicari sebanyak: " . $hoax->count . " kali_\n\n";
-                            }
-
-                            // Link dinamis ke halaman pencarian terpopuler di website Anda (jika ada route name-nya)
-                            // Misal nama routenya 'populer', jika tidak ada bisa tetap pakai route('beranda')
-                            $linkPopuler = route('beranda');
-
-                            $waReply .= "🌐 *Lihat Statistik Lengkap di Web:*\n";
-                            $waReply .= "👉 " . $linkPopuler . "\n\n";
-                            $waReply .= "💡 _Jangan mudah terprovokasi dan langsung menyebarkan berita di atas ya!_ \n";
-                        } else {
-                            $waReply .= "Belum ada data tren hoaks yang cukup untuk bulan ini. Sistem masih terus memantau ruang digital.\n";
+                    if ($trendingHoaxes->isNotEmpty()) {
+                        foreach ($trendingHoaxes as $index => $hoax) {
+                            $waReply .= ($index + 1) . ". *\"" . $hoax->input_text . "\"*\n";
+                            $waReply .= "📈 _Dicari sebanyak: " . $hoax->count . " kali_\n\n";
                         }
-                        $waReply .= "━━━━━━━━━━━━━━━━━━━";
-                        break;
+
+                        // Link dinamis ke halaman pencarian terpopuler di website Anda (jika ada route name-nya)
+                        // Misal nama routenya 'populer', jika tidak ada bisa tetap pakai route('beranda')
+                        $linkPopuler = route('beranda');
+
+                        $waReply .= "🌐 *Lihat Statistik Lengkap di Web:*\n";
+                        $waReply .= "👉 " . $linkPopuler . "\n\n";
+                        $waReply .= "💡 _Jangan mudah terprovokasi dan langsung menyebarkan berita di atas ya!_ \n";
+                    } else {
+                        $waReply .= "Belum ada data tren hoaks yang cukup untuk bulan ini. Sistem masih terus memantau ruang digital.\n";
+                    }
+                    $waReply .= "━━━━━━━━━━━━━━━━━━━";
+                    break;
 
                 // ==========================================
                 // COMMAND: #history
@@ -258,9 +293,9 @@ class WaController extends Controller
 
     public function linkWhatsApp($wa_number)
     {
-        
+
         $waNumberRaw = trim($wa_number);
-        
+
         $waNumberFonnte = $waNumberRaw;
         if (str_starts_with($waNumberRaw, '0')) {
             $waNumberFonnte = '62' . substr($waNumberRaw, 1);
@@ -318,7 +353,7 @@ class WaController extends Controller
         $currentUser = Users::find($userId);
 
         if (!$currentUser) {
-             return redirect()->route('beranda')->with('error', 'Akun tidak ditemukan.');
+            return redirect()->route('beranda')->with('error', 'Akun tidak ditemukan.');
         }
 
         // Cek apakah ada akun bot (atau akun lain) di DB yang udah pake nomor WA ini
@@ -328,7 +363,7 @@ class WaController extends Controller
         try {
             // SKENARIO 1: Nomor udah dipake di akun lain (MERGE DATA)
             if ($existingWaUser && $existingWaUser->id !== $currentUser->id) {
-                
+
                 // Pindahkan history ke akun utama (Gmail)
                 UserInteractions::where('user_id', $existingWaUser->id)
                     ->update(['user_id' => $currentUser->id]);
@@ -354,7 +389,6 @@ class WaController extends Controller
             Cache::forget("wa_verification_{$token}");
 
             return redirect()->route('beranda')->with('success', 'Nomor WhatsApp berhasil dihubungkan ke akun Anda!');
-            
         } catch (\Exception $e) {
             dd($e);
             DB::rollBack();

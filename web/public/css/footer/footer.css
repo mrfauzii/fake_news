@@ -1,0 +1,137 @@
+:root {
+    --footer-page-bg: #f7f5f2;
+    --footer-page-surface: #ffffff;
+    --footer-page-surface-soft: #fbfaf8;
+    --footer-page-text: #1f2937;
+    --footer-page-muted: #6b7280;
+    --footer-page-border: #e7e1da;
+    --footer-page-accent: #8f1717;
+    --footer-page-accent-soft: #f8eaea;
+}
+
+.footer-page {
+    background:
+        radial-gradient(circle at top left, rgba(143, 23, 23, 0.08), transparent 28%),
+        linear-gradient(180deg, #fffdfb 0%, var(--footer-page-bg) 100%);
+    color: var(--footer-page-text);
+    padding-bottom: 72px;
+}
+
+.footer-page__container {
+    width: min(1100px, calc(100% - 32px));
+    margin: 0 auto;
+}
+
+.footer-page__hero {
+    padding: 88px 0 48px;
+}
+
+.footer-page__eyebrow {
+    margin: 0 0 12px;
+    color: var(--footer-page-accent);
+    font-size: 0.92rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.footer-page__hero h1 {
+    margin: 0;
+    font-size: clamp(2.2rem, 4vw, 3.5rem);
+    line-height: 1.08;
+    letter-spacing: -0.04em;
+}
+
+.footer-page__lead {
+    margin: 18px 0 0;
+    max-width: 720px;
+    color: var(--footer-page-muted);
+    font-size: 1.05rem;
+    line-height: 1.8;
+}
+
+.footer-page__content {
+    padding: 0 0 12px;
+}
+
+.footer-page__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.footer-page__grid--two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.footer-page__stack {
+    display: grid;
+    gap: 20px;
+}
+
+.footer-card {
+    background: var(--footer-page-surface);
+    border: 1px solid var(--footer-page-border);
+    border-radius: 22px;
+    padding: 28px;
+    box-shadow: 0 16px 36px rgba(31, 41, 55, 0.06);
+}
+
+.footer-card--accent {
+    background: linear-gradient(180deg, var(--footer-page-accent) 0%, #a81d1d 100%);
+    color: #fff;
+    border-color: transparent;
+}
+
+.footer-card h2 {
+    margin: 0 0 14px;
+    font-size: 1.25rem;
+    line-height: 1.25;
+}
+
+.footer-card p {
+    margin: 0;
+    color: inherit;
+    line-height: 1.8;
+}
+
+.footer-list {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--footer-page-muted);
+    line-height: 1.85;
+}
+
+.footer-card--accent .footer-list {
+    color: rgba(255, 255, 255, 0.92);
+}
+
+.footer-list li + li {
+    margin-top: 10px;
+}
+
+@media (max-width: 900px) {
+    .footer-page__grid,
+    .footer-page__grid--two {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-page__hero {
+        padding-top: 70px;
+    }
+}
+
+@media (max-width: 640px) {
+    .footer-page__container {
+        width: min(100% - 24px, 100%);
+    }
+
+    .footer-card {
+        padding: 22px;
+        border-radius: 18px;
+    }
+
+    .footer-page__lead {
+        font-size: 1rem;
+    }
+}

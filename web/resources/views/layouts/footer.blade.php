@@ -94,7 +94,7 @@
 
             <div style="display:flex; flex-direction:column; gap:12px;">
 
-                <a href="/tentang-kami" style="
+                <a href="{{ route('tentang.kami') }}" style="
                     color:#ffe5e5;
                     text-decoration:none;
                     font-size:14px;
@@ -102,7 +102,7 @@
                     Tentang Kami
                 </a>
 
-                <a href="/kebijakan-privasi" style="
+                <a href="{{ route('kebijakan.privasi') }}" style="
                     color:#ffe5e5;
                     text-decoration:none;
                     font-size:14px;

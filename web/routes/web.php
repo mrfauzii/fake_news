@@ -32,6 +32,10 @@ Route::get('/', function () {
     return view('landing_page.landing');
 })->name('beranda');
 
+// Footer information pages
+Route::view('/tentang-kami', 'footer.tentang-kami')->name('tentang.kami');
+Route::view('/kebijakan-privasi', 'footer.kebijakan-privasi')->name('kebijakan.privasi');
+
 // Pencarian (public)
 Route::get('/pencarian', [PencarianController::class, 'index'])->name('deteksi');
 Route::post('/telusuri', [PencarianController::class, 'telusuri'])->name('telusuri');

@@ -2,8 +2,9 @@ from services.scraper_service import *
 import pandas as pd
 from services.db_service import insert_to_mysql, get_latest_title
 from services.chroma_service import insert_to_chroma
+import requests
 
-def update_knowledge_base_controller(model, collection, batch_size=32):
+def update_knowledge_base_controller(model, collection, data, batch_size=32,):
     print("🚀 Memulai proses scraping data hoaks...")
     latest_title = get_latest_title()
     print(f"📌 Judul terbaru di database: '{latest_title}'")
@@ -19,6 +20,12 @@ def update_knowledge_base_controller(model, collection, batch_size=32):
 
     list_id = insert_to_mysql(df)
     insert_to_chroma(df, list_id, model, collection, batch_size)
+    
+    token =data.get("token")
+    url = "http://127.0.0.1:8000/scraper/done/" + token
+    
+    requests.get(url)
+
     return {
         "status": "success",
         "message": "Scraping dan sinkronisasi selesai"

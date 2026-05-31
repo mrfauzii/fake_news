@@ -2,30 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Users;
-use App\Models\UserInteractions;
 use App\Models\Feedbacks;
 use App\Models\Images;
+use App\Models\UserInteractions;
+use App\Models\Users;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class EmailController extends Controller
 {
     // =========================================================================
     // 1. KIRIM LINK VERIFIKASI KE EMAIL
     // =========================================================================
-    public function linkEmail(Request $request)
+    public function linkEmail($email)
     {
         // Validasi input email
-        $request->validate([
-            'email' => 'required|email'
-        ]);
-
-        $emailTarget = trim($request->email);
+        $emailTarget = trim($email);
         $userId = Auth::id();
         $token = Str::random(40);
 
@@ -54,6 +51,7 @@ class EmailController extends Controller
             return back()->with('success', 'Link verifikasi telah dikirim ke email Anda. Silakan cek Inbox atau folder Spam.');
 
         } catch (\Exception $e) {
+            Log::error('Gagal mengirim email', ['error' => $e->getMessage()]);
             return back()->with('error', 'Gagal mengirim email. Pastikan settingan SMTP sudah benar: ' . $e->getMessage());
         }
     }

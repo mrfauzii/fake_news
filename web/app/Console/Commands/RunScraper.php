@@ -2,10 +2,12 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Http;
-use Carbon\Carbon;
 use App\Models\ScrapeSchedule;
+use Carbon\Carbon;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class RunScraper extends Command
 {
@@ -14,33 +16,51 @@ class RunScraper extends Command
 
     public function handle()
     {
-        // 1. Ambil jadwal dari database
-        $schedule = \App\Models\ScrapeSchedule::find(1);
+        $schedule = ScrapeSchedule::find(1);
 
         if (!$schedule || !$schedule->scheduled_at) {
-            $this->info('Jadwal belum diatur di database.');
-            return;
+            $this->info('Jadwal belum diatur');
+            return 0;
         }
 
-        // 2. Ambil jam & menit sekarang, lalu cocokan dengan jadwal
         $now = Carbon::now()->format('H:i');
         $scheduledTime = Carbon::parse($schedule->scheduled_at)->format('H:i');
 
-        $this->info("Mengecek jadwal... Sekarang: $now | Jadwal: $scheduledTime");
+        $this->info("Sekarang: $now | Jadwal: $scheduledTime");
 
-        // 3. Kalau waktunya sama, eksekusi!
-        if ($now === $scheduledTime) {
-            $this->info('Waktu cocok! Menembak server scraper...');
+        if ($now !== $scheduledTime) {
+            $this->info('Belum waktunya scraping');
+            return 0;
+        }
 
-            try {
-                Http::timeout(1)->get('http://127.0.0.1:8004/scrape');
-                
-            } catch (\Exception $e) {
-            }
+        // LOCK supaya tidak double run
+        $lock = Cache::lock('global-scraper-lock', 7200);
 
-            $this->info('Status Success: Perintah scraping berhasil dikirim ke server!');
-        } else {
-            $this->info('Belum waktunya scraping.');
+        if (!$lock->get()) {
+            $this->info('Scraper masih berjalan, skip');
+            return 0;
+        }
+
+        try {
+            $this->info('Trigger scraper (NON-BLOCKING)...');
+
+            // 🔥 FIRE AND FORGET (tidak nunggu hasil)
+            $token = Str::random(40);
+            Cache::put("scraper_token_$token", true, now()->addDay());
+
+            $response = Http::timeout(5)->post('http://127.0.0.1:8004/scrape', [
+                'token' => $token,
+            ]);
+
+            $this->info('Scraper berhasil dipicu');
+
+            return 0;
+        } catch (\Throwable $e) {
+            $this->error('Error trigger: ' . $e->getMessage());
+            return 1;
+        } finally {
+            // tetap release lock biar tidak nyangkut
+            $lock->release();
         }
     }
 }

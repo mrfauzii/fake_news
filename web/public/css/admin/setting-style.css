@@ -106,3 +106,33 @@
 .sync-btn:hover {
     background: #374151;
 }
+
+.notif {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    color: white;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    transition: 0.3s ease;
+    z-index: 9999;
+}
+
+.notif.hidden {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+}
+
+.notif.success {
+    background: #22c55e;
+}
+
+.notif.error {
+    background: #ef4444;
+}

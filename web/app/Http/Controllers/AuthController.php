@@ -92,7 +92,7 @@ class AuthController extends Controller
         // 🔥 CEK ROLE DAN REDIRECT SESUAI HAK AKSES
         // Berdasarkan web.php kamu sebelumnya, route admin bernama 'dashboard'
         if ($user->role === 'admin') {
-            return redirect()->route('dashboard')->with('success', 'Login berhasil sebagai Admin');
+            return redirect()->route('admin.dashboard')->with('success', 'Login berhasil sebagai Admin');
         }
 
         // Redirect untuk user biasa (misalnya diarahkan ke route 'beranda' atau 'landing')

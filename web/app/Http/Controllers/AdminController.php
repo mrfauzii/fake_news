@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use App\Models\Users;
 use App\Models\Requests;
 use App\Models\history_view;
+use App\Models\ScrapeSchedule;
 use App\Models\Feedbacks;
 
 class AdminController extends Controller
@@ -136,7 +137,8 @@ class AdminController extends Controller
     // SETTING
     public function setting()
     {
-        return view('admin.setting');
+        $time = ScrapeSchedule::find(1)->scheduled_at ?? '01:00';
+        return view('admin.setting', compact('time'));
     }
 
     // Menyimpan jadwal pembaruan manual dari tombol "Simpan Jadwal"

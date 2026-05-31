@@ -13,7 +13,7 @@ return new class extends Migration
 {
     Schema::create('scrape_schedules', function (Blueprint $table) {
         $table->id();
-        $table->dateTime('scheduled_at'); // Waktu eksekusi dari frontend
+        $table->time('scheduled_at'); // Waktu eksekusi dari frontend
         $table->string('status')->default('pending'); // pending, success, failed
         $table->timestamps();
     });

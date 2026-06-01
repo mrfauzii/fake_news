@@ -1,22 +1,22 @@
-import joblib
-import numpy as np
-from config.explainer import get_text_explainer
-# load model
+# import joblib
+# import numpy as np
+# from config.explainer import get_text_explainer
+# # load model
 
-model = joblib.load("./models/cat_model (5).pkl")
+# model = joblib.load("./models/cat_model (5).pkl")
 
-explainer = get_text_explainer(model)
-# print(explainer.model.feature_names)
-print(type(model))
+# explainer = get_text_explainer(model)
+# # print(explainer.model.feature_names)
+# print(type(model))
 
-if hasattr(model, "feature_names_in_"):
-    print(model.feature_names_in_)
+# if hasattr(model, "feature_names_in_"):
+#     print(model.feature_names_in_)
 
-if hasattr(model, "feature_names_"):
-    print(model.feature_names_)
+# if hasattr(model, "feature_names_"):
+#     print(model.feature_names_)
 
-if hasattr(model, "n_features_in_"):
-    print(model.n_features_in_)
+# if hasattr(model, "n_features_in_"):
+#     print(model.n_features_in_)
 
 # # susun fitur (HARUS urut sesuai training)
 # X = [[
@@ -93,3 +93,31 @@ if hasattr(model, "n_features_in_"):
 
 # for model in client.models.list():
 #     print(model.name)
+
+
+# testsimilarity
+
+from config.transformer_config import get_transformer_model
+from config.chroma_config import get_chroma_collection
+from services.chroma_service import search_similar
+from config.nli_config import get_nli_model
+from services.nli_service import run_nli_top_label
+
+
+model = get_transformer_model()
+knowledge_base = get_chroma_collection("knowledge_base")
+query_embedding = model.encode("prabowo qurban pake dana apbn").tolist()
+result = search_similar(
+        knowledge_base,
+        query_embedding,
+        5
+    )
+print(result)
+
+nli = get_nli_model()
+pairs = [
+    ("prabowo qurban pake dana apbn", "wna asal tiongkok dianiaya di lampung"),
+    ("prabowo qurban pake dana apbn", "Faktanya, informasi dalam unggahan tersebut adalah tidak benar atau hoaks. Dikutip dari turnbackhoax.id, tidak ditemukan informasi dari laman berita kredibel atau akun resmi pemerintahan yang membenarkan klaim tersebut. Kemudian ditemukan video serupa dimuat dalam kanal YouTube KOMPASTV yang berjudul “Jual Emas Palsu, WNA Asal Tiongkok Ditangkap di Bandar Lampung”.Kategori : Hoaks"),
+]
+
+print(run_nli_top_label(nli, pairs))

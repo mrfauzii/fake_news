@@ -8,8 +8,6 @@ class KnowledgeBase extends Model
 {
     protected $table = 'knowledge_base';
 
-    public $timestamps = false;
-
     protected $fillable = [
         'title',
         'hoax_text',

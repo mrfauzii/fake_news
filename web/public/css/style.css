@@ -197,7 +197,7 @@ footer {
    5. HERO
 ======================= */
 .hero {
-    padding: 60px 0 80px;
+    padding: 60px 0 80px; 
     background: #ffffff;
     position: relative;
     min-height: 100vh;
@@ -218,10 +218,10 @@ footer {
 }
 
 .hero-text h1 {
-    font-size: clamp(3rem, 5vw, 5.2rem);
+    font-size: clamp(1rem, 3vw, 2rem);
     color: #7f1018;
     font-weight: 800;
-    line-height: 1.02;
+    line-height: 1.2;
 }
 
 .hero-text p {
@@ -246,16 +246,6 @@ footer {
     align-items: center;
 }
 
-.hero-img::after {
-    content: "";
-    position: absolute;
-    bottom: 20px;
-    left: -100vw;
-    width: 200vw;
-    height: 4px;
-    background: #8b0000;
-}
-
 .hero-img img {
     height: 90%;
     width: auto;
@@ -263,150 +253,585 @@ footer {
 }
 
 .hero-border {
-    margin-top: 40px;
+    display: none; 
 }
 
-/* =======================
-   6. TOP FEATURES
-======================= */
-.top-features {
-    margin-top: -100px;
-}
-
-.top-features .container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
+/* ==========================================================================
+   STATISTICS SECTION
+   ========================================================================== */
+.statistics-section {
+    background-color: #f2f4f6;
     padding: 60px 0;
 }
 
-.box {
-    padding: 30px;
-    border-radius: 20px;
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid #fdeaea;
+    border-radius: 16px;
+    padding: 32px 20px;
     text-align: center;
-    border: 2px solid transparent;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
 }
 
-.box h4 {
-    font-size: 20px;
-    font-weight: 600;
-    color: #7b131a;
-    margin: 15px 0 10px;
+.stat-card:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
 }
 
-.box p {
+.stat-card h3 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 2.5rem;
+    color: #7a0006;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.stat-card p {
+    font-family: 'Manrope', sans-serif;
     font-size: 14px;
-    color: #5f4a4a;
+    color: #5a403d;
+    font-weight: 600;
+}
+
+/* Response Layar Handphone untuk Statistik */
+@media (max-width: 992px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ==========================================================================
+   CARA MENGGUNAKAN (STEPPER) SECTION
+   ========================================================================== */
+.how-to-use-section {
+    padding: 80px 0;
+    background-color: #ffffff;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.section-header h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 2.5rem;
+    color: #7a0006;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: inline-block;
+    text-decoration-color: #e3beba;
+    text-underline-offset: 8px;
+}
+
+.section-header p {
+    font-family: 'Manrope', sans-serif;
+    color: #5a403d;
+    max-width: 600px;
+    margin: 0 auto;
+    font-size: 16px;
+}
+
+.stepper-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    gap: 48px;
+    z-index: 1;
+}
+
+/* Garis putus-putus dekoratif di belakang lingkaran */
+.stepper-line {
+    position: absolute;
+    top: 48px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    border-top: 2px dashed #e3beba;
+    z-index: -1;
+}
+
+.step-item {
+    flex: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.step-icon-box {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    border: 4px solid #7a0006;
+    display: flex;
+    items-align: center;
+    justify-content: center;
+    align-items: center;
+    color: #7a0006;
+    margin-bottom: 24px;
+    transition: all 0.3s ease;
+}
+
+.step-icon-box .material-symbols-outlined {
+    font-size: 36px;
+}
+
+/* Efek Hover Lingkaran seperti contoh */
+.step-item:hover .step-icon-box {
+    background-color: #7a0006;
+    color: #ffffff;
+}
+
+.step-item h4 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #191c1e;
+    margin-bottom: 8px;
+}
+
+.step-item p {
+    font-family: 'Manrope', sans-serif;
+    font-size: 16px;
+    color: #5a403d;
+    line-height: 24px;
+}
+
+/* Response Layar Handphone untuk Stepper (Berubah jadi Vertikal) */
+@media (max-width: 768px) {
+    .stepper-wrapper {
+        flex-direction: column;
+        align-items: center;
+        gap: 40px;
+    }
+    
+    .stepper-line {
+        display: none; /* Sembunyikan garis horizontal di layar mobile */
+    }
+}
+
+/* ==========================================================================
+   6. FITUR UTAMA SECTION (GRID REVISION)
+   ========================================================================== */
+.main-features-section {
+    padding: 80px 0;
+    background-color: #ffffff;
+}
+
+.features-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 40px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 20px;
+}
+
+.features-header h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 2.5rem;
+    color: #7a0006;
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+.view-all-link {
+    font-family: 'Manrope', sans-serif;
+    color: #7a0006;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+/* Penataan Grid 4 Kolom Baris Sejajar */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.feature-card {
+    background: #ffffff;
+    border: 1px solid #f3f4f6;
+    border-radius: 20px;
+    padding: 30px 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(122, 0, 6, 0.05);
+}
+
+/* Khusus highlight kartu WhatsApp hijau */
+.feature-card.border-green {
+    border: 1px solid #e8f9ee;
+}
+.feature-card.border-green:hover {
+    box-shadow: 0 10px 30px rgba(37, 211, 102, 0.08);
+}
+
+.feature-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-bottom: 20px;
 }
 
-/* warna */
-.box.red {
-    background: rgba(255, 77, 77, 0.08);
-    border: 2px solid #ef4f4f;
-}
-.box.blue {
-    background: rgba(77, 121, 255, 0.12);
-    border: 2px solid #6b8cff;
-}
-.box.green {
-    background: rgba(52, 199, 89, 0.15);
-    border: 2px solid #3ecf74;
+.feature-icon-wrapper i {
+    font-size: 24px;
 }
 
-/* tombol warna */
-.red-btn { background: linear-gradient(180deg, #ff6b6b, #d62828); color: white; }
-.blue-btn { background: linear-gradient(180deg, #6ea8ff, #2f4fdb); color: white; }
-.green-btn { background: linear-gradient(180deg, #4cd964, #28b463); color: white; }
+/* Varian Warna Latar Belakang Ikon */
+.bg-soft-red { background-color: #fff1f1; }
+.bg-soft-green { background-color: #eafaf1; }
 
-.icon {
-    width: 72px;
-    margin: 0 auto 18px;
+.icon-red { color: #7a0006; font-size: 24px; }
+.icon-green { color: #25d366; font-size: 24px; }
+
+.feature-card h3 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.25rem;
+    color: #1a1a1a;
+    font-weight: 700;
+    margin-bottom: 10px;
 }
 
-/* =======================
-   7. FITUR
-======================= */
-.fitur {
-    padding: 60px 0;
-    text-align: center;
-    border-top: 4px solid #8b0000;
+.feature-card p {
+    font-family: 'Manrope', sans-serif;
+    font-size: 14px;
+    color: #666666;
+    line-height: 1.6;
 }
 
-.fitur h2::after {
-    content: "";
-    display: block;
-    width: 120px;
-    height: 3px;
-    background: #8b0000;
-    margin: 10px auto 0;
+/* ==========================================================================
+   7. KENAPA LENSA HOAX SECTION (SIDE-BY-SIDE REVISION)
+   ========================================================================== */
+.why-us-section {
+    padding: 80px 0;
+    background-color: #f9fafb; /* Latar abu-abu sangat terang agar kontras */
 }
 
-.fitur-list {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-    margin-top: 40px;
+.why-us-flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 60px;
 }
 
-.card {
-    background: #fff;
-    padding: 30px;
-    border-radius: 20px;
-    text-align: center;
-    border: 1.5px solid rgba(184, 32, 29, 0.4);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
-    transition: 0.3s;
+.why-us-content {
+    width: 50%;
 }
 
-.card:hover {
-    transform: translateY(-6px);
+.why-us-content h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 2.5rem;
+    color: #7a0006;
+    font-weight: 700;
+    margin-bottom: 35px;
 }
 
-.icon-big {
-    width: 110px;
-    margin: 0 auto;
+.why-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 24px;
 }
 
-/* =======================
-   8. HOW
-======================= */
-.how {
-    padding: 60px 0;
-    text-align: center;
-    border-top: 4px solid #8b0000;
-    margin-top: 40px;
+.why-icon-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #7a0006;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0; /* Mencegah ikon menyusut */
+    box-shadow: 0 4px 10px rgba(122, 0, 6, 0.2);
 }
 
-.steps {
+.why-icon-box .material-symbols-outlined {
+    font-size: 20px;
+}
+
+.why-text h4 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #111111;
+    margin-bottom: 4px;
+}
+
+.why-text p {
+    font-family: 'Manrope', sans-serif;
+    font-size: 14px;
+    color: #666666;
+    line-height: 1.5;
+}
+
+/* Wadah Gambar Kanan dengan Sudut Lembut */
+.why-us-media {
+    width: 45%;
     display: flex;
     justify-content: center;
-    gap: 25px;
+}
+
+.why-us-media img {
+    width: 100%;
+    height: auto;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+    object-fit: contain;
+}
+
+/* ==========================================================================
+   RESPONSIVE MEDIA QUERIES (HANDPHONE & TABLET)
+   ========================================================================== */
+@media (max-width: 1200px) {
+    .features-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .features-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .header-right {
+        text-align: left;
+    }
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .why-us-flex {
+        flex-direction: column;
+        gap: 40px;
+    }
+    .why-us-content, .why-us-media {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+    .why-us-content h2, .features-header h2 {
+        font-size: 2rem;
+    }
+}
+
+/* ==========================================================================
+   8. TIM PENGEMBANG SECTION
+   ========================================================================== */
+.team-section {
+    padding: 80px 0;
+    background-color: #ffffff;
+    text-align: center;
+}
+
+.team-header h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 2.5rem;
+    color: #7a0006;
+    font-weight: 700;
+    margin-bottom: 50px;
+}
+
+/* Pembungkus kartu agar otomatis simetris di tengah halaman */
+.team-grid {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
     flex-wrap: wrap;
 }
 
-.step-card {
-    background: #fff;
-    padding: 25px;
-    border-radius: 20px;
-    width: 260px;
-    text-align: center;
-    border: 1.5px solid rgba(184, 32, 29, 0.4);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+.team-card {
+    background: #ffffff;
+    border: 1px solid #f3f4f6;
+    border-radius: 24px;
+    padding: 40px 30px;
+    width: 320px; /* Ukuran lebar proporsional sesuai contoh */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.arrow {
-    font-size: 28px;
-    color: #8b0000;
+.team-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 35px rgba(122, 0, 6, 0.06);
+}
+
+/* Penataan lingkaran foto profil */
+.avatar-wrapper {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 24px;
+    border: 3px solid #fdf2f2;
+}
+
+.avatar-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.team-card h3 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.35rem;
+    color: #111111;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.team-card .role {
+    font-family: 'Manrope', sans-serif;
+    font-size: 14px;
+    color: #7a7a7a;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+/* Pembungkus Ikon Bulat di Bagian Bawah Kartu */
+.team-socials {
+    display: flex;
+    gap: 12px;
+}
+
+.social-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #f5f5f7;
+    color: #7a7a7a;
     display: flex;
     align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.social-icon .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.social-icon:hover {
+    background-color: #7a0006;
+    color: #ffffff;
+    transform: scale(1.08);
+}
+
+/* Responsive Handler untuk HP */
+@media (max-width: 576px) {
+    .team-header h2 {
+        font-size: 2rem;
+    }
+    .team-card {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+/* Container Utama Banner CTA */
+.cta-banner-section {
+    width: 100%;
+    padding: 60px 24px;        /* Memberikan ruang atas-bawah yang lega */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+/* Pembungkus Konten di Dalamnya */
+.cta-banner__container {
+    max-width: 800px;          /* Membatasi bentangan teks agar rapi */
+    width: 100%;
+    text-align: center;        /* Memastikan semua teks & tombol rata tengah secara sempurna */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;                 /* Mengatur jarak vertikal antar elemen otomatis */
+}
+
+/* Pengaturan Teks Judul */
+.cta-banner__title {
+    color: #800000;
+    font-size: 2.2rem;         /* Ukuran font tebal dan besar */
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+/* Pengaturan Teks Deskripsi */
+.cta-banner__description {
+    color: #800000; /* Putih sedikit transparan agar nyaman dibaca */
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin: 0;
+    max-width: 650px;          /* Menjaga kalimat agar memotong baris dengan estetis */
+}
+
+/* Area Tombol */
+.cta-banner__action {
+    margin-top: 12px;          /* Jarak ekstra khusus untuk area tombol */
+}
+
+/* Desain Tombol Kapsul Putih */
+.cta-banner__button {
+    display: inline-block;
+    background-color: #ffffff;
+    color: #800000;            /* Teks tombol berwarna merah marun senada dengan background */
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;     /* Menghilangkan garis bawah tautan */
+    padding: 14px 40px;        /* Membuat tombol lebih lebar ke samping */
+    border-radius: 50px;       /* Membuat bentuk bulat kapsul sempurna (Pill Shape) */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* Efek bayangan halus di bawah tombol */
+    transition: all 0.3s ease; /* Animasi transisi halus saat di-hover */
+}
+
+/* Efek Ketika Tombol Disentuh Kursor (Hover) */
+.cta-banner__button:hover {
+    background-color: #f5f5f5; /* Sedikit memudar ke abu-abu terang */
+    transform: translateY(-2px); /* Tombol sedikit terangkat naik memberikan efek dinamis */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
 /* =======================
    9. RESPONSIVE
 ======================= */
 @media (max-width: 1024px) {
-    .hero-flex,
     .top-features .container,
     .fitur-list {
         grid-template-columns: 1fr;
@@ -415,16 +840,121 @@ footer {
 
     .hero {
         padding-top: 80px;
+        min-height: auto;
+    }
+
+    .hero-flex {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .hero-text {
+        min-width: 0;
+        flex: 0 0 42%;
+        max-width: 42%;
+        text-align: left;
+    }
+
+    .hero-img {
+        min-width: 0;
+        flex: 0 0 58%;
+        max-width: 58%;
+        position: static;
+        right: auto;
+        top: auto;
+        margin: 0;
+        height: auto;
+    }
+
+    .hero-img img {
+        width: 100%;
+        height: auto;
+        max-width: 100%;
+    }
+
+    .hero-btn {
+        justify-content: flex-start;
     }
 }
 
 @media (max-width: 768px) {
+    .hero {
+        padding: 40px 0 60px;
+    }
+
+    .hero-flex {
+        gap: 16px;
+    }
+
+    .hero-text {
+        flex: 0 0 45%;
+        max-width: 45%;
+    }
+
+    .hero-img {
+        flex: 0 0 55%;
+        max-width: 55%;
+    }
+
     .hero-text h1 {
-        font-size: 3rem;
+        font-size: 1.8rem;
+    }
+
+    .hero-text p {
+        font-size: 0.95rem;
+    }
+
+    .hero-btn {
+        justify-content: flex-start;
+        gap: 12px;
     }
 
     .btn,
     .btn-login {
         width: 100%;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero {
+        padding: 30px 0 40px;
+    }
+
+    .hero-flex {
+        gap: 12px;
+    }
+
+    .hero-text {
+        flex: 0 0 48%;
+        max-width: 48%;
+    }
+
+    .hero-img {
+        flex: 0 0 52%;
+        max-width: 52%;
+    }
+
+    .hero-text h1 {
+        font-size: 1.6rem;
+        line-height: 1.1;
+    }
+
+    .hero-text p {
+        font-size: 0.9rem;
+    }
+
+    .hero-btn {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .btn,
+    .btn-login {
+        width: 100%;
+        padding: 12px 16px;
     }
 }

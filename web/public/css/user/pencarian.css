@@ -422,6 +422,7 @@ a { text-decoration: none; color: inherit; }
     font-size: 12px;
     line-height: 1.45;
     color: #272727;
+    white-space: pre-line !important;
 }
 
 .lh-result-view__sources p {

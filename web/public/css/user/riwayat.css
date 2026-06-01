@@ -9,6 +9,83 @@
     gap: 16px;
 }
 
+.riwayat-pagination-info {
+    margin-top: 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    color: #7f6668;
+}
+
+.riwayat-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.riwayat-pagination__pages {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.riwayat-pagination__nav,
+.riwayat-pagination__page {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 42px;
+    min-height: 42px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid #e2c9ce;
+    background: linear-gradient(180deg, #ffffff 0%, #fff6f7 100%);
+    color: #7a5558;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(196, 30, 58, 0.08);
+    transition: all 0.2s ease;
+}
+
+.riwayat-pagination__nav:hover:not(:disabled),
+.riwayat-pagination__page:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: #c41e3a;
+    color: #c41e3a;
+    box-shadow: 0 6px 16px rgba(196, 30, 58, 0.14);
+}
+
+.riwayat-pagination__nav:disabled,
+.riwayat-pagination__page:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.riwayat-pagination__page.is-active {
+    background: linear-gradient(180deg, #c31f24 0%, #8f1215 100%);
+    color: #fff;
+    border-color: #8f1215;
+    box-shadow: 0 8px 18px rgba(143, 18, 21, 0.24);
+}
+
+.riwayat-pagination__ellipsis {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    color: #a08486;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+}
+
 /* Group by date - Softer borders & shadows */
 .riwayat-group {
     position: relative;
@@ -400,6 +477,7 @@
 .riwayat-result-summary {
     color: #3d3d3d;
     font-size: 13px;
+    white-space: pre-line;
 }
 
 .riwayat-result-footnote {
@@ -798,6 +876,17 @@
     .riwayat-item-container {
         gap: 10px;
     }
+
+    .riwayat-pagination {
+        gap: 8px;
+    }
+
+    .riwayat-pagination__nav,
+    .riwayat-pagination__page {
+        min-height: 38px;
+        padding: 9px 12px;
+        font-size: 12px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -870,6 +959,27 @@
 
     .riwayat-empty p {
         font-size: 12px;
+    }
+
+    .riwayat-pagination-info {
+        font-size: 11px;
+        margin-top: 14px;
+    }
+
+    .riwayat-pagination {
+        gap: 6px;
+    }
+
+    .riwayat-pagination__pages {
+        gap: 6px;
+    }
+
+    .riwayat-pagination__nav,
+    .riwayat-pagination__page {
+        min-width: 36px;
+        min-height: 36px;
+        padding: 8px 10px;
+        font-size: 11px;
     }
 }
 

@@ -63,6 +63,7 @@ class ImageDetectionController extends Controller
             ]);
             log::info('Request baru dibuat dengan ID: ' . $url);
             // 4. Panggil API Python
+            Log::info('SEBELUM PYTHON');
             $response = Http::timeout(300)
         ->post('http://localhost:8004/image-detection', [
             'image_url' => $url
@@ -73,6 +74,7 @@ class ImageDetectionController extends Controller
                 $links = collect($res['data'])
     ->pluck('link')
     ->toArray();
+    Log::info('SESUDAH PYTHON');
                 // 5. Simpan ke tabel 'image_search_results'
                 ImageSearchResults::create([
                     'request_id' => $newReq->id,
@@ -97,7 +99,7 @@ class ImageDetectionController extends Controller
                     'final_confidence' => $res['confidence'],
                     'status' => 'completed'
                 ]);
-                $finalLabel = $isHoax ? 'HOAX' : 'FAKTA';
+                $finalLabel = $isHoax ? 'FAKE' : 'FAKTA';
 
                 // 7. RETURN SESUAI FIGMA
                 return response()->json([

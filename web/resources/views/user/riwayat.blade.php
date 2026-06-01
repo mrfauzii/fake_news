@@ -25,6 +25,9 @@
             <div class="riwayat-list" id="riwayatContainer">
             </div>
 
+            <div class="riwayat-pagination-info" id="riwayatPaginationInfo" hidden></div>
+            <div class="riwayat-pagination" id="riwayatPagination" hidden></div>
+
             <div class="riwayat-empty" id="emptyState" style="display: none;">
                 <iconify-icon icon="mdi:history" width="80" height="80"></iconify-icon>
                 <h2>Tidak Ada Riwayat</h2>
@@ -45,7 +48,7 @@
 
 @push('scripts')
 <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-<script src="{{ asset('js/user/riwayat.js') }}?v=3"></script>
+<script src="{{ asset('js/user/riwayat.js') }}?v=4"></script>
 <script src="{{ asset('js/user/profile-popup.js') }}"></script>
 
 <script>

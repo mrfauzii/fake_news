@@ -3,19 +3,26 @@
  * Handles form submission, file uploads, and result display
  */
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener("DOMContentLoaded", function () {
     // Element references
-    const inputInformasi = document.getElementById('inputInformasi');
-    const fileInput = document.getElementById('fileInput');
-    const btnUnggah = document.getElementById('btnUnggah');
-    const btnTelusuri = document.getElementById('btnTelusuri');
-    const hasilPenelusuran = document.getElementById('hasilPenelusuran');
-    const imagePreviewContainer = document.getElementById('imagePreviewContainer');
-    const imagePreview = document.getElementById('imagePreview');
+    const inputInformasi = document.getElementById("inputInformasi");
+    const fileInput = document.getElementById("fileInput");
+    const btnUnggah = document.getElementById("btnUnggah");
+    const btnTelusuri = document.getElementById("btnTelusuri");
+    const hasilPenelusuran = document.getElementById("hasilPenelusuran");
+    const imagePreviewContainer = document.getElementById(
+        "imagePreviewContainer",
+    );
+    const imagePreview = document.getElementById("imagePreview");
     const searchParams = new URLSearchParams(window.location.search);
-    const prefilledInformasi = (searchParams.get('informasi') || searchParams.get('q') || '').trim();
+    const prefilledInformasi = (
+        searchParams.get("informasi") ||
+        searchParams.get("q") ||
+        ""
+    ).trim();
     // Get CSRF token from meta tag
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    const csrfToken =
+        document.querySelector('meta[name="csrf-token"]')?.content || "";
 
     // State: store uploaded file for later processing
     let uploadedFile = null;
@@ -26,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
     /**
      * Handle upload button click
      */
-    btnUnggah.addEventListener('click', function () {
+    btnUnggah.addEventListener("click", function () {
         // clearImagePreview(); // Clear previous preview if any
         fileInput.click();
     });
@@ -34,22 +41,22 @@ document.addEventListener('DOMContentLoaded', function () {
     /**
      * Handle file selection
      */
-    fileInput.addEventListener('change', function (event) {
+    fileInput.addEventListener("change", function (event) {
         const file = event.target.files[0];
         if (!file) return;
 
         // Validate file type
-        if (!file.type.startsWith('image/')) {
-            showError('File harus berupa gambar (JPEG, PNG, GIF)');
-            fileInput.value = ''; // Reset input
+        if (!file.type.startsWith("image/")) {
+            showError("File harus berupa gambar (JPEG, PNG, GIF)");
+            fileInput.value = ""; // Reset input
             return;
         }
 
         // Validate file size (5MB max)
         const maxSize = 5 * 1024 * 1024; // 5MB
         if (file.size > maxSize) {
-            showError('Ukuran file maksimal 5MB');
-            fileInput.value = '';
+            showError("Ukuran file maksimal 5MB");
+            fileInput.value = "";
             return;
         }
 
@@ -61,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
     /**
      * Handle search button click
      */
-    btnTelusuri.addEventListener('click', function () {
+    btnTelusuri.addEventListener("click", function () {
         // If file is uploaded, search by image
         if (uploadedFile) {
             performImageSearch(uploadedFile);
@@ -72,12 +79,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const informasi = inputInformasi.value.trim();
 
         if (!informasi) {
-            showError('Silakan masukkan informasi terlebih dahulu');
+            showError("Silakan masukkan informasi terlebih dahulu");
             return;
         }
 
         if (informasi.length < 10) {
-            showError('Informasi minimal harus 10 karakter');
+            showError("Informasi minimal harus 10 karakter");
             return;
         }
 
@@ -87,8 +94,8 @@ document.addEventListener('DOMContentLoaded', function () {
     /**
      * Allow Enter key to search (Ctrl+Enter or Cmd+Enter)
      */
-    inputInformasi.addEventListener('keydown', function (event) {
-        if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+    inputInformasi.addEventListener("keydown", function (event) {
+        if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
             event.preventDefault();
             btnTelusuri.click();
         }
@@ -97,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function () {
     /**
      * Clear image preview when user focuses on textarea
      */
-    inputInformasi.addEventListener('focus', function () {
+    inputInformasi.addEventListener("focus", function () {
         if (uploadedFile) {
             clearImagePreview();
         }
@@ -113,8 +120,8 @@ document.addEventListener('DOMContentLoaded', function () {
         reader.onload = function (e) {
             const imageDataUrl = e.target.result;
             imagePreview.src = imageDataUrl;
-            imagePreviewContainer.style.display = 'block';
-            inputInformasi.style.display = 'none'; // Hide textarea when image is shown
+            imagePreviewContainer.style.display = "block";
+            inputInformasi.style.display = "none"; // Hide textarea when image is shown
         };
         reader.readAsDataURL(file);
     }
@@ -123,39 +130,39 @@ document.addEventListener('DOMContentLoaded', function () {
      * Clear image preview and show textarea again
      */
     function clearImagePreview() {
-        imagePreviewContainer.style.display = 'none';
-        imagePreview.src = '';
-        inputInformasi.style.display = 'block';
+        imagePreviewContainer.style.display = "none";
+        imagePreview.src = "";
+        inputInformasi.style.display = "block";
         uploadedFile = null;
-        fileInput.value = '';
+        fileInput.value = "";
     }
 
     /**
      * Search by text
      */
-    function searchText(informasi, skip_similarity = 0 ) {
+    function searchText(informasi, skip_similarity = 0) {
         showLoading();
         clearImagePreview(); // Clear image preview when searching by text
 
         // 1. UBAH URL ke /telusuri
-        fetch('/telusuri', {
-            method: 'POST',
+        fetch("/telusuri", {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken,
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": csrfToken,
             },
             body: JSON.stringify({
-                informasi: informasi, 
-                skip_similarity: skip_similarity
+                informasi: informasi,
+                skip_similarity: skip_similarity,
             }),
         })
-            .then(response => {
+            .then((response) => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.json(); // Sedot JSON-nya 1 kali
             })
-            .then(data => {
+            .then((data) => {
                 // 🔥 PERBAIKAN LAPISAN KEDUA:
                 // Cek apakah ada lapisan kedua bernama 'data', kalau ada ambil isinya, kalau tidak pakai langsung
                 const actualData = data.data ? data.data : data;
@@ -163,12 +170,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (actualData.success) {
                     displayResult(actualData);
                 } else {
-                    showError(actualData.message || 'Terjadi kesalahan. Silakan coba lagi.');
+                    showError(
+                        actualData.message ||
+                            "Terjadi kesalahan. Silakan coba lagi.",
+                    );
                 }
             })
-            .catch(error => {
-                console.error('Search error:', error);
-                showError('Gagal menghubungi server. Periksa koneksi internet Anda.');
+            .catch((error) => {
+                console.error("Search error:", error);
+                showError(
+                    "Gagal menghubungi server. Periksa koneksi internet Anda.",
+                );
             });
     }
 
@@ -179,39 +191,45 @@ document.addEventListener('DOMContentLoaded', function () {
         showLoading();
 
         const formData = new FormData();
-        formData.append('gambar', file);
+        formData.append("gambar", file);
 
-        fetch('/telusuri-gambar', {
-            method: 'POST',
+        fetch("/telusuri-gambar", {
+            method: "POST",
             headers: {
-                'X-CSRF-TOKEN': csrfToken,
+                "X-CSRF-TOKEN": csrfToken,
             },
             body: formData,
         })
-            .then(response => {
+            .then((response) => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.json();
             })
-            .then(data => {
+            .then((data) => {
                 // Support both 'status' and 'success' response format
-                const isSuccess = data.status === 'success' || data.success === true;
-                
+                const isSuccess =
+                    data.status === "success" || data.success === true;
+
                 if (isSuccess) {
                     // Handle both response formats
                     const resultData = data;
                     displayResult(resultData);
-                // clearImagePreview();
+                    // clearImagePreview();
                 } else {
-                    showError(data.message || 'Gagal mengupload gambar. Silakan coba lagi.');
-                    fileInput.value = '';
+                    showError(
+                        data.message ||
+                            "Gagal mengupload gambar. Silakan coba lagi.",
+                    );
+                    fileInput.value = "";
                 }
             })
-            .catch(error => {
-                console.error('Upload error:', error);
-                showError('Gagal mengupload gambar. Periksa koneksi internet Anda.');
-                fileInput.value = '';
+            .catch((error) => {
+                console.error("Upload error:", error);
+                showError(
+                    "Gagal mengupload gambar. Periksa koneksi internet Anda.",
+                );
+                fileInput.value = "";
             });
     }
 
@@ -242,78 +260,88 @@ document.addEventListener('DOMContentLoaded', function () {
      * Display search result
      */
     function displayResult(data) {
-    // Selalu update ID request terbaru ke variabel global
-    currentRequestId = data.raw_data?.request_id || null;
+        // Selalu update ID request terbaru ke variabel global
+        currentRequestId = data.raw_data?.request_id || null;
 
-    let verdict = data.verdict || data.indication;
-    let confidence = data.confidence || data.confidence_score?.hoax || 50;
-    let summary = data.summary;
-    let sources = data.sources;
-    const isSimilar = data.is_similar === true;
+        let verdict = data.verdict || data.indication;
+        let confidence = data.confidence || data.confidence_score?.hoax || 50;
+        let summary = data.summary;
+        console.log(summary);
+        let sources = data.sources;
+        const isSimilar = data.is_similar === true;
 
-    // Normalize and map verdict label
-    const normalizedVerdict = String(verdict || '').toLowerCase();
-    console.log(normalizedVerdict);
-    const verdictMap = {
-        fake: { label: 'HOAX', className: 'lh-verdict--hoax' },
-        valid: { label: 'FAKTA', className: 'lh-verdict--valid' },
-        unclear: { label: 'PERLU VERIFIKASI', className: 'lh-verdict--unclear' },
-        fakta: { label: 'FAKTA', className: 'lh-verdict--valid' },
-    };
+        // Normalize and map verdict label
+        const normalizedVerdict = String(verdict || "").toLowerCase();
+        const verdictMap = {
+            fake: { label: "HOAX", className: "lh-verdict--hoax" },
+            valid: { label: "FAKTA", className: "lh-verdict--valid" },
+            unclear: {
+                label: "PERLU VERIFIKASI",
+                className: "lh-verdict--unclear",
+            },
+            fakta: { label: "FAKTA", className: "lh-verdict--valid" },
+        };
 
-    const verdictInfo = verdictMap[normalizedVerdict] || verdictMap.unclear;
+        const verdictInfo = verdictMap[normalizedVerdict] || verdictMap.unclear;
 
-    const safeConfidence = Number.isFinite(Number(confidence))
-        ? Math.max(0, Math.min(100, Math.round(Number(confidence))))
-        : 50;
+        const safeConfidence = Number.isFinite(Number(confidence))
+            ? Math.max(0, Math.min(100, Math.round(Number(confidence))))
+            : 50;
 
-    let hoaxPercent = safeConfidence;
-    if (normalizedVerdict === 'valid') {
-        hoaxPercent = 100 - safeConfidence;
-    } else if (normalizedVerdict === 'unclear') {
-        hoaxPercent = 50;
-    }
-    const faktaPercent = 100 - hoaxPercent;
-
-    // Build sources HTML
-    let sourcesHtml = '<li>Belum ada sumber yang terdeteksi.</li>';
-    let linkCounterArray = [];
-
-    // 1. Cek dan ubah teks string JSON menjadi Array JavaScript
-    if (data.link_counter) {
-        try {
-            linkCounterArray = typeof data.link_counter === 'string' 
-                ? JSON.parse(data.link_counter) 
-                : data.link_counter;
-        } catch (e) {
-            console.error("Gagal memproses data link_counter:", e);
+        let hoaxPercent = safeConfidence;
+        if (normalizedVerdict === "valid") {
+            hoaxPercent = 100 - safeConfidence;
+        } else if (normalizedVerdict === "unclear") {
+            hoaxPercent = 50;
         }
-    }
+        const faktaPercent = 100 - hoaxPercent;
 
-    // 2. Buat list HTML jika array URL berhasil didapatkan
-    if (Array.isArray(linkCounterArray) && linkCounterArray.length > 0) {
-        sourcesHtml = linkCounterArray.map((url, index) => {
-            const safeUrl = escapeHtml(url || '#');
-            return `<li>Sumber ${index + 1}: <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" style="word-break: break-all; color: #B71C1C;">${safeUrl}</a></li>`;
-        }).join('');
-    } 
-    // 3. Fallback (cadangan) jika link_counter kosong
-    else if (Array.isArray(sources) && sources.length > 0) {
-        sourcesHtml = sources.map((url, index) => {
-            const safeUrl = escapeHtml(url);
-            return `<li>
+        // Build sources HTML
+        let sourcesHtml = "<li>Belum ada sumber yang terdeteksi.</li>";
+        let linkCounterArray = [];
+
+        // 1. Cek dan ubah teks string JSON menjadi Array JavaScript
+        if (data.link_counter) {
+            try {
+                linkCounterArray =
+                    typeof data.link_counter === "string"
+                        ? JSON.parse(data.link_counter)
+                        : data.link_counter;
+            } catch (e) {
+                console.error("Gagal memproses data link_counter:", e);
+            }
+        }
+
+        // 2. Buat list HTML jika array URL berhasil didapatkan
+        if (Array.isArray(linkCounterArray) && linkCounterArray.length > 0) {
+            sourcesHtml = linkCounterArray
+                .map((url, index) => {
+                    const safeUrl = escapeHtml(url || "#");
+                    return `<li>Sumber ${index + 1}: <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" style="word-break: break-all; color: #B71C1C;">${safeUrl}</a></li>`;
+                })
+                .join("");
+        }
+        // 3. Fallback (cadangan) jika link_counter kosong
+        else if (Array.isArray(sources) && sources.length > 0) {
+            sourcesHtml = sources
+                .map((url, index) => {
+                    const safeUrl = escapeHtml(url);
+                    return `<li>
                 Sumber ${index + 1}:
                 <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" style="word-break: break-all;">
                     ${safeUrl}
                 </a>
             </li>`;
-        }).join('');
-    }
+                })
+                .join("");
+        }
 
-    const safeSummary = escapeHtml(summary || 'Belum ada penjelasan detail untuk hasil pencarian ini.');
-    const badgeLeftPercent = Math.max(8, Math.min(92, hoaxPercent));
+        const safeSummary = escapeHtml(
+            summary || "Belum ada penjelasan detail untuk hasil pencarian ini.",
+        );
+        const badgeLeftPercent = Math.max(8, Math.min(92, hoaxPercent));
 
-    hasilPenelusuran.innerHTML = `
+        hasilPenelusuran.innerHTML = `
         <article class="lh-result-view">
             <div class="lh-result-view__head">
                 <p class="lh-result-view__lead">Informasi tersebut terindikasi :</p>
@@ -348,19 +376,27 @@ document.addEventListener('DOMContentLoaded', function () {
             <hr class="lh-result-view__divider">
 
             <section class="lh-result-view__footer">
-                ${isSimilar ? `
+                ${
+                    isSimilar
+                        ? `
                 <p>
-                    Informasi ini telah ditelusuri beberapa orang dengan hasil yang sama sebelumnya.
-                    Ingin memulai penelusuran kembali untuk informasi yang lebih baru?
+                    Data serupa sudah pernah dianalisis sebelumnya.
+                    Ingin melakukan analisis ulang?
                 </p>
-                ` : ''}
+                `
+                        : ""
+                }
                 <div style="display:flex; gap:12px; align-items:center;">
-                    ${isSimilar ? `
+                    ${
+                        isSimilar
+                            ? `
                     <button class="lh-btn lh-btn--search lh-result-action" id="btnTelusuriUlang" type="button">
                         <iconify-icon icon="ic:outline-search" width="22" height="22"></iconify-icon>
                         Telusuri Ulang
                     </button>
-                    ` : ''}
+                    `
+                            : ""
+                    }
                     <button class="lh-btn lh-btn--upload lh-result-action" id="btnFeedback" type="button">
                         <iconify-icon icon="ic:outline-feedback" width="20" height="20"></iconify-icon>
                         Umpan Balik
@@ -370,122 +406,131 @@ document.addEventListener('DOMContentLoaded', function () {
         </article>
     `;
 
-    // Tombol Telusuri Ulang
-    const btnTelusuriUlang = document.getElementById('btnTelusuriUlang');
-    if (btnTelusuriUlang) {
-        btnTelusuriUlang.addEventListener('click', function () {
-            const informasi = inputInformasi.value.trim();
+        // Tombol Telusuri Ulang
+        const btnTelusuriUlang = document.getElementById("btnTelusuriUlang");
+        if (btnTelusuriUlang) {
+            btnTelusuriUlang.addEventListener("click", function () {
+                const informasi = inputInformasi.value.trim();
 
-        if (!informasi) {
-            showError('Silakan masukkan informasi terlebih dahulu');
-            return;
-        }
-
-        if (informasi.length < 10) {
-            showError('Informasi minimal harus 10 karakter');
-            return;
-        }
-
-        searchText(informasi, skip_similarity = 1);
-        });
-    }
-
-    // Feedback button handler: open modal
-    const btnFeedback = document.getElementById('btnFeedback');
-    if (btnFeedback) {
-        btnFeedback.addEventListener('click', function () {
-            const feedbackModal = document.getElementById('feedbackModal');
-            const feedbackText = document.getElementById('feedbackText');
-            if (feedbackModal) {
-                feedbackModal.style.display = 'block';
-                feedbackText.value = '';
-                feedbackText.focus();
-            }
-        });
-    }
-}
-// ==================== Modal Feedback Actions ====================
-
-const btnSubmitFeedback = document.getElementById('btnSubmitFeedback');
-const btnCancelFeedback = document.getElementById('btnCancelFeedback');
-const feedbackOverlay = document.getElementById('feedbackOverlay');
-
-function closeFeedbackModal() {
-    const feedbackModal = document.getElementById('feedbackModal');
-    const statusEl = document.getElementById('feedbackStatus');
-    if (feedbackModal) feedbackModal.style.display = 'none';
-    if (statusEl) statusEl.textContent = ''; // Bersihkan pesan status saat tutup modal
-}
-
-// Tutup modal jika klik tombol batal atau area luar modal
-if (btnCancelFeedback) {
-    btnCancelFeedback.addEventListener('click', closeFeedbackModal);
-}
-if (feedbackOverlay) {
-    feedbackOverlay.addEventListener('click', closeFeedbackModal);
-}
-
-// Fungsi Submit - Hanya diikat 1x ke DOM
-if (btnSubmitFeedback) {
-    btnSubmitFeedback.addEventListener('click', function () {
-        const feedbackTextEl = document.getElementById('feedbackText');
-        const statusEl = document.getElementById('feedbackStatus');
-        const text = (feedbackTextEl && feedbackTextEl.value || '').trim();
-
-        if (!text) {
-            if (statusEl) statusEl.textContent = 'Silakan masukkan umpan balik sebelum mengirim.';
-            return;
-        }
-
-        // Matikan tombol sementara agar tidak diklik berkali-kali
-        btnSubmitFeedback.disabled = true;
-        if (statusEl) statusEl.textContent = 'Mengirim...';
-
-        // Kirim API feedback dengan currentRequestId yang paling baru
-        fetch('/feedback', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken,
-            },
-            body: JSON.stringify({
-                feedback: text,
-                request_id: currentRequestId, // Pastikan memanggil variabel global
-            }),
-        })
-            .then(resp => resp.json())
-            .then(resdata => {
-                if (statusEl) {
-                    statusEl.textContent = (resdata.success || resdata.status === 'success') 
-                        ? 'Terima kasih, umpan balik berhasil dikirim.' 
-                        : (resdata.message || 'Gagal mengirim umpan balik.');
+                if (!informasi) {
+                    showError("Silakan masukkan informasi terlebih dahulu");
+                    return;
                 }
-                setTimeout(() => { 
-                    closeFeedbackModal(); 
-                }, 1400);
-            })
-            .catch(err => {
-                console.error('Feedback error:', err);
-                if (statusEl) statusEl.textContent = 'Terjadi kesalahan saat mengirim umpan balik.';
-            })
-            .finally(() => { 
-                btnSubmitFeedback.disabled = false; 
+
+                if (informasi.length < 10) {
+                    showError("Informasi minimal harus 10 karakter");
+                    return;
+                }
+
+                searchText(informasi, (skip_similarity = 1));
             });
-    });
-} 
-/**
+        }
+
+        // Feedback button handler: open modal
+        const btnFeedback = document.getElementById("btnFeedback");
+        if (btnFeedback) {
+            btnFeedback.addEventListener("click", function () {
+                const feedbackModal = document.getElementById("feedbackModal");
+                const feedbackText = document.getElementById("feedbackText");
+                if (feedbackModal) {
+                    feedbackModal.style.display = "block";
+                    feedbackText.value = "";
+                    feedbackText.focus();
+                }
+            });
+        }
+    }
+    // ==================== Modal Feedback Actions ====================
+
+    const btnSubmitFeedback = document.getElementById("btnSubmitFeedback");
+    const btnCancelFeedback = document.getElementById("btnCancelFeedback");
+    const feedbackOverlay = document.getElementById("feedbackOverlay");
+
+    function closeFeedbackModal() {
+        const feedbackModal = document.getElementById("feedbackModal");
+        const statusEl = document.getElementById("feedbackStatus");
+        if (feedbackModal) feedbackModal.style.display = "none";
+        if (statusEl) statusEl.textContent = ""; // Bersihkan pesan status saat tutup modal
+    }
+
+    // Tutup modal jika klik tombol batal atau area luar modal
+    if (btnCancelFeedback) {
+        btnCancelFeedback.addEventListener("click", closeFeedbackModal);
+    }
+    if (feedbackOverlay) {
+        feedbackOverlay.addEventListener("click", closeFeedbackModal);
+    }
+
+    // Fungsi Submit - Hanya diikat 1x ke DOM
+    if (btnSubmitFeedback) {
+        btnSubmitFeedback.addEventListener("click", function () {
+            const feedbackTextEl = document.getElementById("feedbackText");
+            const statusEl = document.getElementById("feedbackStatus");
+            const text = (
+                (feedbackTextEl && feedbackTextEl.value) ||
+                ""
+            ).trim();
+
+            if (!text) {
+                if (statusEl)
+                    statusEl.textContent =
+                        "Silakan masukkan umpan balik sebelum mengirim.";
+                return;
+            }
+
+            // Matikan tombol sementara agar tidak diklik berkali-kali
+            btnSubmitFeedback.disabled = true;
+            if (statusEl) statusEl.textContent = "Mengirim...";
+
+            // Kirim API feedback dengan currentRequestId yang paling baru
+            fetch("/feedback", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": csrfToken,
+                },
+                body: JSON.stringify({
+                    feedback: text,
+                    request_id: currentRequestId, // Pastikan memanggil variabel global
+                }),
+            })
+                .then((resp) => resp.json())
+                .then((resdata) => {
+                    if (statusEl) {
+                        statusEl.textContent =
+                            resdata.success || resdata.status === "success"
+                                ? "Terima kasih, umpan balik berhasil dikirim."
+                                : resdata.message ||
+                                  "Gagal mengirim umpan balik.";
+                    }
+                    setTimeout(() => {
+                        closeFeedbackModal();
+                    }, 1400);
+                })
+                .catch((err) => {
+                    console.error("Feedback error:", err);
+                    if (statusEl)
+                        statusEl.textContent =
+                            "Terjadi kesalahan saat mengirim umpan balik.";
+                })
+                .finally(() => {
+                    btnSubmitFeedback.disabled = false;
+                });
+        });
+    }
+    /**
      * Escape HTML to prevent XSS
      */
     function escapeHtml(text) {
-        if (!text) return '';
-        const div = document.createElement('div');
+        if (!text) return "";
+        const div = document.createElement("div");
         div.textContent = text;
         return div.innerHTML;
     }
 
     // ==================== Clear empty state on first focus ====================
-    inputInformasi.addEventListener('focus', function () {
-        if (hasilPenelusuran.innerHTML.includes('lh-result-empty')) {
+    inputInformasi.addEventListener("focus", function () {
+        if (hasilPenelusuran.innerHTML.includes("lh-result-empty")) {
             hasilPenelusuran.innerHTML = `
                 <div class="lh-result-empty">
                     Masukkan informasi atau upload gambar untuk mulai penelusuran

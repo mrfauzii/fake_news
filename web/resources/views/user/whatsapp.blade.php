@@ -25,18 +25,96 @@
                 </div>
 
                 <div class="wa-hero__text">
-                    <h1>Cek Hoax Langsung<br>Via Whatsapp</h1>
+                    <h1>Cek Hoaks Langsung via WhatsApp</h1>
+                    <p>Periksa kebenaran informasi dengan mudah melalui WhatsApp.</p>
+
                     <p>
-                        Lebih praktis tanpa ribet. Kini Anda dapat memverifikasi kebenaran informasi
-                        langsung melalui WhatsApp.
+                        Klik <strong>Cek via WhatsApp</strong>, kirim atau teruskan pesan yang ingin diverifikasi,
+                        lalu tunggu hasilnya. Setelah terhubung dengan bot Lensa Hoax, Anda dapat menggunakan
+                        nomor WhatsApp yang sama untuk login ke website.
                     </p>
-                    <p>
-                        Cukup kirim atau teruskan (forward) pesan yang Anda terima tanpa perlu membuka website.
-                    </p>
+
+                    <p><strong>Klik Cek via WhatsApp untuk memulai.</strong></p>
+
                     <a id="wa-cta" href="#" class="wa-btn-cta">
                         <iconify-icon icon="garden:whatsapp-fill-16" width="25" height="25"></iconify-icon>
                         Cek Via WhatsApp
                     </a>
+                </div>
+            </section>
+
+            <section class="wa-steps">
+                <h2>Alur singkat penggunaan</h2>
+                <div class="wa-steps__grid">
+                    <article class="wa-step-card">
+                        <iconify-icon icon="mdi:cursor-default-click" width="52" height="52"></iconify-icon>
+                        <h3>1. Buka WhatsApp</h3>
+                        <p>Tekan tombol Cek Via WhatsApp untuk memulai percakapan dengan bot.</p>
+                    </article>
+
+                    <div class="wa-step-arrow"><iconify-icon icon="mdi:arrow-right-bold" width="46" height="46"></iconify-icon></div>
+
+                    <article class="wa-step-card">
+                        <iconify-icon icon="mdi:message-question" width="52" height="52"></iconify-icon>
+                        <h3>2. Kirim command</h3>
+                        <p>Gunakan command seperti #detect, #info, #trending, atau #history sesuai kebutuhan.</p>
+                    </article>
+
+                    <div class="wa-step-arrow"><iconify-icon icon="mdi:arrow-right-bold" width="46" height="46"></iconify-icon></div>
+
+                    <article class="wa-step-card">
+                        <iconify-icon icon="line-md:loading-alt-loop" width="52" height="52"></iconify-icon>
+                        <h3>3. Lihat hasilnya</h3>
+                        <p>Sistem akan memproses pesan dan menampilkan hasil secara cepat dan akurat.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="wa-commands">
+                <div class="wa-section-heading">
+                    <span class="wa-section-heading__eyebrow">Command Bot</span>
+                    <h2>Fitur utama via WhatsApp</h2>
+                    <p>
+                        Gunakan command berikut untuk mengakses fitur bot dengan cepat dan terarah.
+                    </p>
+                </div>
+                <div class="wa-command-grid">
+                    <article class="wa-command-card">
+                        <div class="wa-command-card__icon wa-command-card__icon--detect">
+                            <iconify-icon icon="mdi:shield-search-outline" width="24" height="24"></iconify-icon>
+                        </div>
+                        <div>
+                            <h3>#detect</h3>
+                            <p>Periksa keaslian pesan terakhir yang Anda kirim.</p>
+                        </div>
+                    </article>
+                    <article class="wa-command-card">
+                        <div class="wa-command-card__icon wa-command-card__icon--info">
+                            <iconify-icon icon="mdi:information-outline" width="24" height="24"></iconify-icon>
+                        </div>
+                        <div>
+                            <h3>#info</h3>
+                            <p>Lihat informasi tentang sistem Lensa Hoax.</p>
+                        </div>
+                    </article>
+                    <article class="wa-command-card">
+                        <div class="wa-command-card__icon wa-command-card__icon--trend">
+                            <iconify-icon icon="mdi:trending-up" width="24" height="24"></iconify-icon>
+                        </div>
+                        <div>
+                            <h3>#trending</h3>
+                            <p>Lihat daftar tren hoaks terpopuler saat ini.</p>
+                        </div>
+                    </article>
+                    <article class="wa-command-card">
+                        <div class="wa-command-card__icon wa-command-card__icon--history">
+                            <iconify-icon icon="mdi:history" width="24" height="24"></iconify-icon>
+                        </div>
+                        <div>
+                            <h3>#history</h3>
+                            <p>Lihat riwayat pencarian terakhir Anda di bot.</p>
+                        </div>
+                    </article>
                 </div>
             </section>
 
@@ -55,33 +133,6 @@
                 </div>
             </section>
 
-            <section class="wa-steps">
-                <h2>Cara Menggunakannya</h2>
-                <div class="wa-steps__grid">
-                    <article class="wa-step-card">
-                        <iconify-icon icon="mdi:cursor-default-click" width="52" height="52"></iconify-icon>
-                        <h3>Klik tombol WhatsApp</h3>
-                        <p>Anda akan langsung diarahkan ke percakapan dengan Lensa Hoax Bot.</p>
-                    </article>
-
-                    <div class="wa-step-arrow"><iconify-icon icon="mdi:arrow-right-bold" width="46" height="46"></iconify-icon></div>
-
-                    <article class="wa-step-card">
-                        <iconify-icon icon="mdi:message-question" width="52" height="52"></iconify-icon>
-                        <h3>Kirim atau teruskan pesan</h3>
-                        <p>Kirim berita, gambar, atau tautan yang ingin Anda periksa.</p>
-                    </article>
-
-                    <div class="wa-step-arrow"><iconify-icon icon="mdi:arrow-right-bold" width="46" height="46"></iconify-icon></div>
-
-                    <article class="wa-step-card">
-                        <iconify-icon icon="line-md:loading-alt-loop" width="52" height="52"></iconify-icon>
-                        <h3>Tunggu hasil verifikasi</h3>
-                        <p>Sistem akan menganalisis dan memberikan hasil apakah informasi tersebut hoaks atau fakta.</p>
-                    </article>
-                </div>
-            </section>
-
             <section class="wa-tips">
                 <h2>Tips</h2>
                 <div class="wa-tips__content">
@@ -97,6 +148,7 @@
                 </div>
             </section>
         </main>
+        @include('layouts.footer')
     </div>
     <script src="{{ asset('js/user/profile-popup.js') }}"></script>
 </body>

@@ -44,7 +44,7 @@ def search_from_text(knowledge_base, model, query_text, top_k=5):
     
 def insert_to_chroma(df, list_id, model, knowledge_base, batch_size=32):
     
-    df['teks_vektor'] = df.get('klaim', df.get('penjelasan')).fillna("")
+    df['teks_vektor'] = df.get('judul').fillna("")
     list_teks = df['teks_vektor'].tolist()
     clean_ids = [str(i) for i in list_id]
     device = "cuda" if torch.cuda.is_available() else "cpu"

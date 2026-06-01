@@ -20,6 +20,8 @@ use App\Http\Controllers\CsvController;
 use App\Http\Controllers\HistoryManagementController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\ScraperController;
+use App\Http\Controllers\LandingPageController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -27,10 +29,14 @@ use App\Http\Controllers\ScraperController;
 |--------------------------------------------------------------------------
 */
 
-// Landing Page
-Route::get('/', function () {
-    return view('landing_page.landing');
-})->name('beranda');
+// Landing Page 
+Route::get('/', [LandingPageController::class, 'index'])->name('beranda');
+
+// Footer information pages
+Route::view('/tentang-kami', 'footer.tentang-kami')->name('tentang.kami');
+Route::view('/kebijakan-privasi', 'footer.kebijakan-privasi')->name('kebijakan.privasi');
+Route::view('/panduan', 'footer.panduan-pengguna')->name('panduan.pengguna');
+Route::view('/faq', 'footer.faq')->name('faq');
 
 // Pencarian (public)
 Route::get('/pencarian', [PencarianController::class, 'index'])->name('deteksi');

@@ -120,8 +120,10 @@
     gap: 20px;
 }
 
-.footer-page__grid--two {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+ .footer-page__grid--two {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr)); 
+    gap: 16px; 
 }
 
 .footer-page__stack {
@@ -194,4 +196,355 @@
     .footer-page__lead {
         font-size: 1rem;
     }
+}
+
+/* ==========================================================================
+   HALAMAN FAQ
+   ========================================================================== */
+
+/* Efek interaksi ketika kartu FAQ di-hover */
+.faq-card-interactive {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                border-color 0.3s ease;
+}
+
+.faq-card-interactive:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(31, 41, 55, 0.1);
+    border-color: var(--footer-page-accent);
+}
+
+/* Styling Box Ikon di dalam kartu */
+.faq-icon-box {
+    width: 44px;
+    height: 44px;
+    background-color: var(--footer-page-accent-soft);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    transition: transform 0.3s ease;
+}
+
+.faq-icon-box .material-symbols-outlined {
+    color: var(--footer-page-accent);
+    font-size: 22px;
+    font-variation-settings: 'FILL' 1;
+}
+
+/* Efek putar mikro pada ikon saat kartu di-hover */
+.faq-card-interactive:hover .faq-icon-box {
+    transform: scale(1.1) rotate(5deg);
+}
+
+/* Penyelarasan tombol WhatsApp ke area bawah kartu */
+.faq-card__action {
+    margin-top: auto;
+    padding-top: 16px;
+}
+
+/* Tombol WhatsApp Hijau Standar */
+.faq-whatsapp-btn {
+    background-color: #25D366;
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.faq-whatsapp-btn .material-symbols-outlined {
+    font-size: 16px;
+}
+
+.faq-whatsapp-btn:hover {
+    opacity: 0.92;
+}
+
+.faq-whatsapp-btn:active {
+    transform: scale(0.96);
+}
+
+/* ==========================================================================
+    PANDUAN PENGGUNA
+   ========================================================================== */
+
+/* Utility Jarak Antar Section */
+.section-spacing {
+    padding-bottom: 64px;
+}
+.section-spacing-top {
+    padding-top: 64px;
+}
+.align-center {
+    align-items: center;
+}
+.text-left {
+    text-align: left;
+}
+.flex-center {
+    display: flex;
+    justify-content: center;
+}
+.relative-box {
+    position: relative;
+}
+
+/* Penataan Jarak Grid Konten */
+.content-gap-large { gap: 48px; }
+.content-gap-md { gap: 24px; }
+.content-gap-small { gap: 16px; }
+
+/* Tipografi & Badge Section 1 */
+.footer-icon-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--footer-page-accent);
+    background: var(--footer-page-accent-soft);
+    padding: 6px 16px;
+    border-radius: 9999px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+/* 1. Mengubah pembungkus luar dari 2 kolom menjadi 1 kolom terpusat */
+.footer-page__content .footer-page__grid--two.align-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;    /* Memaksa kontainer anak bergeser ke tengah layar */
+    justify-content: center;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* 2. Memastikan tumpukan teks dan kartu mengambil posisi tengah layar secara penuh */
+.footer-page__content .footer-page__stack {
+    width: 100%;
+    max-width: 850px;       /* Membatasi lebar maksimal agar layout tetap proporsional */
+    display: flex;
+    flex-direction: column;
+    align-items: center;    /* Menjaga elemen kartu di dalamnya tetap presisi di tengah */
+    margin: 0 auto;
+}
+
+/* 3. Menjaga agar grid 4 kartu di bawah teks tetap konsisten membentuk 2 kolom di tengah */
+.footer-page__grid--two.content-gap-small {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;              /* Memperbesar jarak antar kotak agar lebih renggang dan lega */
+    width: 100%;
+    max-width: 1000px;      /* Diperlebar dari 650px ke 1000px agar pas untuk layar laptop */
+    margin: 32px auto 0 auto; /* Memberikan space jarak vertikal yang seimbang */
+}
+
+.icon-size-sm {
+    font-size: 18px;
+}
+.section-main-title {
+    font-size: 2.2rem;
+    line-height: 1.2;
+    margin: 0 0 16px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+.section-description {
+    text-align: center;
+    margin: 0 auto;
+    max-width: 850px;
+}
+
+/* Modifikasi Mini Card */
+.card-padding-sm { padding: 20px; }
+.radius-sm { border-radius: 16px; }
+.icon-color-accent { color: var(--footer-page-accent); margin-bottom: 8px; }
+.mini-card-title { margin: 0 0 4px; font-size: 1rem; font-weight: 700; }
+.mini-card-desc { font-size: 0.85rem; color: var(--footer-page-muted); margin: 0; }
+
+/* Banner Ilustrasi Kanan (Section 1) */
+.wrapper-card {
+    width: 100%;
+    padding: 12px;
+    border-radius: 28px;
+    background: var(--footer-page-surface-soft);
+}
+
+.banner-icon { font-size: 64px; margin-bottom: 16px; opacity: 0.9; }
+.banner-title { font-size: 1.5rem; font-weight: 700; margin: 0 0 8px; color: #ffffff; }
+.banner-desc { font-size: 0.95rem; opacity: 0.8; max-width: 320px; margin: 0; }
+
+/* Lencana Statistik (Section 1) */
+.badge-stat-card {
+    position: absolute;
+    bottom: -20px;
+    left: -20px;
+    padding: 16px 24px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+}
+
+/* Section 2 (Panduan Memulai) */
+.container-card-soft {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Meratakan elemen flex ke tengah secara horizontal */
+    text-align: center;  /* Meratakan teks ke tengah */
+}
+
+.center-title-lg { font-size: 2rem; font-weight: 800; margin: 0 0 8px; }
+.center-desc-md { color: var(--footer-page-muted); max-width: 500px; margin: 0 auto 40px; }
+.radius-md { border-radius: 24px; }
+.footer-icon-box-large {
+    width: 64px;
+    height: 64px;
+    background-color: var(--footer-page-accent-soft);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--footer-page-accent);
+    margin-bottom: 24px;
+}
+.footer-icon-box-large .material-symbols-outlined { font-size: 36px; }
+.guide-card-title { font-size: 1.3rem; font-weight: 700; margin: 0 0 12px; color: var(--footer-page-accent); }
+.guide-card-desc { color: var(--footer-page-muted); font-size: 0.95rem; margin: 0; }
+
+/* Section 3 (Cara Verifikasi) */
+.center-header-wrapper { text-align: center; margin-bottom: 48px; }
+.accent-line-center { width: 60px; height: 4px; background: var(--footer-page-accent); margin: 0 auto; border-radius: 2px; }
+.step-verification-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    border-radius: 24px;
+}
+.footer-step-badge {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: var(--footer-page-accent);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 24px rgba(143, 23, 23, 0.2);
+}
+.step-card-icon { font-size: 44px; color: var(--footer-page-accent); margin-bottom: 16px; }
+.step-card-title { font-size: 1.2rem; font-weight: 700; margin: 0 0 12px; }
+.step-card-desc { color: var(--footer-page-muted); font-size: 0.95rem; margin: 0; }
+
+/* Section 4 (WhatsApp Bot Layout) */
+.banner-wrapper-padding { padding: 60px; border-radius: 32px; }
+.wa-section-layout { display: grid; grid-template-columns: 1fr; gap: 40px; width: 100%; }
+.info-stack-gap { gap: 24px; }
+.mini-uppercase-badge {
+    background: rgba(255,255,255,0.2);
+    width: fit-content;
+    padding: 4px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+}
+.wa-banner-title { font-size: 2.2rem; font-weight: 800; margin: 0 0 12px; line-height: 1.2; color: #ffffff; }
+.wa-banner-desc { color: rgba(255,255,255,0.85); font-size: 1.05rem; line-height: 1.7; margin: 0; }
+.action-btn-space { padding-top: 12px; }
+
+/* WhatsApp Button */
+.whatsapp-btn-green {
+    background-color: #25D366;
+    color: #ffffff;
+    font-weight: 700;
+    padding: 14px 28px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    box-shadow: 0 12px 24px rgba(37, 211, 102, 0.25);
+    transition: transform 0.2s, opacity 0.2s;
+}
+.whatsapp-btn-green:hover { opacity: 0.95; transform: translateY(-2px); color: #ffffff; }
+.fill-icon { font-variation-settings: 'FILL' 1; }
+
+/* WhatsApp Live Chat Mockup Box */
+.whatsapp-mockup {
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 20px;
+    color: var(--footer-page-text);
+    width: 100%;
+    max-width: 300px;
+    box-shadow: 0 20px 48px rgba(31, 41, 55, 0.12);
+    border: 1px solid var(--footer-page-border);
+}
+.wa-mockup-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eee;
+}
+.wa-avatar-mini {
+    width: 40px;
+    height: 40px;
+    background: var(--footer-page-accent);
+    color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+.wa-name { margin: 0; font-weight: 700; font-size: 0.9rem; color: var(--footer-page-text); }
+.wa-status { margin: 0; font-size: 0.75rem; color: #25D366; font-weight: 600; }
+.bubble-stack-gap { gap: 12px; }
+
+/* Chat Bubbles */
+.chat-bubble-user {
+    background: var(--footer-page-bg);
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-style: italic;
+    align-self: flex-start;
+    max-width: 90%;
+}
+.chat-bubble-bot {
+    background: #fff5f5;
+    border: 1px solid #ffdad6;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    align-self: flex-start;
+    max-width: 100%;
+}
+.bot-alert-title { color: var(--footer-page-accent); display: block; margin-bottom: 4px; }
+.badge-hoax-text { color: #ba1a1a; font-weight: 800; }
+
+/* Media Query Responsif Banner WhatsApp */
+@media (min-width: 800px) {
+    .wa-section-layout { grid-template-columns: 1.2fr 0.8fr; }
 }

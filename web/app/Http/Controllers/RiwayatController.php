@@ -178,12 +178,8 @@ class RiwayatController extends Controller
 
                 if ($isHoax) {
                     $statusStr = 'hoax';
-                    $description = 'Investigasi mendalam menunjukkan bahwa informasi ini mengandung elemen yang telah dilebih-lebihkan atau tidak sesuai dengan fakta sebenarnya. Berdasarkan analisis, klaim ini diklasifikasikan sebagai informasi yang menyesatkan dengan tingkat hoaks ' . round($confidence) . '%.';
                 } else {
-                    // JANGAN diubah jadi "fakta" kalau frontend masih cek "benar"
                     $statusStr = 'benar';
-
-                    $description = 'Hasil verifikasi menunjukkan bahwa informasi ini memiliki tingkat kebenaran sekitar ' . round($confidence) . '% dan termasuk informasi yang valid berdasarkan hasil analisis sistem.';
                 }
 
                 // Stage 2 URL Referensi
@@ -200,7 +196,7 @@ class RiwayatController extends Controller
                             : $stage2->url;
 
                         if (is_array($urlArr) && count($urlArr)) {
-                            $description .= "\n\nSumber Referensi:\n- " . implode("\n- ", $urlArr);
+                            $description .= "\n\nSumber Referensi: \n" . implode("\n", $urlArr);
                         }
                     }
                 }elseif ($request->stage1Results->isNotEmpty()) {
@@ -212,25 +208,19 @@ class RiwayatController extends Controller
                         $description = $kb->fact_text; // FULL REPLACE
                     }
 
-                    if ($kb && !empty($kb->source_url)) {
-                        $description .= "\n\nSumber Knowledge Base:\n- " . $kb->source_url;
-                    }
-                }
+                    if (!empty($kb->link_counter)) {
+                        $urlArr = is_string($kb->link_counter)
+                            ? json_decode($kb->link_counter, true)
+                            : $kb->link_counter;
 
-                // Stage 1 Knowledge Base
-                if ($request->stage1Results->isNotEmpty()) {
-                    $kbId = $request->stage1Results->first()->knowledge_id;
-
-                    $kb = \App\Models\KnowledgeBase::find($kbId);
-
-                    if ($kb && !empty($kb->fact_text)) {
-                        $description = nl2br(ltrim($kb->fact_text, ', '));
+                        if (is_array($urlArr) && count($urlArr)) {
+                            $description .= "\n\nSumber Referensi: \n" . implode("\n", $urlArr);
+                        }
                     }
                 }
 
                 // Feedback User
                 $feedback = null;
-
                 if (Auth::check()) {
                     $fb = $request->feedbacks->where('user_id', Auth::id())->first();
 

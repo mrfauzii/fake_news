@@ -147,8 +147,8 @@ def run_stage1_kb_check(
             if majority_label == "entailment":
                 final_label = 0
 
-            elif majority_label == "contradiction":
-                final_label = 1
+            # elif majority_label == "contradiction":
+            #     final_label = 1
 
             elif majority_label == "neutral":
                 return build_response(

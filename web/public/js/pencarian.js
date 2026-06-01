@@ -266,6 +266,7 @@ document.addEventListener("DOMContentLoaded", function () {
         let verdict = data.verdict || data.indication;
         let confidence = data.confidence || data.confidence_score?.hoax || 50;
         let summary = data.summary;
+        console.log(summary);
         let sources = data.sources;
         const isSimilar = data.is_similar === true;
 
@@ -379,8 +380,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     isSimilar
                         ? `
                 <p>
-                    Informasi ini telah ditelusuri beberapa orang dengan hasil yang sama sebelumnya.
-                    Ingin memulai penelusuran kembali untuk informasi yang lebih baru?
+                    Data serupa sudah pernah dianalisis sebelumnya.
+                    Ingin melakukan analisis ulang?
                 </p>
                 `
                         : ""

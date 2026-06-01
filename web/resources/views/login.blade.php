@@ -23,6 +23,7 @@
     {{-- ===== NAVBAR ===== --}}
     @include('user.partials.navbar')
 
+
     {{-- ===== MAIN CONTENT ===== --}}
     <main class="login-page">
         {{-- Left: hero image area --}}
@@ -81,6 +82,9 @@
             </div>
         </section>
     </main>
+
+    {{-- Footer: keep consistent with other pages --}}
+    @include('layouts.footer')
 
 </body>
 </html>

@@ -36,10 +36,10 @@
 
                     <p><strong>Klik Cek via WhatsApp untuk memulai.</strong></p>
 
-                    <a id="wa-cta" href="#" class="wa-btn-cta">
-                        <iconify-icon icon="garden:whatsapp-fill-16" width="25" height="25"></iconify-icon>
-                        Cek Via WhatsApp
-                    </a>
+                    <a id="wa-cta" href="https://wa.me/6289508135121" class="wa-btn-cta" target="_blank">
+                    <iconify-icon icon="garden:whatsapp-fill-16" width="25" height="25"></iconify-icon>
+                    Cek Via WhatsApp
+                </a>
                 </div>
             </section>
 
@@ -141,10 +141,10 @@
                         <li>Anda dapat mengirim teks, gambar, maupun tautan.</li>
                         <li>Pastikan pesan yang dikirim jelas agar hasil lebih akurat.</li>
                     </ul>
-                    <a href="#wa-cta" class="wa-btn-cta wa-btn-cta--small">
-                        <iconify-icon icon="garden:whatsapp-fill-16" width="24" height="24"></iconify-icon>
-                        Cek Via WhatsApp
-                    </a>
+                    <a id="wa-cta" href="https://wa.me/6289508135121" class="wa-btn-cta" target="_blank">
+                    <iconify-icon icon="garden:whatsapp-fill-16" width="25" height="25"></iconify-icon>
+                    Cek Via WhatsApp
+                </a>
                 </div>
             </section>
         </main>

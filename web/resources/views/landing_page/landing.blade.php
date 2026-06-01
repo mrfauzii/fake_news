@@ -252,6 +252,71 @@
             </div>
 
             <div class="team-grid">
+                {{-- purnama --}}
+                <div class="team-card">
+                    <div class="avatar-wrapper">
+                        <img src="{{ asset('img/purnama-rizky.jpg') }}" alt="Foto Purnama Rizky Nugraha">
+                    </div>
+                    <h3>Purnama Rizky Nugraha</h3>
+                    <p class="role">Project Manager & AI Engineer</p>
+                    
+                    <div class="team-socials">
+                        <a href="#" class="social-icon" title="Website/Portofolio">
+                            <span class="material-symbols-outlined">language</span>
+                        </a>
+                        <a href="mailto:email@kamu.com" class="social-icon" title="Email">
+                            <span class="material-symbols-outlined">mail</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="team-card">
+                    <div class="avatar-wrapper">
+                        <img src="{{ asset('img/purnama-rizky.jpg') }}" alt="Foto Purnama Rizky Nugraha">
+                    </div>
+                    <h3>Purnama Rizky Nugraha</h3>
+                    <p class="role">Project Manager & AI Engineer</p>
+                    
+                    <div class="team-socials">
+                        <a href="#" class="social-icon" title="Website/Portofolio">
+                            <span class="material-symbols-outlined">language</span>
+                        </a>
+                        <a href="mailto:email@kamu.com" class="social-icon" title="Email">
+                            <span class="material-symbols-outlined">mail</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="team-card">
+                    <div class="avatar-wrapper">
+                        <img src="{{ asset('img/purnama-rizky.jpg') }}" alt="Foto Purnama Rizky Nugraha">
+                    </div>
+                    <h3>Purnama Rizky Nugraha</h3>
+                    <p class="role">Project Manager & AI Engineer</p>
+                    
+                    <div class="team-socials">
+                        <a href="#" class="social-icon" title="Website/Portofolio">
+                            <span class="material-symbols-outlined">language</span>
+                        </a>
+                        <a href="mailto:email@kamu.com" class="social-icon" title="Email">
+                            <span class="material-symbols-outlined">mail</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="team-card">
+                    <div class="avatar-wrapper">
+                        <img src="{{ asset('img/purnama-rizky.jpg') }}" alt="Foto Purnama Rizky Nugraha">
+                    </div>
+                    <h3>Purnama Rizky Nugraha</h3>
+                    <p class="role">Project Manager & AI Engineer</p>
+                    
+                    <div class="team-socials">
+                        <a href="#" class="social-icon" title="Website/Portofolio">
+                            <span class="material-symbols-outlined">language</span>
+                        </a>
+                        <a href="mailto:email@kamu.com" class="social-icon" title="Email">
+                            <span class="material-symbols-outlined">mail</span>
+                        </a>
+                    </div>
+                </div>
                 <div class="team-card">
                     <div class="avatar-wrapper">
                         <img src="{{ asset('img/purnama-rizky.jpg') }}" alt="Foto Purnama Rizky Nugraha">
@@ -270,6 +335,8 @@
                 </div>
             </div>
         </div>
+
+
     </section>
 
     {{-- CALL TO ACTION SECTION --}}

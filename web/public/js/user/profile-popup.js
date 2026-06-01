@@ -212,20 +212,53 @@ document.addEventListener('DOMContentLoaded', function () {
         if (closeModalBtn) closeModalBtn.addEventListener('click', closeEditModal);
         if (cancelBtn) cancelBtn.addEventListener('click', closeEditModal);
         if (editModal) editModal.addEventListener('click', function (e) { if (e.target === this || e.target.className === 'lh-field-edit-modal__overlay') closeEditModal(); });
-        if (editForm) {
-            editForm.addEventListener('submit', function (e) {
-                e.preventDefault();
-                const fieldType = editTypeInput.value;
-                const fieldValue = editInput.value.trim();
-                const fieldElement = document.querySelector('.js-editable-field[data-field="' + fieldType + '"]');
-                if (!fieldValue) { alert('Nilai tidak boleh kosong'); return; }
-                updateFieldOnServer(fieldType, fieldValue).then(data => {
-                    if (!data.success) { alert(data.message || 'Gagal memperbarui profil'); return; }
-                    if (fieldElement) { const fieldSpan = fieldElement.querySelector('span'); fieldSpan.textContent = fieldValue; }
-                    closeEditModal();
-                }).catch(() => alert('Gagal memperbarui profil'));
+        // Ganti blok editForm kamu dengan kode ini:
+
+if (editForm) {
+    // CEGAH DUPLIKASI: Cek apakah form sudah punya listener sebelumnya
+    if (!editForm.dataset.listenerBound) {
+        editForm.dataset.listenerBound = 'true'; // Pasang gembok
+
+        editForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            e.stopImmediatePropagation(); // Hentikan paksa jika ada listener siluman lain yang ikut terpanggil
+            
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            // 1. Kunci tombol dan ubah teksnya
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Menyimpan...';
+
+            const fieldType = editTypeInput.value;
+            const fieldValue = editInput.value.trim();
+            const fieldElement = document.querySelector('.js-editable-field[data-field="' + fieldType + '"]');
+            
+            if (!fieldValue) { 
+                alert('Nilai tidak boleh kosong'); 
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+                return; 
+            }
+
+            updateFieldOnServer(fieldType, fieldValue).then(data => {
+                // Hapus location.reload() dari dalam sini, biarkan fungsi updateFieldOnServer yang mengurusnya
+                if (!data.success) { 
+                    alert(data.message || 'Gagal memperbarui profil'); 
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                    return; 
+                }
+                
+                // Kalau sukses, biarkan fungsi reload() di fetch bekerja. Jangan buka kunci tombolnya.
+            }).catch(() => {
+                alert('Gagal memperbarui profil');
+                submitBtn.disabled = false; 
+                submitBtn.innerHTML = originalText;
             });
-        }
+        });
+    }
+}
 
         // Mark and restore the initial active button state for mobile.
         markInitialMobileActiveState();
@@ -344,11 +377,30 @@ document.addEventListener('DOMContentLoaded', function () {
         // initialize indicator after initial active restore
         initMobileNavIndicator();
 
-        function updateFieldOnServer(fieldType, fieldValue) {
-            const fieldMap = { name: 'name', email: 'email', phone: 'phone_number' };
-            const fieldKey = fieldMap[fieldType]; if (!fieldKey) return Promise.resolve({ success: false, message: 'Field tidak valid' });
-            return fetch('/profile/update', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '' }, body: JSON.stringify({ [fieldKey]: fieldValue }) }).then(async response => { const data = await response.json().catch(() => ({})); if (!response.ok) return { success: false, message: data.message || 'Gagal memperbarui profil' }; return data; });
-        }
+       function updateFieldOnServer(fieldType, fieldValue) {
+    const fieldMap = { name: 'name', email: 'email', phone: 'phone_number' };
+    const fieldKey = fieldMap[fieldType]; 
+    if (!fieldKey) return Promise.resolve({ success: false, message: 'Field tidak valid' });
+
+    return fetch('/profile/update', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json', 
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+        },
+        body: JSON.stringify({ [fieldKey]: fieldValue })
+    })
+    .then(async response => {
+        const data = await response.json().catch(() => ({}));
+        
+        // LANGSUNG RELOAD DI SINI
+        // Mau response.ok atau data.success true/false, pokoknya begitu server jawab, langsung reload!
+        window.location.reload(); 
+
+        return data;
+    }); 
+}
     } catch (err) {
         console.error('profile-popup.js error', err);
     }

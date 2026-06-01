@@ -335,9 +335,17 @@ class WaController extends Controller
         }
     }
 
-    public function verifyWaLink($token)
+    public function showVerifyPage($token)
     {
+        // Cek apakah token valid
+    
+        return view('user.verify_wa', ['token' => $token]);
+    }
+    public function verifyWaLink(Request $request)
+    {
+        $token = $request->input('token');
         // Cek apakah token ada dan belum expired
+        Log::info("Attempting WhatsApp verification with token: " . $token);
         $cacheData = Cache::get("wa_verification_{$token}");
 
         if (!$cacheData) {

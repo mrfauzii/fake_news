@@ -266,7 +266,6 @@ document.addEventListener("DOMContentLoaded", function () {
         let verdict = data.verdict || data.indication;
         let confidence = data.confidence || data.confidence_score?.hoax || 50;
         let summary = data.summary;
-        console.log(summary);
         let sources = data.sources;
         const isSimilar = data.is_similar === true;
 

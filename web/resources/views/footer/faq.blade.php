@@ -4,10 +4,15 @@
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/footer/footer.css') }}">
+<link rel="stylesheet" href="{{ asset('css/user/background.css') }}">
+<link rel="stylesheet" href="{{ asset('css/user/navbar.css') }}">
+<link rel="stylesheet" href="{{ asset('css/user/profile-popup.css') }}">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 @endpush
 
 @section('content')
+ @include('user.partials.navbar')
+    @include('user.partials.hero-bg')
 <main class="footer-page">
     <section class="footer-page__hero">
         <div class="footer-page__container">
@@ -88,3 +93,7 @@
     </section>
 </main>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/user/profile-popup.js') }}"></script>
+@endpush

@@ -56,7 +56,7 @@ class PopulerHistoryController extends Controller
         ];
 
         $popularItems = [];
-
+    
         // 3. Format data agar SAMA PERSIS dengan contentBlueprints di file JS kamu
         foreach ($histories as $idx => $row) {
             $category = strtolower($row->final_label) === 'fake' ? 'hoax' : 'fakta';

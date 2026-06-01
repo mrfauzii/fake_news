@@ -4,10 +4,15 @@
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/footer/footer.css') }}">
+<link rel="stylesheet" href="{{ asset('css/user/background.css') }}">
+<link rel="stylesheet" href="{{ asset('css/user/navbar.css') }}">
+<link rel="stylesheet" href="{{ asset('css/user/profile-popup.css') }}">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 @endpush
 
 @section('content')
+@include('user.partials.navbar')
+    @include('user.partials.hero-bg')
 <main class="footer-page">
     <section class="footer-page__hero">
         <div class="footer-page__container">
@@ -53,8 +58,8 @@
                         </div>
                         <div class="footer-card card-padding-sm radius-sm">
                             <span class="material-symbols-outlined icon-color-accent">psychology</span>
-                            <h4 class="mini-card-title">Penjelasan AI</h4>
-                            <p class="mini-card-desc">Analisis sumber original.</p>
+                            <h4 class="mini-card-title">Penjelasan</h4>
+                            <p class="mini-card-desc">Setiap hasil verifikasi dilengkapi dengan penjelasan.</p>
                         </div>
                     </div>
                 </div>
@@ -141,9 +146,9 @@
                         </ul>
 
                         <div class="action-btn-space">
-                            <a href="https://wa.me/6289508135121" target="_blank" class="whatsapp-btn-green">
+                            <a href="{{ route('whatsapp.page') }}" target="_blank" class="whatsapp-btn-green">
                                 <span class="material-symbols-outlined fill-icon">chat</span>
-                                Hubungkan WhatsApp Sekarang
+                                Cek panduan lengkap untuk WhatsApp Bot
                             </a>
                         </div>
                     </div>
@@ -159,11 +164,14 @@
                             </div>
                             <div class="footer-page__stack bubble-stack-gap">
                                 <div class="chat-bubble-user">
-                                    "Apakah bantuan sosial di tautan ini resmi?"
+                                    kementerian umkm bagikan blt rp5 juta kepada pelaku umkm
+                                </div>
+                                <div class="chat-bubble-user">
+                                    #detect
                                 </div>
                                 <div class="chat-bubble-bot">
-                                    <strong class="bot-alert-title">Hasil Verifikasi AI:</strong>
-                                    Konten terindikasi <span class="badge-hoax-text">HOAKS</span>. Informasi serupa telah divalidasi oleh FactCheck.id...
+                                    <strong class="bot-alert-title">HASIL CEK FAKTA AI:</strong>
+                                    Konten terindikasi <span class="badge-hoax-text">HOAKS</span>...
                                 </div>
                             </div>
                         </div>
@@ -174,3 +182,6 @@
     </section>
 </main>
 @endsection
+@push('scripts')
+<script src="{{ asset('js/user/profile-popup.js') }}"></script>
+@endpush

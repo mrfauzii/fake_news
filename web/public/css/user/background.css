@@ -2,10 +2,11 @@
    HERO BACKGROUND (network SVG)
    ========================================================== */
 .lh-hero-bg {
-    position: absolute;
+    position: fixed;
     inset: 0;
-    z-index: 0;
+    opacity: 0.8;
     pointer-events: none;
+    z-index: 0;
 }
 
 .lh-network-svg {

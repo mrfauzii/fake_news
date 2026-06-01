@@ -200,6 +200,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const percentages = resolvePercentages(item);
         const summary = item.summary || "-";
+        console.log("Summary for detail modal:", summary);
 
         if (detailDate) {
             detailDate.textContent = resolveDetailDateLabel(item.period);

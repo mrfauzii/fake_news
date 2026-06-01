@@ -2,6 +2,8 @@
 class RiwayatManager {
     constructor() {
         this.riwayatData = window.realRiwayatData || [];
+        this.itemsPerPage = 5;
+        this.currentPage = 1;
         this.statusModal = null;
         console.log('RiwayatManager initialized with data:', this.riwayatData);
         this.render();
@@ -56,6 +58,46 @@ class RiwayatManager {
         return this.riwayatData;
     }
 
+    getTotalPages() {
+        return Math.max(1, Math.ceil(this.getData().length / this.itemsPerPage));
+    }
+
+    getPaginatedData() {
+        const data = this.getData();
+        const totalPages = this.getTotalPages();
+        this.currentPage = Math.min(Math.max(this.currentPage, 1), totalPages);
+
+        const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+        return data.slice(startIndex, startIndex + this.itemsPerPage);
+    }
+
+    getPaginationItems(totalPages) {
+        const pages = [];
+        const windowSize = 1;
+        const start = Math.max(2, this.currentPage - windowSize);
+        const end = Math.min(totalPages - 1, this.currentPage + windowSize);
+
+        pages.push(1);
+
+        if (start > 2) {
+            pages.push('ellipsis-start');
+        }
+
+        for (let page = start; page <= end; page += 1) {
+            pages.push(page);
+        }
+
+        if (end < totalPages - 1) {
+            pages.push('ellipsis-end');
+        }
+
+        if (totalPages > 1) {
+            pages.push(totalPages);
+        }
+
+        return [...new Set(pages)];
+    }
+
     formatDateDisplay(date) {
         const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
         const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -72,18 +114,77 @@ class RiwayatManager {
     render() {
         const container = document.getElementById('riwayatContainer');
         const emptyState = document.getElementById('emptyState');
+        const paginationContainer = document.getElementById('riwayatPagination');
+        const paginationInfo = document.getElementById('riwayatPaginationInfo');
         const data = this.getData();
 
         if (data.length === 0) {
             container.style.display = 'none';
             emptyState.style.display = 'flex';
+            if (paginationContainer) paginationContainer.hidden = true;
+            if (paginationInfo) paginationInfo.hidden = true;
             return;
         }
 
+        const totalPages = this.getTotalPages();
+        this.currentPage = Math.min(this.currentPage, totalPages);
+        const paginatedData = this.getPaginatedData();
+
         container.style.display = 'flex';
         emptyState.style.display = 'none';
-        container.innerHTML = data.map(item => this.renderItem(item)).join('');
+        container.innerHTML = paginatedData.map(item => this.renderItem(item)).join('');
         this.attachItemEventListeners();
+        this.renderPagination();
+
+        if (paginationInfo) {
+            const start = ((this.currentPage - 1) * this.itemsPerPage) + 1;
+            const end = Math.min(this.currentPage * this.itemsPerPage, data.length);
+            paginationInfo.hidden = false;
+            paginationInfo.textContent = `Menampilkan ${start}-${end} dari ${data.length} riwayat`;
+        }
+    }
+
+    renderPagination() {
+        const paginationContainer = document.getElementById('riwayatPagination');
+        if (!paginationContainer) return;
+
+        const totalPages = this.getTotalPages();
+
+        if (this.getData().length <= this.itemsPerPage) {
+            paginationContainer.hidden = true;
+            paginationContainer.innerHTML = '';
+            return;
+        }
+
+        const pageItems = this.getPaginationItems(totalPages);
+
+        paginationContainer.hidden = false;
+        paginationContainer.innerHTML = `
+            <button type="button" class="riwayat-pagination__nav" data-page="prev" ${this.currentPage === 1 ? 'disabled' : ''}>
+                <iconify-icon icon="mdi:chevron-left" width="16" height="16"></iconify-icon>
+                Sebelumnya
+            </button>
+            <div class="riwayat-pagination__pages">
+                ${pageItems.map(item => {
+                    if (item === 'ellipsis-start' || item === 'ellipsis-end') {
+                        return '<span class="riwayat-pagination__ellipsis">...</span>';
+                    }
+
+                    const page = Number(item);
+                    return `
+                        <button type="button" class="riwayat-pagination__page ${page === this.currentPage ? 'is-active' : ''}" data-page="${page}" aria-current="${page === this.currentPage ? 'page' : 'false'}">
+                            ${page}
+                        </button>
+                    `;
+                }).join('')}
+            </div>
+            <button type="button" class="riwayat-pagination__nav" data-page="next" ${this.currentPage === totalPages ? 'disabled' : ''}>
+                Berikutnya
+                <iconify-icon icon="mdi:chevron-right" width="16" height="16"></iconify-icon>
+            </button>
+        `;
+
+        this.attachPaginationListeners();
     }
 
    renderItem(item) {
@@ -342,6 +443,7 @@ class RiwayatManager {
         .then(data => {
             if (data.success) {
                 this.riwayatData = this.riwayatData.filter(item => item.id !== parseInt(id));
+                this.currentPage = Math.min(this.currentPage, this.getTotalPages());
                 this.render();
                 this.showToast('success', 'Riwayat terhapus', data.message || 'Item riwayat berhasil dihapus.', 1800);
             } else {
@@ -377,6 +479,7 @@ class RiwayatManager {
         .then(data => {
             if (data.success) {
                 this.riwayatData = [];
+                this.currentPage = 1;
                 this.render();
                 this.showToast('success', 'Riwayat dihapus', data.message || 'Seluruh riwayat berhasil dihapus.', 2000);
             } else {
@@ -401,6 +504,25 @@ class RiwayatManager {
                 });
             });
         }
+    }
+
+    attachPaginationListeners() {
+        document.querySelectorAll('.riwayat-pagination__nav, .riwayat-pagination__page').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const target = e.currentTarget.dataset.page;
+
+                if (target === 'prev') {
+                    this.currentPage = Math.max(1, this.currentPage - 1);
+                } else if (target === 'next') {
+                    this.currentPage = Math.min(this.getTotalPages(), this.currentPage + 1);
+                } else {
+                    this.currentPage = parseInt(target, 10);
+                }
+
+                this.render();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
     }
 
     attachItemEventListeners() {

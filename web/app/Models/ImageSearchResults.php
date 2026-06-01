@@ -10,7 +10,8 @@ class ImageSearchResults extends Model
         'request_id',
         'source_url',
         'similarity_score',
-        'mean_date_score'
+        'mean_date_score',
+        'summary'
     ];
 
     protected $casts = [

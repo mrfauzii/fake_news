@@ -75,14 +75,7 @@ class ImageDetectionController extends Controller
     ->pluck('link')
     ->toArray();
     Log::info('SESUDAH PYTHON');
-                // 5. Simpan ke tabel 'image_search_results'
-                ImageSearchResults::create([
-                    'request_id' => $newReq->id,
-                    'source_url' => $links,
-                    'similarity_score' => $res['similarity_score'],
-                    'mean_date_score' => $res['avg_date_scaled'],
-                ]);
-
+                // 5. Simpan ke tabel 'image_search_results'        
                 // 6. Update hasil akhir di tabel 'requests'
                 $isHoax = $res['prediction'] == 1;
                 $finalLabel = $isHoax ? 'fake' : 'real';
@@ -93,20 +86,30 @@ class ImageDetectionController extends Controller
                     $factPercentage = round($res['confidence'] * 100);
                     $hoaxPercentage  = 100 - $factPercentage;
                 }
+                $finalLabel = $isHoax ? 'FAKE' : 'FAKTA';
+                $summary = 'Analisis gambar menunjukkan indikasi ' . $finalLabel . ' dengan tingkat kepercayaan ' . $hoaxPercentage . '%.';
+                
+                ImageSearchResults::create([
+                    'request_id' => $newReq->id,
+                    'source_url' => $links,
+                    'similarity_score' => $res['similarity_score'],
+                    'mean_date_score' => $res['avg_date_scaled'],
+                    'summary' => $summary ?? '-',
+                ]);
                 
                 $newReq->update([
                     'final_label' => $finalLabel,
                     'final_confidence' => $res['confidence'],
                     'status' => 'completed'
                 ]);
-                $finalLabel = $isHoax ? 'FAKE' : 'FAKTA';
+                
 
                 // 7. RETURN SESUAI FIGMA
                 return response()->json([
                     'status' => 'success',
                     'verdict' => $finalLabel,
                     'confidence' => $hoaxPercentage,
-                    'summary' => 'Analisis gambar menunjukkan indikasi ' . $finalLabel . ' dengan tingkat kepercayaan ' . $hoaxPercentage . '%.',
+                    'summary' => $summary ?? '-',
                     'sources' => $links,
 
                     'data' => [

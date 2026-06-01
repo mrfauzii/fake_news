@@ -48,6 +48,8 @@ class RiwayatController extends Controller
                 $kb = \App\Models\KnowledgeBase::find($kbId);
 
                 $penjelasan = $kb?->fact_text;
+            }elseif($isImageSearch && $history->request && $history->request->imageSearchResults->isNotEmpty()){
+                $penjelasan = $history->request->imageSearchResults->first()->summary;
             }
 
             return [
@@ -142,7 +144,7 @@ class RiwayatController extends Controller
 
         $userId = Auth::check() ? Auth::id() : 2;
 
-        $histories = UserInteractions::with(['request.image', 'request.stage1Results', 'request.stage2Results', 'request.feedbacks'])
+        $histories = UserInteractions::with(['request.image', 'request.stage1Results', 'request.stage2Results', 'request.feedbacks','request.imageSearchResults'])
             ->where('user_id', $userId)
             ->orderBy('created_at', 'desc')
             ->get();
@@ -217,6 +219,24 @@ class RiwayatController extends Controller
                             $description .= "\n\nSumber Referensi: \n" . implode("\n", $urlArr);
                         }
                     }
+                }elseif($request->imageSearchResults->isNotEmpty()){
+                    $image_result = $request->imageSearchResults->first();
+
+                    if (!empty($image_result->summary)) {
+                        $description = $image_result->summary; // FULL REPLACE
+                    }
+                    if (!empty($image_result->source_url)) {
+                        $urlArr = is_string($image_result->source_url)
+                            ? json_decode($image_result->source_url, true)
+                            : $image_result->source_url;
+
+                        if (is_array($urlArr) && count($urlArr)) {
+                            $description .= "\n\nSumber Referensi: \n" . implode("\n", $urlArr);
+                        }
+                    }
+
+                }else {
+                    $description = '-';
                 }
 
                 // Feedback User

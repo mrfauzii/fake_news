@@ -17,6 +17,7 @@ return new class extends Migration
             $table->json('source_url')->nullable();
             $table->float('similarity_score')->nullable();
             $table->float('mean_date_score')->nullable();
+            $table->text('summary')->nullable();
             $table->timestamps();
         });
     }

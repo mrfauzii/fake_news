@@ -1,18 +1,23 @@
 <footer style="
+    width:100%;
+    display:block;
     background: linear-gradient(90deg, #73070B 0%, #B8201D 100%);
     color:white;
     font-family:'Poppins', sans-serif;
     margin-top:50px;
+    align-self:stretch;
+    box-sizing:border-box;
 ">
 
     <div style="
-        max-width:1200px;
-        margin:auto;
+        width:min(1200px, calc(100% - 40px));
+        margin:0 auto;
         padding:45px 20px;
         display:flex;
         flex-wrap:wrap;
         justify-content:space-between;
         gap:40px;
+        box-sizing:border-box;
     ">
 
         <!-- Logo / Desc -->
@@ -116,6 +121,7 @@
 
     <!-- Bottom -->
     <div style="
+        width:100%;
         border-top:1px solid rgba(255,255,255,0.15);
         padding:18px;
         text-align:center;

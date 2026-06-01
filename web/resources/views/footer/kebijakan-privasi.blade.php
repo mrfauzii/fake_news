@@ -7,6 +7,9 @@
 @endpush
 
 @section('content')
+@include('user.partials.navbar')
+
+@include('user.partials.hero-bg')
 <main class="footer-page">
     <section class="footer-page__hero">
         <div class="footer-page__container">
@@ -60,3 +63,13 @@
     </section>
 </main>
 @endsection
+
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/user/background.css') }}">
+<link rel="stylesheet" href="{{ asset('css/user/navbar.css') }}">
+<link rel="stylesheet" href="{{ asset('css/user/profile-popup.css') }}">
+@endpush
+
+@push('scripts')
+<script src="{{ asset('js/user/profile-popup.js') }}"></script>
+@endpush

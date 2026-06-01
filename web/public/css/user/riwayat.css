@@ -477,6 +477,7 @@
 .riwayat-result-summary {
     color: #3d3d3d;
     font-size: 13px;
+    white-space: pre-line;
 }
 
 .riwayat-result-footnote {

@@ -2,7 +2,7 @@
 class RiwayatManager {
     constructor() {
         this.riwayatData = window.realRiwayatData || [];
-        this.itemsPerPage = 5;
+        this.itemsPerPage = 10;
         this.currentPage = 1;
         this.statusModal = null;
         console.log('RiwayatManager initialized with data:', this.riwayatData);

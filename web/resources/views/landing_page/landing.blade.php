@@ -3,10 +3,11 @@
 @section('title', 'Landing Page')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/style.css') }}">
-<link rel="stylesheet" href="{{ asset('css/user/navbar.css') }}">
-<link rel="stylesheet" href="{{ asset('css/user/profile-popup.css') }}">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/user/navbar.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/user/profile-popup.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
 @endpush
 
 @section('content')
@@ -20,14 +21,17 @@
 
             <div class="hero-text">
                 <h1>Lensa Hoax:<br>Verifikasi Informasi dan Keaslian Foto dengan AI</h1>
-                <p>Jangan mudah percaya berita yang belum tentu benar. Pastikan keaslian teks berita dan foto kejadian dengan sistem deteksi cerdas kami.</p>
+                <p>Jangan mudah percaya berita yang belum tentu benar. Pastikan keaslian teks berita dan foto kejadian
+                    dengan sistem deteksi cerdas kami.</p>
 
                 <div class="hero-btn">
-                    <a href="{{ route('whatsapp.page') }}" class="btn-red" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+                    <a href="{{ route('whatsapp.page') }}" class="btn-red"
+                        style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
                         <i class="fab fa-whatsapp"></i> Dapatkan melalui Whatsapp
                     </a>
 
-                    <a href="{{ route('deteksi') }}" class="btn-outline" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
+                    <a href="{{ route('deteksi') }}" class="btn-outline"
+                        style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
                         Coba Sekarang !
                     </a>
                 </div>
@@ -40,7 +44,7 @@
         </div>
     </section>
 
-<div class="hero-border"></div>
+    <div class="hero-border"></div>
 
 
     {{-- STATISTIK SECTION --}}
@@ -192,10 +196,10 @@
     {{-- WHY US SECTION --}}
     <section class="why-us-section">
         <div class="container why-us-flex">
-            
+
             <div class="why-us-content">
                 <h2>Kenapa Lensa Hoax?</h2>
-                
+
                 <div class="why-item">
                     <div class="why-icon-box">
                         <span class="material-symbols-outlined">bolt</span>
@@ -255,11 +259,27 @@
                 {{-- purnama --}}
                 <div class="team-card">
                     <div class="avatar-wrapper">
-                        <img src="{{ asset('img/purnama-rizky.jpg') }}" alt="Foto Purnama Rizky Nugraha">
+                        <img src="{{ asset('img/landing/pur.png') }}" alt="Foto Purnama Rizky Nugraha">
                     </div>
                     <h3>Purnama Rizky Nugraha</h3>
                     <p class="role">Project Manager & AI Engineer</p>
-                    
+
+                    <div class="team-socials">
+                        <a href="#" class="social-icon" title="Website/Portofolio">
+                            <span class="material-symbols-outlined">language</span>
+                        </a>
+                        <a href="mailto:purnamanugara492@gmail.com" class="social-icon" title="Email">
+                            <span class="material-symbols-outlined">mail</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="team-card">
+                    <div class="avatar-wrapper">
+                        <img src="{{ asset('img/landing/adinda.jpeg') }}" alt="Foto Adinda Ivanka Maysanda Putri">
+                    </div>
+                    <h3>Adinda Ivanka Maysanda Putri</h3>
+                    <p class="role">Frontend Developer</p>
+
                     <div class="team-socials">
                         <a href="#" class="social-icon" title="Website/Portofolio">
                             <span class="material-symbols-outlined">language</span>
@@ -271,11 +291,11 @@
                 </div>
                 <div class="team-card">
                     <div class="avatar-wrapper">
-                        <img src="{{ asset('img/purnama-rizky.jpg') }}" alt="Foto Purnama Rizky Nugraha">
+                        <img src="{{ asset('img/landing/desi.jpeg') }}" alt="Foto Desi Karmila">
                     </div>
-                    <h3>Purnama Rizky Nugraha</h3>
-                    <p class="role">Project Manager & AI Engineer</p>
-                    
+                    <h3>Desi Karmila</h3>
+                    <p class="role">Frontend Developer</p>
+
                     <div class="team-socials">
                         <a href="#" class="social-icon" title="Website/Portofolio">
                             <span class="material-symbols-outlined">language</span>
@@ -287,11 +307,11 @@
                 </div>
                 <div class="team-card">
                     <div class="avatar-wrapper">
-                        <img src="{{ asset('img/purnama-rizky.jpg') }}" alt="Foto Purnama Rizky Nugraha">
+                        <img src="{{ asset('img/landing/reishi.jpeg') }}" alt="Foto Muhammad Reishi Fauzi Auguri">
                     </div>
-                    <h3>Purnama Rizky Nugraha</h3>
-                    <p class="role">Project Manager & AI Engineer</p>
-                    
+                    <h3>Muhammad Reishi Fauzi Auguri</h3>
+                    <p class="role">Backend Developer</p>
+
                     <div class="team-socials">
                         <a href="#" class="social-icon" title="Website/Portofolio">
                             <span class="material-symbols-outlined">language</span>
@@ -303,32 +323,19 @@
                 </div>
                 <div class="team-card">
                     <div class="avatar-wrapper">
-                        <img src="{{ asset('img/purnama-rizky.jpg') }}" alt="Foto Purnama Rizky Nugraha">
+                        <img src="{{ asset('img/landing/firman.jpeg') }}" alt="Foto Firman Dzaki Rahman">
                     </div>
-                    <h3>Purnama Rizky Nugraha</h3>
-                    <p class="role">Project Manager & AI Engineer</p>
-                    
+
+                    <h3>Firman Dzaki Rahman</h3>
+                    <p class="role">Backend Developer</p>
+
                     <div class="team-socials">
-                        <a href="#" class="social-icon" title="Website/Portofolio">
-                            <span class="material-symbols-outlined">language</span>
+                        <a href="https://linkedin.com/in/username-firman" target="_blank" class="social-icon"
+                            title="LinkedIn">
+                            <span class="material-symbols-outlined">business_center</span>
                         </a>
-                        <a href="mailto:email@kamu.com" class="social-icon" title="Email">
-                            <span class="material-symbols-outlined">mail</span>
-                        </a>
-                    </div>
-                </div>
-                <div class="team-card">
-                    <div class="avatar-wrapper">
-                        <img src="{{ asset('img/purnama-rizky.jpg') }}" alt="Foto Purnama Rizky Nugraha">
-                    </div>
-                    <h3>Purnama Rizky Nugraha</h3>
-                    <p class="role">Project Manager & AI Engineer</p>
-                    
-                    <div class="team-socials">
-                        <a href="#" class="social-icon" title="Website/Portofolio">
-                            <span class="material-symbols-outlined">language</span>
-                        </a>
-                        <a href="mailto:email@kamu.com" class="social-icon" title="Email">
+
+                        <a href="mailto:firman@example.com" class="social-icon" title="Email">
                             <span class="material-symbols-outlined">mail</span>
                         </a>
                     </div>
@@ -346,7 +353,7 @@
             <p class="cta-banner__description">
                 Bergabunglah bersama ribuan pengguna lainnya dalam menciptakan ruang digital yang bersih dan terpercaya.
             </p>
-            
+
             <!-- Tombol Aksi -->
             <div class="cta-banner__action">
                 <a href="#" class="cta-banner__button">Coba Sekarang !</a>
@@ -356,5 +363,5 @@
 @endsection
 
 @push('scripts')
-<script src="{{ asset('js/user/profile-popup.js') }}"></script>
+    <script src="{{ asset('js/user/profile-popup.js') }}"></script>
 @endpush

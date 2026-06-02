@@ -113,27 +113,27 @@ class RiwayatController extends Controller
         ]);
     }
 
-    public function destroy($id)
-    {
-        $request = Requests::findOrFail($id);
+    // public function destroy($id)
+    // {
+    //     $request = Requests::findOrFail($id);
 
-        $request->delete();
+    //     $request->delete();
 
-        return response()->json([
-            'success' => true,
-        ]);
-    }
+    //     return response()->json([
+    //         'success' => true,
+    //     ]);
+    // }
 
-    public function restore($id)
-    {
-        $request = Requests::withTrashed()->findOrFail($id);
+    // public function restore($id)
+    // {
+    //     $request = Requests::withTrashed()->findOrFail($id);
 
-        $request->restore();
+    //     $request->restore();
 
-        return response()->json([
-            'success' => true,
-        ]);
-    }
+    //     return response()->json([
+    //         'success' => true,
+    //     ]);
+    // }
 
     /**
      * FUNGSI UNTUK HALAMAN RIWAYAT ROLE: USER

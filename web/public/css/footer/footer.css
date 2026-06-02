@@ -15,11 +15,15 @@
         linear-gradient(180deg, #fffdfb 0%, var(--footer-page-bg) 100%);
     color: var(--footer-page-text);
     padding-bottom: 72px;
+    position: relative; 
+    overflow: hidden;
 }
 
 .footer-page__container {
     width: min(1100px, calc(100% - 32px));
     margin: 0 auto;
+    position: relative; 
+    z-index: 2;
 }
 
 .footer-page__hero {

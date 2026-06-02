@@ -7,6 +7,8 @@
     margin-top:50px;
     align-self:stretch;
     box-sizing:border-box;
+    position: relative; /* TAMBAHKAN BARIS INI */
+    z-index: 2;
 ">
 
     <div style="

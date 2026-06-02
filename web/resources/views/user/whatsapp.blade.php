@@ -170,7 +170,7 @@
                         </ol>
 
                         <div class="wa-command-preview">
-                            <img src="{{ asset('img/command.jpg') }}" alt="Contoh tampilan chat WhatsApp" class="wa-command-preview__image">
+                            <img src="{{ asset('img/detect.png') }}" alt="Contoh tampilan chat WhatsApp" class="wa-command-preview__image">
                         </div>
                     </div>
                 </div>

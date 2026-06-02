@@ -36,7 +36,8 @@ class WaController extends Controller
             // akan aman menggunakan variabel $sender yang sudah berawalan '0'
             $user = Users::firstOrCreate(
                 ['phone_number' => $sender],
-                ['name' => $name ?? 'User WA']
+                ['name' => $name ?? 'User WA'],
+                ['role' => 'user'] // Pastikan role diisi dengan 'user' untuk membedakan dari akun Gmail
             );
 
             // 🔥 2. JIKA BUKAN COMMAND (#) -> SIMPAN KE CACHE
@@ -338,7 +339,7 @@ class WaController extends Controller
     public function showVerifyPage($token)
     {
         // Cek apakah token valid
-    
+
         return view('user.verify_wa', ['token' => $token]);
     }
     public function verifyWaLink(Request $request)

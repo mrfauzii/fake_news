@@ -110,14 +110,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
     // Umpan Balik
     Route::get('/umpanbalik', [UmpanBalikController::class, 'index']);
-    Route::get('/umpanbalik-data', [UmpanBalikController::class, 'getFeedbackData']);
+    // Route::get('/umpanbalik-data', [UmpanBalikController::class, 'getFeedbackData']);
 
     // Riwayat (admin side)
     Route::prefix('riwayat')->group(function () {
         Route::get('/', [RiwayatController::class, 'index']);
-        Route::get('/edit/{id}', [RiwayatController::class, 'edit']);
-        Route::post('/update/{id}', [RiwayatController::class, 'update']);
-        Route::get('/delete/{id}', [RiwayatController::class, 'delete']);
+        // Route::get('/edit/{id}', [RiwayatController::class, 'edit']);
+        // Route::post('/update/{id}', [RiwayatController::class, 'update']);
+        // Route::get('/delete/{id}', [RiwayatController::class, 'delete']);
         Route::post('/filter', [RiwayatController::class, 'filterRiwayat'])->name('riwayat.filter');
     });
 

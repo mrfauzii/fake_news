@@ -128,7 +128,11 @@
             <div class="feedback-box" id="popupFeedback"></div>
         </div>
     </div>
-
+<script>
+window.appConfig = {
+    publicProtocol: "{{ env('APP_PUBLIC', 'http') }}"
+};
+</script>
     {{-- 5. LOGIKA JAVASCRIPT (AJAX LIVE SEARCH, PAGINATION & POPUP) --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -140,13 +144,23 @@
             // --- FUNGSI UTAMA FETCH ---
             function fetchLiveData(url) {
     // Pastikan URL diubah menjadi HTTPS jika masih HTTP
-    let secureUrl = url;
-    if (typeof url === 'string' && url.startsWith('http://')) {
-        secureUrl = url.replace('http://', 'https://');
-    } else if (url instanceof URL) {
+   let secureUrl = url;
+
+if (window.appConfig.publicProtocol === 'https') {
+    if (url instanceof URL) {
         url.protocol = 'https:';
         secureUrl = url.href;
+    } else {
+        secureUrl = String(url).replace(/^http:/, 'https:');
     }
+} else {
+    if (url instanceof URL) {
+        url.protocol = 'http:';
+        secureUrl = url.href;
+    } else {
+        secureUrl = String(url).replace(/^https:/, 'http:');
+    }
+}
 
     fetch(secureUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
     .then(response => response.text())

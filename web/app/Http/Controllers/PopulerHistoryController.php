@@ -63,15 +63,20 @@ class PopulerHistoryController extends Controller
             $badge = strtoupper($category);
             $period = $bulanIndo[$row->month] . ' ' . $row->year;
 
+            $summary = '-';
+            if ($row->summary_text) {
+                $summary = $row->summary_text;
+            } elseif ($row->fact_text) {
+                $summary = $row->fact_text;
+            }
+
             $popularItems[] = [
                 'category'  => $category,
                 'period'    => $period,
                 'badge'     => $badge,
                 'confidence' => $row->final_confidence,
                 'count'     => $row->count,
-                'summary' => strtolower($row->final_label) === 'fake'
-                    ? ($row->summary_text ?? null)
-                    : ($row->fact_text ?? null),
+                'summary' => $summary,
                 'headline'  => Str::limit($row->input_text, 60), // Potong teks untuk judul
                 'excerpt'   => $row->input_text, // Teks utuh untuk penjelasan
                 'query'     => $row->input_text, // Teks yang akan di-parsing ke URL ?informasi=...

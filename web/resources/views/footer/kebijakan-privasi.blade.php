@@ -13,10 +13,10 @@
 <main class="footer-page">
     <section class="footer-page__hero">
         <div class="footer-page__container">
-            <a href="javascript:history.back()" class="footer-page__back-button footer-page__back-button--accent" aria-label="Kembali ke halaman sebelumnya">
+            {{-- <a href="javascript:history.back()" class="footer-page__back-button footer-page__back-button--accent" aria-label="Kembali ke halaman sebelumnya">
                 <span class="footer-page__back-button-symbol" aria-hidden="true">&lt;</span>
                 Kembali
-            </a>
+            </a> --}}
             <p class="footer-page__eyebrow">Informasi</p>
             <h1>Kebijakan Privasi</h1>
             <p class="footer-page__lead">

@@ -868,6 +868,13 @@ body.lh-filter-lock {
     font-size: 13px;
     line-height: 1.48;
     color: #2b2324;
+    
+    /* Tambahan agar bisa scroll saat kepanjangan */
+    max-height: 110px; /* Batas tinggi maksimal, silakan sesuaikan */
+    overflow-y: auto;
+    padding-right: 8px; /* Ruang senggang untuk scrollbar */
+    scrollbar-width: thin; /* Kustomisasi scrollbar untuk Firefox */
+    scrollbar-color: rgba(152, 22, 25, 0.35) transparent;
 }
 
 @media (max-width: 1080px) {
@@ -1024,4 +1031,13 @@ body.lh-filter-lock {
     .lh-popular-detail-modal__summary {
         font-size: 12px;
     }
+    /* Kustomisasi scrollbar untuk browser Webkit (Chrome, Safari, Edge) */
+.lh-popular-detail-modal__summary::-webkit-scrollbar {
+    width: 6px;
+}
+
+.lh-popular-detail-modal__summary::-webkit-scrollbar-thumb {
+    background: rgba(152, 22, 25, 0.35);
+    border-radius: 999px;
+}
 }

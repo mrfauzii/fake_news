@@ -75,40 +75,46 @@ class ImageDetectionController extends Controller
     ->pluck('link')
     ->toArray();
     Log::info('SESUDAH PYTHON');
-                // 5. Simpan ke tabel 'image_search_results'
+                // 5. Simpan ke tabel 'image_search_results'        
+                // 6. Update hasil akhir di tabel 'requests'
+                $isHoax = $res['prediction'] == 1;
+                $finalLabel = $isHoax == 1 ? 'fake' : 'real';
+                $confidence = round($res['confidence'] * 100);
+                if ($isHoax == 1) {
+                    $hoaxPercentage = $confidence;
+                    $factPercentage = 100 - $hoaxPercentage;
+                } else {
+                    $factPercentage = $confidence;
+                    $hoaxPercentage  = 100 - $factPercentage;
+                }
+                $finalLabel = $isHoax == 1 ? 'FAKE' : 'FAKTA';
+                $summary = 'Analisis gambar menunjukkan indikasi ' . $finalLabel . ' dengan tingkat kepercayaan ' . $confidence . '%.';
+                
                 ImageSearchResults::create([
                     'request_id' => $newReq->id,
                     'source_url' => $links,
                     'similarity_score' => $res['similarity_score'],
                     'mean_date_score' => $res['avg_date_scaled'],
+                    'summary' => $summary ?? '-',
                 ]);
-
-                // 6. Update hasil akhir di tabel 'requests'
-                $isHoax = $res['prediction'] == 1;
-                $finalLabel = $isHoax ? 'fake' : 'real';
-                if ($isHoax) {
-                    $hoaxPercentage = round($res['confidence'] * 100);
-                    $factPercentage = 100 - $hoaxPercentage;
-                } else {
-                    $factPercentage = round($res['confidence'] * 100);
-                    $hoaxPercentage  = 100 - $factPercentage;
-                }
                 
                 $newReq->update([
                     'final_label' => $finalLabel,
                     'final_confidence' => $res['confidence'],
                     'status' => 'completed'
                 ]);
-                $finalLabel = $isHoax ? 'FAKE' : 'FAKTA';
+                
 
                 // 7. RETURN SESUAI FIGMA
                 return response()->json([
                     'status' => 'success',
                     'verdict' => $finalLabel,
                     'confidence' => $hoaxPercentage,
-                    'summary' => 'Analisis gambar menunjukkan indikasi ' . $finalLabel . ' dengan tingkat kepercayaan ' . $hoaxPercentage . '%.',
+                    'summary' => $summary ?? '-',
                     'sources' => $links,
-
+                    'raw_data' => [
+                        'request_id' => $newReq->id,
+                    ],
                     'data' => [
                         'indication' => $finalLabel,
                         'confidence_score' => [

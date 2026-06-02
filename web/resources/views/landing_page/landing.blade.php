@@ -238,7 +238,7 @@
             </div>
 
             <div class="why-us-media">
-                <img src="{{ asset('img/fact-checking.jpeg') }}">
+                <img src="{{ asset('img/data-statistik.png') }}">
             </div>
 
         </div>
@@ -270,7 +270,7 @@
                     </div>
                 </div>
                 <div class="team-card">
-                    <div class="avatar-wrapper">
+                    <div class="avatar-wrapper"> 
                         <img src="{{ asset('img/purnama-rizky.jpg') }}" alt="Foto Purnama Rizky Nugraha">
                     </div>
                     <h3>Purnama Rizky Nugraha</h3>
@@ -319,16 +319,16 @@
                 </div>
                 <div class="team-card">
                     <div class="avatar-wrapper">
-                        <img src="{{ asset('img/purnama-rizky.jpg') }}" alt="Foto Purnama Rizky Nugraha">
+                        <img src="{{ asset('img/desi-karmila.jpeg') }}" alt="Foto Desi Karmila">
                     </div>
-                    <h3>Purnama Rizky Nugraha</h3>
-                    <p class="role">Project Manager & AI Engineer</p>
+                    <h3>Desi Karmila</h3>
+                    <p class="role">Front End Developer</p>
                     
                     <div class="team-socials">
-                        <a href="#" class="social-icon" title="Website/Portofolio">
+                        <a href="https://portofolio-pink-pi.vercel.app/" class="social-icon" title="Website/Portofolio">
                             <span class="material-symbols-outlined">language</span>
                         </a>
-                        <a href="mailto:email@kamu.com" class="social-icon" title="Email">
+                        <a href="mailto:desikarmila211@gmail.com" class="social-icon" title="Email">
                             <span class="material-symbols-outlined">mail</span>
                         </a>
                     </div>

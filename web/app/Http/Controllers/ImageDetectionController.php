@@ -78,16 +78,17 @@ class ImageDetectionController extends Controller
                 // 5. Simpan ke tabel 'image_search_results'        
                 // 6. Update hasil akhir di tabel 'requests'
                 $isHoax = $res['prediction'] == 1;
-                $finalLabel = $isHoax ? 'fake' : 'real';
-                if ($isHoax) {
-                    $hoaxPercentage = round($res['confidence'] * 100);
+                $finalLabel = $isHoax == 1 ? 'fake' : 'real';
+                $confidence = round($res['confidence'] * 100);
+                if ($isHoax == 1) {
+                    $hoaxPercentage = $confidence;
                     $factPercentage = 100 - $hoaxPercentage;
                 } else {
-                    $factPercentage = round($res['confidence'] * 100);
+                    $factPercentage = $confidence;
                     $hoaxPercentage  = 100 - $factPercentage;
                 }
-                $finalLabel = $isHoax ? 'FAKE' : 'FAKTA';
-                $summary = 'Analisis gambar menunjukkan indikasi ' . $finalLabel . ' dengan tingkat kepercayaan ' . $hoaxPercentage . '%.';
+                $finalLabel = $isHoax == 1 ? 'FAKE' : 'FAKTA';
+                $summary = 'Analisis gambar menunjukkan indikasi ' . $finalLabel . ' dengan tingkat kepercayaan ' . $confidence . '%.';
                 
                 ImageSearchResults::create([
                     'request_id' => $newReq->id,
@@ -111,7 +112,9 @@ class ImageDetectionController extends Controller
                     'confidence' => $hoaxPercentage,
                     'summary' => $summary ?? '-',
                     'sources' => $links,
-
+                    'raw_data' => [
+                        'request_id' => $newReq->id,
+                    ],
                     'data' => [
                         'indication' => $finalLabel,
                         'confidence_score' => [

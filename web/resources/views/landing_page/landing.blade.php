@@ -238,7 +238,7 @@
             </div>
 
             <div class="why-us-media">
-                <img src="{{ asset('img/fact-checking.jpeg') }}">
+                <img src="{{ asset('img/proses-analisis.png') }}">
             </div>
 
         </div>

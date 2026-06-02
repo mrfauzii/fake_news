@@ -12,6 +12,7 @@
           content="{{ csrf_token() }}">
 
     <title>@yield('title', 'Admin Panel')</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/Lensa-saja.png') }}">
 
     <!-- GLOBAL CSS -->
     <link rel="stylesheet"

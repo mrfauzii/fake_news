@@ -71,50 +71,108 @@
             </section>
 
             <section class="wa-commands">
-                <div class="wa-section-heading">
-                    <span class="wa-section-heading__eyebrow">Command Bot</span>
-                    <h2>Fitur utama via WhatsApp</h2>
-                    <p>
-                        Gunakan command berikut untuk mengakses fitur bot dengan cepat dan terarah.
-                    </p>
+                <div class="wa-commands__top">
+                    <div class="wa-section-heading wa-section-heading--commands">
+                        <span class="wa-section-heading__eyebrow">Command Bot</span>
+                        <h2>Fitur utama via WhatsApp</h2>
+                        <p>
+                            Gunakan command berikut untuk mengakses fitur bot dengan cepat dan terarah.
+                        </p>
+                    </div>
+
+                    {{-- <aside class="wa-tip-card" aria-label="Tips penggunaan command">
+                        <div class="wa-tip-card__icon">
+                            <iconify-icon icon="mdi:lightbulb-on-outline" width="28" height="28"></iconify-icon>
+                        </div>
+                        <div>
+                            <h3>Tips</h3>
+                            <p>Ketik command di WhatsApp persis seperti contoh untuk hasil yang akurat.</p>
+                        </div>
+                    </aside> --}}
                 </div>
-                <div class="wa-command-grid">
-                    <article class="wa-command-card">
-                        <div class="wa-command-card__icon wa-command-card__icon--detect">
-                            <iconify-icon icon="mdi:shield-search-outline" width="24" height="24"></iconify-icon>
+                <div class="wa-commands__layout">
+                    <div class="wa-command-list">
+                        <div class="wa-command-list__heading">01. Daftar Command</div>
+
+                        <article class="wa-command-row wa-command-row--detect">
+                            <div class="wa-command-row__icon">
+                                <iconify-icon icon="mdi:search" width="28" height="28"></iconify-icon>
+                            </div>
+                            <div class="wa-command-row__content">
+                                <h3>#detect</h3>
+                                <p>Kirim berita atau informasi, lalu ketik #detect untuk memeriksa keaslian pesan terakhir yang Anda kirim.</p>
+                            </div>
+                            <div class="wa-command-row__example">
+                                <span>Contoh penggunaan</span>
+                                <strong>#detect</strong>
+                            </div>
+                        </article>
+
+                        <article class="wa-command-row wa-command-row--info">
+                            <div class="wa-command-row__icon">
+                                <iconify-icon icon="mdi:information-outline" width="28" height="28"></iconify-icon>
+                            </div>
+                            <div class="wa-command-row__content">
+                                <h3>#info</h3>
+                                <p>Lihat informasi tentang sistem Lensa Hoax.</p>
+                            </div>
+                            <div class="wa-command-row__example">
+                                <span>Contoh penggunaan</span>
+                                <strong>#info</strong>
+                            </div>
+                        </article>
+
+                        <article class="wa-command-row wa-command-row--trend">
+                            <div class="wa-command-row__icon">
+                                <iconify-icon icon="mdi:trending-up" width="28" height="28"></iconify-icon>
+                            </div>
+                            <div class="wa-command-row__content">
+                                <h3>#trending</h3>
+                                <p>Lihat daftar tren hoaks terpopuler saat ini.</p>
+                            </div>
+                            <div class="wa-command-row__example">
+                                <span>Contoh penggunaan</span>
+                                <strong>#trending</strong>
+                            </div>
+                        </article>
+
+                        <article class="wa-command-row wa-command-row--history">
+                            <div class="wa-command-row__icon">
+                                <iconify-icon icon="mdi:history" width="28" height="28"></iconify-icon>
+                            </div>
+                            <div class="wa-command-row__content">
+                                <h3>#history</h3>
+                                <p>Lihat riwayat pencarian terakhir Anda di bot.</p>
+                            </div>
+                            <div class="wa-command-row__example">
+                                <span>Contoh penggunaan</span>
+                                <strong>#history</strong>
+                            </div>
+                        </article>
+
+                        {{-- <div class="wa-command-note">
+                            <div class="wa-command-note__icon">
+                                <iconify-icon icon="mdi:shield-check-outline" width="22" height="22"></iconify-icon>
+                            </div>
+                            <div>
+                                <h3>Catatan</h3>
+                                <p>Pastikan command diketik dengan benar dan tanpa tambahan spasi. Gunakan bahasa yang sopan untuk hasil terbaik.</p>
+                            </div>
+                        </div> --}}
+                    </div>
+
+                    <div class="wa-command-side">
+                        <div class="wa-command-side__heading">02. Cara Menggunakan</div>
+                        <ol class="wa-command-steps">
+                            <li>Klik "Check Via WhatsApp" untuk memulai.</li>
+                            <li>Ketik command sesuai fitur yang ingin digunakan.</li>
+                            <li>Kirim pesan dan bot akan memberikan respon.</li>
+                        </ol>
+
+                        <div class="wa-command-preview">
+                            <img src="{{ asset('img/detect.png') }}" alt="Contoh tampilan chat WhatsApp" class="wa-command-preview__image">
                         </div>
-                        <div>
-                            <h3>#detect</h3>
-                            <p>Periksa keaslian pesan terakhir yang Anda kirim.</p>
-                        </div>
-                    </article>
-                    <article class="wa-command-card">
-                        <div class="wa-command-card__icon wa-command-card__icon--info">
-                            <iconify-icon icon="mdi:information-outline" width="24" height="24"></iconify-icon>
-                        </div>
-                        <div>
-                            <h3>#info</h3>
-                            <p>Lihat informasi tentang sistem Lensa Hoax.</p>
-                        </div>
-                    </article>
-                    <article class="wa-command-card">
-                        <div class="wa-command-card__icon wa-command-card__icon--trend">
-                            <iconify-icon icon="mdi:trending-up" width="24" height="24"></iconify-icon>
-                        </div>
-                        <div>
-                            <h3>#trending</h3>
-                            <p>Lihat daftar tren hoaks terpopuler saat ini.</p>
-                        </div>
-                    </article>
-                    <article class="wa-command-card">
-                        <div class="wa-command-card__icon wa-command-card__icon--history">
-                            <iconify-icon icon="mdi:history" width="24" height="24"></iconify-icon>
-                        </div>
-                        <div>
-                            <h3>#history</h3>
-                            <p>Lihat riwayat pencarian terakhir Anda di bot.</p>
-                        </div>
-                    </article>
+                    </div>
                 </div>
             </section>
 

@@ -31,6 +31,14 @@
                         placeholder="Ketik, Tempel, atau Unggah informasi ....."></textarea>
                     <!-- Image preview area -->
                     <div id="imagePreviewContainer" style="display: none; margin-top: 16px;">
+                        <button
+                            type="button"
+                            id="btnRemoveImage"
+                            class="lh-image-preview__remove"
+                            aria-label="Hapus gambar yang diunggah"
+                            title="Hapus gambar">
+                            &times;
+                        </button>
                         <img id="imagePreview" src="" alt="Preview gambar" style="max-width: 100%; max-height: 300px; border-radius: 8px; display: block; margin-bottom: 8px;">
                         <p id="imagePreviewText" style="text-align: center; font-size: 12px; color: #666; margin: 0;">
                             ✓ Gambar siap untuk diteliti

@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "imagePreviewContainer",
     );
     const imagePreview = document.getElementById("imagePreview");
+    const btnRemoveImage = document.getElementById("btnRemoveImage");
     const searchParams = new URLSearchParams(window.location.search);
     const prefilledInformasi = (
         searchParams.get("informasi") ||
@@ -36,6 +37,13 @@ document.addEventListener("DOMContentLoaded", function () {
     btnUnggah.addEventListener("click", function () {
         // clearImagePreview(); // Clear previous preview if any
         fileInput.click();
+    });
+
+    /**
+     * Remove uploaded image from the preview box
+     */
+    btnRemoveImage.addEventListener("click", function () {
+        clearImagePreview();
     });
 
     /**

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request
 from controllers.image_detection_controller import detect_image_fake_controller
 from controllers.text_detection_controller import detect_text_fake_news_controller,similarity_controller
 from controllers.kb_controller import update_knowledge_base_controller
+from controllers.croma_controller import delete_from_chroma_controller
 
 
 def create_routes():
@@ -45,6 +46,13 @@ def create_routes():
         return detect_image_fake_controller(
             request.app.state.image_classifier,
             request.app.state.distance_model,
+            data
+        )
+
+    @router.post("/text-request/delete")
+    def delete_text_request(request: Request, data: dict):
+        return delete_from_chroma_controller(
+            request.app.state.text_request,
             data
         )
 

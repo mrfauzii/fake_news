@@ -39,7 +39,7 @@ class UmpanBalikController extends Controller
 
     // Paginate hasil query
     $feedbacks = $query->orderBy('feedbacks.created_at', 'desc')
-                       ->paginate(1) 
+                       ->paginate(5) 
                        ->withQueryString();
 
     // Hitung total untuk keperluan statistik

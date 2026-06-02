@@ -167,16 +167,31 @@ class WaController extends Controller
                 // ==========================================
                 case str_starts_with($message, '#trending'):
                     // 1. Ambil data dari view database yang sama dengan website (Hanya yang HOAKS/FAKE)
-                    $trendingHoaxes = \Illuminate\Support\Facades\DB::table('history_view')
-                        ->select(
-                            'input_text',
-                            \Illuminate\Support\Facades\DB::raw('COUNT(*) as count')
-                        )
-                        ->where('final_label', 'fake') // Hanya ambil yang terindikasi hoaks
-                        ->groupBy('input_text')
-                        ->orderByDesc('count') // Urutkan dari yang paling banyak dicari/populer
-                        ->take(3) // Ambil 3 besar
-                        ->get();
+                    $trendingHoaxes = DB::table('user_interactions as ui')
+    ->join('requests as r', 'ui.request_id', '=', 'r.id')
+    ->leftJoin('stage1_results as s1', 'r.id', '=', 's1.request_id')
+    ->leftJoin('knowledge_base as kb', 's1.knowledge_id', '=', 'kb.id')
+    ->leftJoin('stage2_results as s2', 'r.id', '=', 's2.request_id')
+    ->whereNull('r.deleted_at')
+    ->where('r.final_label', 'fake')
+    ->select(
+        'r.input_text',
+        'r.final_label',
+        'r.final_confidence',
+        'kb.fact_text as fact_text',
+        's2.summary_text as summary_text',
+        DB::raw('COUNT(*) as count')
+    )
+    ->groupBy(
+        'r.input_text',
+        'r.final_label',
+        'r.final_confidence',
+        'kb.fact_text',
+        's2.summary_text'
+    )
+    ->orderByDesc('count')
+    ->take(3)
+    ->get();
 
                     // 2. Kamus Nama Bulan untuk mempercantik info periode saat ini
                     $bulanIndo = [

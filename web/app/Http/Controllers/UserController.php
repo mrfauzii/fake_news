@@ -25,7 +25,7 @@ class UserController extends Controller
             });
         })
             ->orderBy('name', 'asc') // Menambahkan sorting agar susunan tabel teratur rapi
-            ->paginate(2)
+            ->paginate(5)
             ->appends(['search' => $search]);
 
         // 3. Mapping data koleksi pagination tanpa memutus rantai pagination-nya
@@ -64,7 +64,7 @@ class UserController extends Controller
             // =========================
             $validator = Validator::make($request->all(), [
                 'name' => 'nullable|string|max:255',
-                'email' => 'nullable|email|max:255|unique:users,email,' . $user->id,
+                'email' => 'nullable|email|max:255',
                 'phone_number' => 'nullable|string|max:20',
             ]);
 

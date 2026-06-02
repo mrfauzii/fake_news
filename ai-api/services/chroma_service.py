@@ -73,6 +73,27 @@ def input_text_request(text_request, vector, request_id):
         embeddings=[vector]
     )
     
+
+def delete_from_chroma(collection, ids):
+    if ids is None:
+        raise ValueError("ids is required")
+
+    if isinstance(ids, (str, int)):
+        ids = [str(ids)]
+    elif isinstance(ids, list):
+        ids = [str(i) for i in ids]
+    else:
+        raise ValueError("ids must be a string, int, or list of ids")
+
+    print(f"🗑️ Deleting from Chroma collection {getattr(collection, 'name', '<unknown>')} ids={ids}")
+    collection.delete(ids=ids)
+    print(f"✅ Deleted ids: {ids}")
+    return {
+        "status": "success",
+        "deleted_ids": ids
+    }
+
+
 def search_similar_input(embedding,text_request,THRESHOLD = 0.90):
 
     results = text_request.query(

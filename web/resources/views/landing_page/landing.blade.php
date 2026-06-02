@@ -85,7 +85,7 @@
                         <span class="material-symbols-outlined">login</span>
                     </div>
                     <h4>1. Masuk Menu</h4>
-                    <p>Akses dashboard atau menu utama di platform kami.</p>
+                    <p>Akses bagian pencarian di platform kami.</p>
                 </div>
 
                 <div class="step-item">
@@ -186,7 +186,7 @@
                     <div class="feature-icon-wrapper bg-soft-red">
                         <span class="material-symbols-outlined icon-red">psychology</span>
                     </div>
-                    <h3>Penjelasan AI</h3>
+                    <h3>Penjelasan</h3>
                     <p>Dapatkan alasan logis di balik setiap kesimpulan verifikasi yang diberikan.</p>
                 </div>
             </div>
@@ -275,7 +275,7 @@
                 </div>
                 <div class="team-card">
                     <div class="avatar-wrapper">
-                        <img src="{{ asset('img/landing/adinda.jpeg') }}" alt="Foto Adinda Ivanka Maysanda Putri">
+                        <img src="{{ asset('img/landing/user-3296_256.png') }}" alt="Foto Adinda Ivanka Maysanda Putri">
                     </div>
                     <h3>Adinda Ivanka Maysanda Putri</h3>
                     <p class="role">Frontend Developer</p>
@@ -291,7 +291,7 @@
                 </div>
                 <div class="team-card">
                     <div class="avatar-wrapper">
-                         <img src="{{ asset('img/desi-karmila.jpeg') }}" alt="Foto Desi Karmila">
+                        <img src="{{ asset('img/desi-karmila.jpeg') }}" alt="Foto Desi Karmila">
                     </div>
                     <h3>Desi Karmila</h3>
                     <p class="role">Frontend Developer</p>
@@ -301,15 +301,16 @@
                             <span class="material-symbols-outlined">language</span>
                         </a>
                         <a href="mailto:desikarmila211@gmail.com" class="social-icon" title="Email">
+                            <span class="material-symbols-outlined">mail</span>
+                        </a>
                     </div>
                 </div>
                 <div class="team-card">
                     <div class="avatar-wrapper">
-                        <img src="{{ asset('img/landing/reishi.jpeg') }}" alt="Foto Muhammad Reishi Fauzi Auguri">
+                        <img src="{{ asset('img/landing/user-3296_256.png') }}" alt="Foto Muhammad Reishi Fauzi Auguri">
                     </div>
                     <h3>Muhammad Reishi Fauzi Auguri</h3>
                     <p class="role">Backend Developer</p>
-
                     <div class="team-socials">
                         <a href="#" class="social-icon" title="Website/Portofolio">
                             <span class="material-symbols-outlined">language</span>
@@ -321,27 +322,21 @@
                 </div>
                 <div class="team-card">
                     <div class="avatar-wrapper">
-                        <img src="{{ asset('img/landing/firman.jpeg') }}" alt="Foto Firman Dzaki Rahman">
+                        <img src="{{ asset('img/landing/user-3296_256.png') }}" alt="Foto Firman Dzaki Rahman">
                     </div>
-
                     <h3>Firman Dzaki Rahman</h3>
                     <p class="role">Backend Developer</p>
-
                     <div class="team-socials">
-                        <a href="https://linkedin.com/in/username-firman" target="_blank" class="social-icon"
-                            title="LinkedIn">
-                            <span class="material-symbols-outlined">business_center</span>
+                        <a href="#" class="social-icon" title="Website/Portofolio">
+                            <span class="material-symbols-outlined">language</span>
                         </a>
-
-                        <a href="mailto:firman@example.com" class="social-icon" title="Email">
+                        <a href="mailto:email@kamu.com" class="social-icon" title="Email">
                             <span class="material-symbols-outlined">mail</span>
                         </a>
                     </div>
                 </div>
             </div>
         </div>
-
-
     </section>
 
     {{-- CALL TO ACTION SECTION --}}
@@ -354,7 +349,7 @@
 
             <!-- Tombol Aksi -->
             <div class="cta-banner__action">
-                <a href="#" class="cta-banner__button">Coba Sekarang !</a>
+                <a href="{{ route('deteksi') }}" class="cta-banner__button">Coba Sekarang !</a>
             </div>
         </div>
     </section>

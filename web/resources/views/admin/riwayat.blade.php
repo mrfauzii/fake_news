@@ -61,21 +61,24 @@
     <div class="card-header">
         
         {{-- 1. JUDUL (SELALU DI ATAS) --}}
-        <div class="warning-title">
+        <div class="warning-title" @if(data_get($item, 'is_deleted')) style="text-decoration: line-through; opacity: 0.6; color: #dc3545;" @endif>
             @if (!$hasImage) <i class="fa fa-exclamation-triangle warning-icon"></i> @endif
             {{ data_get($item, 'judul') }}
             @if (!$hasImage) <i class="fa fa-exclamation-triangle warning-icon"></i> @endif
+            @if(data_get($item, 'is_deleted'))
+                <span style="margin-left: 10px; background: #dc3545; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; text-decoration: none;">DIHAPUS</span>
+            @endif
         </div>
 
         {{-- 2. KONTEN (GAMBAR ATAU TEKS) --}}
         @if ($hasImage && is_string($imagePath))
             {{-- Jika ada gambar --}}
-            <div class="card-image-wrapper">
+            <div class="card-image-wrapper" @if(data_get($item, 'is_deleted')) style="opacity: 0.6;" @endif>
                 <img src="{{ asset($imagePath) }}" class="card-img" onerror="this.parentNode.style.display='none'">
             </div>
         @else
             {{-- Jika tidak ada gambar (Tampilkan Teks) --}}
-            <p class="desc">
+            <p class="desc" @if(data_get($item, 'is_deleted')) style="opacity: 0.6; text-decoration: line-through;" @endif>
                 {{ $userText }}
             </p>
         @endif

@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\history_view;
 use App\Models\Requests; // Tabel utamanya
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 
 class HistoryManagementController extends Controller
@@ -89,7 +90,10 @@ class HistoryManagementController extends Controller
 
         DB::beginTransaction();
         try {
-            
+            $delete_sim = Http::timeout(60)->post('http://127.0.0.1:8004/text-request/delete', [
+                    'id' => $request->id,
+                ]);
+
             $request->imageSearchResults()->delete();
             $request->stage1Results()->delete();
             $request->stage2Results()->delete();

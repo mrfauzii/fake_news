@@ -19,7 +19,13 @@ class RiwayatController extends Controller
 
         $search = request('search');
 
-        $histories = history_view::with(['request.image', 'request.stage1Results', 'request.stage2Results'])
+        $histories = history_view::with([
+            'request' => function($q) { $q->withTrashed(); },
+            'request.image',
+            'request.stage1Results',
+            'request.stage2Results',
+            'request.imageSearchResults'
+        ])
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('username', 'like', "%{$search}%")->orWhere('input_text', 'like', "%{$search}%");
@@ -144,7 +150,14 @@ class RiwayatController extends Controller
 
         $userId = Auth::check() ? Auth::id() : 2;
 
-        $histories = UserInteractions::with(['request.image', 'request.stage1Results', 'request.stage2Results', 'request.feedbacks','request.imageSearchResults'])
+        $histories = UserInteractions::with([
+            'request' => function($q) { $q->withTrashed(); },
+            'request.image',
+            'request.stage1Results',
+            'request.stage2Results',
+            'request.feedbacks',
+            'request.imageSearchResults'
+        ])
             ->where('user_id', $userId)
             ->orderBy('created_at', 'desc')
             ->get();

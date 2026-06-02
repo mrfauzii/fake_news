@@ -242,7 +242,7 @@
             </div>
 
             <div class="why-us-media">
-                <img src="{{ asset('img/proses-analisis.png') }}">
+                <img src="{{ asset('img/data-statistik.png') }}">
             </div>
 
         </div>
@@ -291,18 +291,16 @@
                 </div>
                 <div class="team-card">
                     <div class="avatar-wrapper">
-                        <img src="{{ asset('img/landing/desi.jpeg') }}" alt="Foto Desi Karmila">
+                         <img src="{{ asset('img/desi-karmila.jpeg') }}" alt="Foto Desi Karmila">
                     </div>
                     <h3>Desi Karmila</h3>
                     <p class="role">Frontend Developer</p>
 
                     <div class="team-socials">
-                        <a href="#" class="social-icon" title="Website/Portofolio">
+                        <a href="https://portofolio-pink-pi.vercel.app/" class="social-icon" title="Website/Portofolio">
                             <span class="material-symbols-outlined">language</span>
                         </a>
-                        <a href="mailto:email@kamu.com" class="social-icon" title="Email">
-                            <span class="material-symbols-outlined">mail</span>
-                        </a>
+                        <a href="mailto:desikarmila211@gmail.com" class="social-icon" title="Email">
                     </div>
                 </div>
                 <div class="team-card">

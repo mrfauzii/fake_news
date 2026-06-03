@@ -1,23 +1,15 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lensa Hoax - Dapatkan Melalui WhatsApp</title>
+@extends('layouts.app')
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700;800&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/user/navbar.css') }}">
+<link rel="stylesheet" href="{{ asset('css/user/profile-popup.css') }}">
+<link rel="stylesheet" href="{{ asset('css/user/whatsapp.css') }}">
 
-    <link rel="stylesheet" href="{{ asset('css/user/navbar.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/user/whatsapp.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/user/profile-popup.css') }}">
-</head>
-<body>
-    <div class="wa-page">
-        @include('user.partials.navbar', ['variant' => 'wa', 'activeWhatsApp' => true])
+@endpush
 
+@section('content')
+<div class="riwayat-page">
+    @include('user.partials.navbar', ['activeRiwayat' => true])
         <main class="wa-content">
             <section class="wa-hero">
                 <div class="wa-hero__visual" aria-hidden="true">
@@ -206,8 +198,15 @@
                 </div>
             </section>
         </main>
-        @include('layouts.footer')
-    </div>
-    <script src="{{ asset('js/user/profile-popup.js') }}"></script>
-</body>
-</html>
+
+    @auth
+    @include('user.partials.profile-popup', ['popupId' => 'user-profile-popup'])
+    @endauth
+</div>
+@endsection
+
+@push('scripts')
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<script src="{{ asset('js/user/profile-popup.js') }}"></script>
+
+@endpush

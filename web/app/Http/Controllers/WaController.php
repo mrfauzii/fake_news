@@ -174,6 +174,8 @@ class WaController extends Controller
                         ->leftJoin('stage2_results as s2', 'r.id', '=', 's2.request_id')
                         ->whereNull('r.deleted_at')
                         ->where('r.final_label', 'fake')
+                        ->whereYear('ui.created_at', Carbon::now()->year)
+                        ->whereMonth('ui.created_at', Carbon::now()->month)
                         ->select(
                             'r.input_text',
                             'r.final_label',

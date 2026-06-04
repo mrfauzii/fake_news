@@ -275,16 +275,16 @@
                 </div>
                 <div class="team-card">
                     <div class="avatar-wrapper">
-                        <img src="{{ asset('img/landing/user-3296_256.png') }}" alt="Foto Adinda Ivanka Maysanda Putri">
+                        <img src="{{ asset('img/adin.jpg') }}" alt="Foto Adinda Ivanka Maysanda Putri">
                     </div>
                     <h3>Adinda Ivanka Maysanda Putri</h3>
                     <p class="role">Frontend Developer</p>
 
                     <div class="team-socials">
-                        <a href="#" class="social-icon" title="Website/Portofolio">
+                        <a href="https://adindaivankamp.github.io/portofolio/" class="social-icon" title="Website/Portofolio">
                             <span class="material-symbols-outlined">language</span>
                         </a>
-                        <a href="mailto:email@kamu.com" class="social-icon" title="Email">
+                        <a href="mailto:adindaivankamaysandaputri@gmail.com" class="social-icon" title="Email">
                             <span class="material-symbols-outlined">mail</span>
                         </a>
                     </div>

@@ -84,7 +84,7 @@ class ImageDetectionController extends Controller
                     $factPercentage = $confidence;
                     $hoaxPercentage = 100 - $factPercentage;
                 }
-                $finalLabel = $isHoax == 1 ? 'fake' : 'real';
+                $finalLabel = $isHoax == 1 ? 'hoax' : 'fact';
                 $status = '';
 
                 if ($confidence < 60) {

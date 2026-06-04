@@ -25,57 +25,54 @@ class ImageDetectionController extends Controller
             // 1. Upload ke Cloudinary
             $file = $request->file('gambar');
 
-        Log::info('Menerima file: ' . $file->getClientOriginalName());
+            Log::info('Menerima file: ' . $file->getClientOriginalName());
 
-        // 🔥 Setup Cloudinary
-        Configuration::instance([
-            'cloud' => [
-                'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                'api_key'    => env('CLOUDINARY_API_KEY'),
-                'api_secret' => env('CLOUDINARY_API_SECRET'),
-            ],
-        ]);
+            // 🔥 Setup Cloudinary
+            Configuration::instance([
+                'cloud' => [
+                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                    'api_key' => env('CLOUDINARY_API_KEY'),
+                    'api_secret' => env('CLOUDINARY_API_SECRET'),
+                ],
+            ]);
 
-        // 🔥 Upload langsung (NO MOVE)
-        $upload = (new UploadApi())->upload($file->getRealPath(), [
-            'folder' => 'fake_news_system'
-        ]);
+            // 🔥 Upload langsung (NO MOVE)
+            $upload = (new UploadApi())->upload($file->getRealPath(), [
+                'folder' => 'fake_news_system',
+            ]);
 
-        $url = $upload['secure_url'];
+            $url = $upload['secure_url'];
 
-        Log::info('Upload sukses: ' . $url);
+            Log::info('Upload sukses: ' . $url);
             Log::info('Gambar berhasil diupload ke Cloudinary: ' . $url);
             // 2. Simpan ke tabel 'images'
             $imgRecord = Images::create([
-                'file_path' => $url,    
+                'file_path' => $url,
                 'original_filename' => $file->getClientOriginalName(),
-                'uploaded_by' => auth()->id() ?? 2
+                'uploaded_by' => auth()->id() ?? 2,
             ]);
 
             // 3. Inisialisasi awal di tabel 'requests'
             $newReq = Requests::create([
                 'image_id' => $imgRecord->id,
-                'status' => 'processing'
+                'status' => 'processing',
             ]);
             UserInteractions::create([
-                'user_id'    => auth()->id() ?? 2,
+                'user_id' => auth()->id() ?? 2,
                 'request_id' => $newReq->id,
             ]);
             log::info('Request baru dibuat dengan ID: ' . $url);
             // 4. Panggil API Python
             Log::info('SEBELUM PYTHON');
-            $response = Http::timeout(300)
-        ->post('http://localhost:8004/image-detection', [
-            'image_url' => $url
-        ]);
+            $response = Http::timeout(300)->post('http://localhost:8004/image-detection', [
+                'image_url' => $url,
+            ]);
             Log::info($response->body());
             if ($response->successful()) {
                 $res = $response->json();
-                $links = collect($res['data'])
-    ->pluck('link')
-    ->toArray();
-    Log::info('SESUDAH PYTHON');
-                // 5. Simpan ke tabel 'image_search_results'        
+                $links = collect($res['data'])->pluck('link')->toArray();
+                Log::info('SESUDAH PYTHON');
+                // 5. Simpan ke tabel 'image_search_results'
                 // 6. Update hasil akhir di tabel 'requests'
                 $isHoax = $res['prediction'] == 1;
                 $finalLabel = $isHoax == 1 ? 'fake' : 'real';
@@ -85,11 +82,28 @@ class ImageDetectionController extends Controller
                     $factPercentage = 100 - $hoaxPercentage;
                 } else {
                     $factPercentage = $confidence;
-                    $hoaxPercentage  = 100 - $factPercentage;
+                    $hoaxPercentage = 100 - $factPercentage;
                 }
-                $finalLabel = $isHoax == 1 ? 'FAKE' : 'FAKTA';
-                $summary = 'Analisis gambar menunjukkan indikasi ' . $finalLabel . ' dengan tingkat kepercayaan ' . $confidence . '%.';
-                
+                $finalLabel = $isHoax == 1 ? 'fake' : 'real';
+                $status = '';
+
+                if ($confidence < 60) {
+                    $status = '⚪ INFORMASI BELUM DAPAT DIPASTIKAN ⚪';
+                } elseif ($finalLabel === 'HOAX') {
+                    if ($confidence >= 80) {
+                        $status = '🔴 TERINDIKASI KUAT SEBAGAI HOAX 🔴';
+                    } else {
+                        $status = '🟠 INDIKASI DISINFORMASI (CENDERUNG HOAX) 🟠';
+                    }
+                } else {
+                    if ($confidence >= 80) {
+                        $status = '🟢 INFORMASI VALID 🟢';
+                    } else {
+                        $status = '🟡 CENDERUNG FAKTA (MEMBUTUHKAN KONTEKS) 🟡';
+                    }
+                }
+
+                $summary = $status . "\n\n" . 'Analisis gambar menunjukkan indikasi ' . $finalLabel . ' dengan tingkat kepercayaan ' . $confidence . '%.';
                 ImageSearchResults::create([
                     'request_id' => $newReq->id,
                     'source_url' => $links,
@@ -97,18 +111,28 @@ class ImageDetectionController extends Controller
                     'mean_date_score' => $res['avg_date_scaled'],
                     'summary' => $summary ?? '-',
                 ]);
-                
+
                 $newReq->update([
                     'final_label' => $finalLabel,
                     'final_confidence' => $res['confidence'],
-                    'status' => 'completed'
+                    'status' => 'completed',
                 ]);
-                
+                if ($confidence < 60) {
+                    $verdict = 'uncertain';
+                } elseif ($finalLabel === 'fake') {
+                    $verdict = $confidence >= 80
+                        ? 'hoax'
+                        : 'likely-hoax';
+                } else {
+                    $verdict = $confidence >= 80
+                        ? 'fact'
+                        : 'likely-fact';
+                }
 
                 // 7. RETURN SESUAI FIGMA
                 return response()->json([
                     'status' => 'success',
-                    'verdict' => $finalLabel,
+                    'verdict' => $verdict,
                     'confidence' => $hoaxPercentage,
                     'summary' => $summary ?? '-',
                     'sources' => $links,
@@ -119,15 +143,14 @@ class ImageDetectionController extends Controller
                         'indication' => $finalLabel,
                         'confidence_score' => [
                             'fake' => $hoaxPercentage,
-                            'real' => $factPercentage
+                            'real' => $factPercentage,
                         ],
-                        'image_preview' => $url
-                    ]
+                        'image_preview' => $url,
+                    ],
                 ]);
             }
 
             return response()->json(['status' => 'error', 'message' => 'API Python Gagal'], 500);
-
         } catch (\Exception $e) {
             Log::error('Cloudinary ERROR: ' . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);

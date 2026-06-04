@@ -233,7 +233,17 @@ class TextDetectionController extends Controller
             $summaryText = 'Hasil analisis menemukan indikasi ' . $statusTeks . ' dengan tingkat keyakinan ' . $confidencePercentage . '%.';
             $sources = [];
         }
-
+        if ($confidencePercentage < 60) {
+            $verdict = 'uncertain';
+        } elseif ($finalLabel === 'fake') {
+            $verdict = $confidencePercentage >= 80
+                ? 'hoax'
+                : 'likely-hoax';
+        } else {
+            $verdict = $confidencePercentage >= 80
+                ? 'fact'
+                : 'likely-fact';
+        }
         return [
             'success' => true,
             'verdict' => $verdict,
@@ -309,6 +319,17 @@ class TextDetectionController extends Controller
                 $sources[] = $url;
             }
         }
+        if ($confidencePercentage < 60) {
+            $verdict = 'uncertain';
+        } elseif ($finalLabel === 'fake') {
+            $verdict = $confidencePercentage >= 80
+                ? 'hoax'
+                : 'likely-hoax';
+        } else {
+            $verdict = $confidencePercentage >= 80
+                ? 'fact'
+                : 'likely-fact';
+        }
 
         return [
             'success' => true,
@@ -349,6 +370,17 @@ class TextDetectionController extends Controller
                 $summaryText = 'Hasil analisis menemukan indikasi ' . $statusTeks . ' dengan tingkat keyakinan ' . $confidencePercentage . '%.';
                 $sources = [];
             }
+            if ($confidencePercentage < 60) {
+                $verdict = 'uncertain';
+            } elseif ($verdict === 'fake') {
+                $verdict = $confidencePercentage >= 80
+                    ? 'hoax'
+                    : 'likely-hoax';
+            } else {
+                $verdict = $confidencePercentage >= 80
+                    ? 'fact'
+                    : 'likely-fact';
+            }
 
             return [
                 'success' => true,
@@ -382,7 +414,17 @@ class TextDetectionController extends Controller
                     }
                 }
             }
-            // Ubah juga bagian ini di formatMatchedResponse:
+            if ($confidencePercentage < 60) {
+                $verdict = 'uncertain';
+            } elseif ($verdict === 'fake') {
+                $verdict = $confidencePercentage >= 80
+                    ? 'hoax'
+                    : 'likely-hoax';
+            } else {
+                $verdict = $confidencePercentage >= 80
+                    ? 'fact'
+                    : 'likely-fact';
+            }
 
             return [
                 'success' => true,

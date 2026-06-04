@@ -265,7 +265,7 @@
                     <p class="role">Project Manager & AI Engineer</p>
 
                     <div class="team-socials">
-                        <a href="#" class="social-icon" title="Website/Portofolio">
+                        <a href="https://purnama-ridzky-n.vercel.app/" class="social-icon" title="Website/Portofolio">
                             <span class="material-symbols-outlined">language</span>
                         </a>
                         <a href="mailto:purnamanugara492@gmail.com" class="social-icon" title="Email">
@@ -307,12 +307,12 @@
                 </div>
                 <div class="team-card">
                     <div class="avatar-wrapper">
-                        <img src="{{ asset('img/landing/user-3296_256.png') }}" alt="Foto Muhammad Reishi Fauzi Auguri">
+                        <img src="{{ asset('img/Fauzi.png') }}" alt="Foto Muhammad Reishi Fauzi Auguri">
                     </div>
                     <h3>Muhammad Reishi Fauzi Auguri</h3>
                     <p class="role">Backend Developer</p>
                     <div class="team-socials">
-                        <a href="#" class="social-icon" title="Website/Portofolio">
+                        <a href="https://github.com/mrfauzii" class="social-icon" title="Website/Portofolio">
                             <span class="material-symbols-outlined">language</span>
                         </a>
                         <a href="mailto:email@kamu.com" class="social-icon" title="Email">

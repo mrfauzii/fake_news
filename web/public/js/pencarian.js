@@ -280,8 +280,26 @@ document.addEventListener("DOMContentLoaded", function () {
         // Normalize and map verdict label
         const normalizedVerdict = String(verdict || "").toLowerCase();
         const verdictMap = {
-            fake: { label: "HOAX", className: "lh-verdict--hoax" },
-            valid: { label: "FAKTA", className: "lh-verdict--valid" },
+            hoax: {
+                label: "HOAX",
+                className: "lh-verdict--hoax"
+            },
+            "likely-hoax": {
+                label: "CENDERUNG HOAX",
+                className: "lh-verdict--likely-hoax"
+            },
+            uncertain: {
+                label: "BELUM DAPAT DIPASTIKAN",
+                className: "lh-verdict--uncertain"
+            },
+            "likely-fact": {
+                label: "CENDERUNG FAKTA",
+                className: "lh-verdict--likely-fact"
+            },
+            fact: {
+                label: "FAKTA",
+                className: "lh-verdict--fact"
+            },
             unclear: {
                 label: "PERLU VERIFIKASI",
                 className: "lh-verdict--unclear",
@@ -290,13 +308,15 @@ document.addEventListener("DOMContentLoaded", function () {
         };
 
         const verdictInfo = verdictMap[normalizedVerdict] || verdictMap.unclear;
+        console.log("Verdict Info:", verdictInfo);
+        console.log("Confidence:", normalizedVerdict, confidence);
 
         const safeConfidence = Number.isFinite(Number(confidence))
             ? Math.max(0, Math.min(100, Math.round(Number(confidence))))
             : 50;
 
         let hoaxPercent = safeConfidence;
-        if (normalizedVerdict === "valid") {
+        if (normalizedVerdict === "fact" || normalizedVerdict === "likely-fact") {
             hoaxPercent = 100 - safeConfidence;
         } else if (normalizedVerdict === "unclear") {
             hoaxPercent = 50;

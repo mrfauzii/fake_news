@@ -240,7 +240,7 @@ def generate_summary(
     # 1. ZONA AMBIGU (Confidence < 60%)
     if confidence < 0.60:
         return (
-            "⚪ **INFORMASI BELUM DAPAT DIPASTIKAN**\n"
+            "⚪ INFORMASI BELUM DAPAT DIPASTIKAN ⚪\n"
             f"Sistem belum dapat mengambil kesimpulan pasti (Tingkat keyakinan hanya {confidence_pct}%). "
             f"Analisis menunjukkan bahwa {alasan_teks}. "
             "Sangat disarankan untuk menunggu liputan tambahan dari media arus utama, karena informasi saat ini masih terlalu simpang siur."
@@ -250,7 +250,7 @@ def generate_summary(
         # 2. HOAX KUAT (Confidence >= 80%)
         if confidence >= 0.80:
             return (
-                "🔴 **TERINDIKASI KUAT SEBAGAI HOAX**\n"
+                "🔴 TERINDIKASI KUAT SEBAGAI HOAX 🔴\n"
                 f"Sistem sangat yakin ({confidence_pct}%) bahwa konten ini menyesatkan atau bohong. "
                 f"Hal ini dikarenakan {alasan_teks}. "
                 "Saran kami: Jangan langsung membagikan informasi ini."
@@ -258,7 +258,7 @@ def generate_summary(
         # 3. CENDERUNG HOAX (Confidence 60% - 79%)
         else:
             return (
-                "🟠 **INDIKASI DISINFORMASI (CENDERUNG HOAX)**\n"
+                "🟠 INDIKASI DISINFORMASI (CENDERUNG HOAX) 🟠\n"
                 f"Terdapat indikasi ({confidence_pct}%) bahwa konten ini mengandung pelintiran fakta atau disinformasi. "
                 f"Sistem menemukan bahwa {alasan_teks}. "
                 "Harap berhati-hati, klaim dalam berita ini patut diragukan kebenarannya."
@@ -268,7 +268,7 @@ def generate_summary(
         # 4. FAKTA KUAT (Confidence >= 80%)
         if confidence >= 0.80:
             return (
-                "🟢 **INFORMASI VALID**\n"
+                "🟢 INFORMASI VALID 🟢\n"
                 f"Sistem sangat yakin ({confidence_pct}%) bahwa konten ini faktual dan aman. "
                 f"Hal ini didukung oleh temuan bahwa {alasan_teks}. "
                 "Anda dapat mempercayai informasi ini karena sejalan dengan bukti dari berbagai referensi kredibel."
@@ -276,7 +276,7 @@ def generate_summary(
         # 5. CENDERUNG FAKTA (Confidence 60% - 79%)
         else:
             return (
-                "🟡 **CENDERUNG FAKTA (MEMBUTUHKAN KONTEKS)**\n"
+                "🟡 CENDERUNG FAKTA (MEMBUTUHKAN KONTEKS) 🟡\n"
                 f"Informasi ini kemungkinan besar benar ({confidence_pct}%), namun sistem mendeteksi beberapa anomali. "
                 f"Temuan menunjukkan bahwa {alasan_teks}. "
                 "Secara umum inti beritanya aman, namun periksa kembali detail spesifiknya karena mungkin ada konteks yang terlewat."

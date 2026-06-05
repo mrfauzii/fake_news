@@ -259,7 +259,7 @@
                 {{-- purnama --}}
                 <div class="team-card">
                     <div class="avatar-wrapper">
-                        <img src="{{ asset('img/landing/pur.png') }}" alt="Foto Purnama Rizky Nugraha">
+                        <img src="{{ asset('img/landing/pur.jpeg') }}" alt="Foto Purnama Rizky Nugraha">
                     </div>
                     <h3>Purnama Rizky Nugraha</h3>
                     <p class="role">Project Manager & AI Engineer</p>

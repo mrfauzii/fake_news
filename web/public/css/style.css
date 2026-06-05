@@ -913,40 +913,173 @@ p {
 
 @media (max-width: 576px) {
     .hero {
-        padding: 30px 0 40px;
+        padding: 40px 0 !important;
+        margin: 0 !important;
+        min-height: auto;
+        overflow: hidden;
+        background: linear-gradient(135deg, #8b1218 0%, #b8201d 40%, #d4474a 100%) !important;
+        position: relative;
     }
 
+    /* Dekorasi lingkaran background */
+    .hero::before {
+        content: '';
+        position: absolute;
+        top: -60px;
+        right: -60px;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.06);
+        pointer-events: none;
+    }
+
+    .hero::after {
+        content: '';
+        position: absolute;
+        bottom: -40px;
+        left: -40px;
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.05);
+        pointer-events: none;
+    }
+
+    .hero .container,
     .hero-flex {
-        gap: 12px;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 0;
     }
 
-    .hero-text {
-        flex: 0 0 48%;
-        max-width: 48%;
-    }
-
+    /* SEMBUNYIKAN GAMBAR */
     .hero-img {
-        flex: 0 0 52%;
-        max-width: 52%;
+        display: none !important;
+    }
+
+    /* TEKS */
+    .hero-text {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 28px 20px 0 !important;
+        text-align: left !important;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start !important;
+        position: relative;
+        z-index: 2;
     }
 
     .hero-text h1 {
-        font-size: 1.6rem;
-        line-height: 1.1;
+        font-size: 1.55rem !important;
+        line-height: 1.25;
+        color: #ffffff !important;
+        text-align: left !important;
+        margin-left: 0 !important;
+        font-weight: 800 !important;
     }
 
     .hero-text p {
-        font-size: 0.9rem;
+        font-size: 0.9rem !important;
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.82) !important;
+        text-align: left !important;
+        margin-left: 0 !important;
+        margin-top: 10px;
     }
 
-    .hero-btn {
+    /* BADGE MINI STATS — elemen baru */
+    .hero-mini-stats {
+        display: flex;
+        gap: 10px;
+        margin-top: 18px;
         flex-wrap: wrap;
-        justify-content: flex-start;
+    }
+
+    .hero-mini-stats .mini-badge {
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 999px;
+        padding: 6px 14px;
+        font-size: 12px;
+        color: #fff;
+        font-weight: 600;
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .hero-mini-stats .mini-badge .material-symbols-outlined {
+        font-size: 15px;
+    }
+
+    /* TRUST BAR — elemen baru */
+    .hero-trust-bar {
+        width: 100%;
+        margin-top: 20px;
+        padding: 14px 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-trust-bar .material-symbols-outlined {
+        font-size: 20px;
+        color: #ffd700;
+    }
+
+    .hero-trust-bar span.trust-text {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.85);
+        font-weight: 500;
+        line-height: 1.4;
+    }
+
+    /* BUTTON */
+    .hero-btn {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start !important;
+        justify-content: flex-start !important;
+        gap: 10px;
+        margin-top: 20px;
+        padding: 0 20px;
+        position: relative;
+        z-index: 2;
     }
 
     .btn,
+    .btn-red,
+    .btn-outline,
     .btn-login {
-        width: 100%;
-        padding: 12px 16px;
+        width: 100% !important;
+        text-align: center;
+    }
+
+    /* Override warna tombol agar kontras di atas background merah */
+    .btn-red {
+        background: #ffffff !important;
+        color: #8b1218 !important;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.2) !important;
+    }
+
+    .btn-outline {
+        background: transparent !important;
+        color: #ffffff !important;
+        border: 2px solid rgba(255,255,255,0.6) !important;
+        box-shadow: none !important;
     }
 }

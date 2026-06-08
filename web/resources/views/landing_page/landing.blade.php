@@ -212,16 +212,6 @@
 
                 <div class="why-item">
                     <div class="why-icon-box">
-                        <span class="material-symbols-outlined">target</span>
-                    </div>
-                    <div class="why-text">
-                        <h4>Akurat</h4>
-                        <p>Menggunakan sistem analisis berlapis untuk hasil yang terpercaya.</p>
-                    </div>
-                </div>
-
-                <div class="why-item">
-                    <div class="why-icon-box">
                         <span class="material-symbols-outlined">touch_app</span>
                     </div>
                     <div class="why-text">
@@ -236,13 +226,13 @@
                     </div>
                     <div class="why-text">
                         <h4>Informatif</h4>
-                        <p>Laporan lengkap mencakup sumber asli dan alasan deteksi.</p>
+                        <p>Menampilkan alasan deteksi dan sumber pendukung.</p>
                     </div>
                 </div>
             </div>
 
             <div class="why-us-media">
-                <img src="{{ asset('img/data-statistik.png') }}">
+                <img src="{{ asset('img/laptop.png') }}">
             </div>
 
         </div>

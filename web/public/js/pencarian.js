@@ -187,7 +187,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch((error) => {
                 console.error("Search error:", error);
                 showError(
-                    "Gagal menghubungi server. Periksa koneksi internet Anda.",
+                    "Informasi tidak dapat diverifikasi.\nSilakan periksa kembali penulisan atau gunakan kalimat yang lebih jelas.",
                 );
             });
     }
@@ -282,23 +282,23 @@ document.addEventListener("DOMContentLoaded", function () {
         const verdictMap = {
             hoax: {
                 label: "HOAX",
-                className: "lh-verdict--hoax"
+                className: "lh-verdict--hoax",
             },
             "likely-hoax": {
                 label: "CENDERUNG HOAX",
-                className: "lh-verdict--likely-hoax"
+                className: "lh-verdict--likely-hoax",
             },
             uncertain: {
                 label: "BELUM DAPAT DIPASTIKAN",
-                className: "lh-verdict--uncertain"
+                className: "lh-verdict--uncertain",
             },
             "likely-fact": {
                 label: "CENDERUNG FAKTA",
-                className: "lh-verdict--likely-fact"
+                className: "lh-verdict--likely-fact",
             },
             fact: {
                 label: "FAKTA",
-                className: "lh-verdict--fact"
+                className: "lh-verdict--fact",
             },
             unclear: {
                 label: "PERLU VERIFIKASI",
@@ -316,7 +316,10 @@ document.addEventListener("DOMContentLoaded", function () {
             : 50;
 
         let hoaxPercent = safeConfidence;
-        if (normalizedVerdict === "fact" || normalizedVerdict === "likely-fact") {
+        if (
+            normalizedVerdict === "fact" ||
+            normalizedVerdict === "likely-fact"
+        ) {
             hoaxPercent = 100 - safeConfidence;
         } else if (normalizedVerdict === "unclear") {
             hoaxPercent = 50;

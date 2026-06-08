@@ -312,6 +312,8 @@ a {
     font-weight: 700;
     text-align: center;
     padding: 40px;
+    white-space: pre-line !important;
+
 }
 
 .lh-result-loading {

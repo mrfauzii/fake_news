@@ -2,6 +2,10 @@
 
 @section('title', 'Pencarian Terpopuler')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/user/navbar.css') }}">
+@endpush
+
 @section('content')
     @include('user.partials.navbar')
     <style>
@@ -12,7 +16,7 @@
     align-items: center;
     justify-content: center;
     background-color: #f4f6f8; /* Warna background abu-abu terang yang kalem */
-    padding: 1rem;
+    padding: clamp(18px, 4vw, 32px);
     font-family: inherit;
 }
 
@@ -21,10 +25,24 @@
     background: #ffffff;
     border-radius: 12px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    padding: 2.5rem 2rem;
+    padding: clamp(24px, 4vw, 32px);
     text-align: center;
-    max-width: 400px;
-    width: 100%;
+    max-width: 420px;
+    width: min(100%, 420px);
+}
+
+@media (max-width: 480px) {
+    .lh-verify-card {
+        padding: 20px;
+    }
+
+    .lh-verify-title {
+        font-size: 1.15rem;
+    }
+
+    .lh-verify-btn {
+        font-size: 0.95rem;
+    }
 }
 
 /* Teks judul dan deskripsi */
@@ -49,7 +67,7 @@
     justify-content: center;
     gap: 0.5rem;
     width: 100%;
-    background-color: #2563eb; /* Warna biru standar primary, sesuaikan jika app kamu pakai warna lain */
+    background: linear-gradient(90deg, #73070B 0%, #B8201D 100%);
     color: #ffffff;
     border: none;
     border-radius: 8px;
@@ -61,13 +79,13 @@
 }
 
 .lh-verify-btn:hover {
-    background-color: #1d4ed8; /* Warna biru lebih gelap saat di-hover */
+    background: linear-gradient(90deg, #8f1f1f 0%, #ae1f27 100%);
 }
     </style>
 <div class="lh-verify-wrapper">
     <div class="lh-verify-card">
         
-        <iconify-icon icon="mdi:whatsapp" width="56" height="56" style="color: #25D366;"></iconify-icon>
+        <iconify-icon icon="mdi:whatsapp" width="56" height="56" style="color: #B8201D;"></iconify-icon>
 
         <h2 class="lh-verify-title">Verifikasi WhatsApp</h2>
         <p class="lh-verify-text">
@@ -86,12 +104,3 @@
     </div>
 </div>
  @endsection
-
-@push('styles')
-<link rel="stylesheet" href="{{ asset('css/user/navbar.css') }}">
-<link rel="stylesheet" href="{{ asset('css/user/profile-popup.css') }}">
-@endpush
-
-@push('scripts')
-<script src="{{ asset('js/user/profile-popup.js') }}"></script>
-@endpush

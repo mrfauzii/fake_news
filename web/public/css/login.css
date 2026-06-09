@@ -5,17 +5,20 @@
    ============================================================ */
 
 /* ---------- CSS Reset & Base ---------- */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-html, body {
+html,
+body {
     height: 100%;
-    font-family: 'DM Sans', sans-serif;
+    font-family: "DM Sans", sans-serif;
     background-color: #f3f3f3;
-    color: #2D0909;
+    color: #2d0909;
     overflow-x: hidden;
 }
 
@@ -25,38 +28,30 @@ a {
 }
 
 :root {
-    --color-white: #FFFFFF;
-    --shadow-nav: 0px 4px 10px rgba(0,0,0,0.14);
+    --color-white: #ffffff;
+    --shadow-nav: 0px 4px 10px rgba(0, 0, 0, 0.14);
     --radius-circle: 50px;
-    --font-dmsans: 'DM Sans', sans-serif;
-    --login-nav-height: 0px;
+    --font-dmsans: "DM Sans", sans-serif;
+    --login-nav-height: 74px;
 }
 
 /* ============================================================
    NAVBAR (Fixed positioning for desktop)
    ============================================================ */
-.lh-navbar {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    z-index: 1000 !important;
-}
 
 /* ============================================================
    LOGIN PAGE LAYOUT
    ============================================================ */
 .login-page {
-    min-height: 100vh;
+    min-height: calc(100vh - var(--login-nav-height));
     height: auto;
-    margin-top: var(--login-nav-height);
-    padding-top: 0;
+    margin-top: 0;
     display: grid;
+    align-items: stretch;
     grid-template-columns: minmax(420px, 56%) minmax(340px, 44%);
-    background: #F7F7F7;
+    background: #f7f7f7;
     overflow: hidden;
 }
-
 
 /* ---------- Hero / Left image column ---------- */
 .login-page__hero {
@@ -70,7 +65,19 @@ a {
     background: linear-gradient(90deg, #f4d4db 0%, #f6e2e5 45%, #f7f7f7 100%);
 }
 
+.login-panel {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 24px 40px 24px 34px;
+    min-height: 100%;
+    height: auto;
+}
+
 .hero-image {
+    display: block;
     width: 100%;
     height: 100%;
     max-height: none;
@@ -83,21 +90,14 @@ a {
     position: absolute;
     inset: 0 0 0 auto;
     width: min(24%, 220px);
-    background: linear-gradient(90deg, rgba(247, 247, 247, 0) 0%, rgba(247, 247, 247, 1) 100%);
+    background: linear-gradient(
+        90deg,
+        rgba(247, 247, 247, 0) 0%,
+        rgba(247, 247, 247, 1) 100%
+    );
 }
 
 /* ---------- Login Panel / Right column ---------- */
-.login-panel {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 24px 40px 24px 34px;
-    min-height: 100%;
-    height: auto;
-}
-
 .login-panel__inner {
     width: 100%;
     max-width: 440px;
@@ -108,7 +108,7 @@ a {
     font-size: clamp(28px, 2.2vw, 40px);
     font-weight: 600;
     line-height: 1.2;
-    color: #73070B;
+    color: #73070b;
     margin-bottom: 6px;
 }
 
@@ -117,7 +117,7 @@ a {
     font-size: clamp(16px, 1.05vw, 22px);
     font-weight: 600;
     line-height: 1.35;
-    color: #2D0909;
+    color: #2d0909;
     margin-bottom: 28px;
     max-width: 400px;
 }
@@ -142,20 +142,23 @@ a {
     padding: 0 16px;
     border-radius: 18px;
     border: 1px solid rgba(45, 9, 9, 0.45);
-    font-family: 'DM Sans', sans-serif;
+    font-family: "DM Sans", sans-serif;
     font-weight: 700;
     font-size: clamp(15px, 0.95vw, 20px);
     line-height: 1.2;
     color: #000000;
     cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        filter 0.15s ease;
     position: relative;
     overflow: hidden;
 }
 
 .btn-social:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
 
 .btn-social:active {
@@ -207,7 +210,7 @@ a {
 .back-link {
     font-size: clamp(14px, 0.82vw, 18px);
     font-weight: 700;
-    color: #2D0909;
+    color: #2d0909;
     transition: opacity 0.15s;
 }
 
@@ -251,7 +254,7 @@ a {
     .login-page {
         grid-template-columns: 1fr;
         align-items: stretch;
-        min-height: 100vh;
+        min-height: calc(100vh - var(--login-nav-height));
         height: auto;
         margin-top: var(--login-nav-height);
         padding-top: 0;
@@ -264,7 +267,12 @@ a {
         justify-content: center;
         align-items: stretch;
         padding: 0;
-        background: linear-gradient(180deg, #f3d6dd 0%, #f5e7ea 64%, #f7f7f7 100%);
+        background: linear-gradient(
+            180deg,
+            #f3d6dd 0%,
+            #f5e7ea 64%,
+            #f7f7f7 100%
+        );
     }
 
     .hero-image {
@@ -278,7 +286,11 @@ a {
         inset: auto 0 0;
         width: 100%;
         height: 72px;
-        background: linear-gradient(180deg, rgba(247, 247, 247, 0) 0%, #f7f7f7 100%);
+        background: linear-gradient(
+            180deg,
+            rgba(247, 247, 247, 0) 0%,
+            #f7f7f7 100%
+        );
     }
 
     .login-panel {
@@ -320,11 +332,16 @@ a {
         --login-nav-height: 70px;
     }
 
+    .login-page {
+        margin-top: 0;
+        min-height: calc(100vh - 140px);
+    }
+
     .login-page__hero {
-        min-height: min(120px, 16vh);
+        min-height: min(220px, 28vh);
         padding: 0;
         overflow: visible;
-        margin-top: -120px;
+        margin-top: 0;
     }
 
     .hero-image {
@@ -332,15 +349,15 @@ a {
         max-width: none;
         height: 100%;
         max-height: 100%;
-        object-fit: contain;
+        object-fit: cover;
         object-position: center center;
         display: block;
         margin: 0;
     }
 
     .login-panel {
-        padding: 0 14px 10px;
-        margin-top: -350px;
+        padding: 18px 14px 16px;
+        margin-top: 0;
     }
 
     .login-panel__inner {

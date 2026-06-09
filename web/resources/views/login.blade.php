@@ -1,28 +1,13 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Masuk - Lensa Hoax</title>
+@extends('layouts.app')
 
-    {{-- Google Fonts: DM Sans --}}
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-
-    {{-- Vite / compiled CSS (gunakan salah satu sesuai setup) --}}
-    {{-- @vite(['resources/css/login.css']) --}}
-
-    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+@push('styles')
     <link rel="stylesheet" href="{{ asset('css/user/navbar.css') }}">
-</head>
-<body>
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+@endpush
 
-    {{-- ===== NAVBAR ===== --}}
+@section('content')
+
     @include('user.partials.navbar')
-
 
     {{-- ===== MAIN CONTENT ===== --}}
     <main class="login-page">
@@ -31,6 +16,7 @@
             <img src="{{ asset('img/login.png') }}" alt="Ilustrasi keamanan data" class="hero-image">
             <div class="hero-fade"></div>
         </div>
+        
 
         {{-- Right: form panel --}}
         <section class="login-panel">
@@ -83,8 +69,4 @@
         </section>
     </main>
 
-    {{-- Footer: keep consistent with other pages --}}
-    @include('layouts.footer')
-
-</body>
-</html>
+@endsection

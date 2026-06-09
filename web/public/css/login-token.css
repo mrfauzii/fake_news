@@ -2,17 +2,20 @@
    Lensa Hoax - OTP WhatsApp Page
    ============================================================ */
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-html, body {
+html,
+body {
     height: 100%;
-    font-family: 'DM Sans', sans-serif;
+    font-family: "DM Sans", sans-serif;
     background-color: #f3f3f3;
-    color: #2D0909;
+    color: #2d0909;
     overflow-x: hidden;
 }
 
@@ -22,26 +25,10 @@ a {
 }
 
 :root {
-    --color-white: #FFFFFF;
-    --shadow-nav: 0px 4px 10px rgba(0,0,0,0.14);
+    --color-white: #ffffff;
+    --shadow-nav: 0px 4px 10px rgba(0, 0, 0, 0.14);
     --radius-circle: 50px;
     --otp-nav-height: 74px;
-}
-
-.lh-navbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-    width: 100%;
-    height: var(--otp-nav-height);
-    background: var(--color-white);
-    box-shadow: var(--shadow-nav);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 clamp(18px, 2.6vw, 38px);
 }
 
 .lh-logo {
@@ -60,23 +47,6 @@ a {
     display: flex;
     align-items: center;
     gap: 8px;
-}
-
-.lh-nav-btn {
-    position: relative;
-    width: 42px;
-    height: 42px;
-    border-radius: var(--radius-circle);
-    background: linear-gradient(90deg, #73070B 0%, #B8201D 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ffffff;
-    border: 1px solid #73070B;
-    box-shadow: 0 6px 14px rgba(115, 7, 11, 0.22);
-    overflow: hidden;
-    white-space: nowrap;
-    transition: width 0.24s ease, transform 0.2s ease, box-shadow 0.22s ease, padding 0.24s ease;
 }
 
 .lh-nav-btn:hover,
@@ -100,7 +70,10 @@ a {
     overflow: hidden;
     opacity: 0;
     transform: translateX(-6px);
-    transition: max-width 0.24s ease, opacity 0.18s ease, transform 0.18s ease;
+    transition:
+        max-width 0.24s ease,
+        opacity 0.18s ease,
+        transform 0.18s ease;
 }
 
 .lh-nav-tooltip iconify-icon {
@@ -121,7 +94,7 @@ a {
     margin-top: 0;
     display: grid;
     grid-template-columns: minmax(420px, 56%) minmax(340px, 44%);
-    background: #F7F7F7;
+    background: #f7f7f7;
     overflow: hidden;
 }
 
@@ -144,7 +117,11 @@ a {
     position: absolute;
     inset: 0 0 0 auto;
     width: min(24%, 220px);
-    background: linear-gradient(90deg, rgba(247, 247, 247, 0) 0%, rgba(247, 247, 247, 1) 100%);
+    background: linear-gradient(
+        90deg,
+        rgba(247, 247, 247, 0) 0%,
+        rgba(247, 247, 247, 1) 100%
+    );
 }
 
 .otp-panel {
@@ -165,7 +142,7 @@ a {
     font-size: clamp(28px, 2.2vw, 40px);
     font-weight: 600;
     line-height: 1.2;
-    color: #73070B;
+    color: #73070b;
     margin-bottom: 8px;
 }
 
@@ -173,7 +150,7 @@ a {
     font-size: clamp(16px, 1.05vw, 22px);
     font-weight: 600;
     line-height: 1.35;
-    color: #2D0909;
+    color: #2d0909;
     margin-bottom: 22px;
     max-width: 420px;
 }
@@ -211,7 +188,7 @@ a {
 .form-label {
     font-size: 14px;
     font-weight: 700;
-    color: #2D0909;
+    color: #2d0909;
 }
 
 .form-input {
@@ -223,9 +200,11 @@ a {
     padding: 0 16px;
     font-size: 16px;
     font-weight: 500;
-    color: #2D0909;
+    color: #2d0909;
     outline: none;
-    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
 }
 
 .form-input:focus {
@@ -243,11 +222,14 @@ a {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    align-items: center;
 }
 
 .otp-boxes {
     display: flex;
     gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .otp-box {
@@ -286,17 +268,20 @@ a {
     font-size: 16px;
     font-weight: 700;
     cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        opacity 0.15s ease;
 }
 
 .btn-primary {
-    background: linear-gradient(90deg, #73070B 0%, #B8201D 100%);
+    background: linear-gradient(90deg, #73070b 0%, #b8201d 100%);
     color: #ffffff;
 }
 
 .btn-secondary {
     background: #ffffff;
-    color: #73070B;
+    color: #73070b;
     border-color: rgba(115, 7, 11, 0.35);
 }
 
@@ -315,7 +300,7 @@ a {
 .back-link {
     font-size: clamp(14px, 0.82vw, 18px);
     font-weight: 700;
-    color: #2D0909;
+    color: #2d0909;
 }
 
 .back-link:hover {
@@ -385,9 +370,19 @@ a {
         max-width: 124px;
     }
 
+    .otp-boxes {
+        gap: 8px;
+        justify-content: center;
+    }
+
+    .otp-box {
+        width: 48px;
+        height: 48px;
+    }
+
     .otp-page {
         margin-top: 0;
-        min-height: calc(100vh - 70px);
+        min-height: calc(100vh - 140px);
         height: auto;
     }
 

@@ -66,7 +66,7 @@ class ImageDetectionController extends Controller
             log::info('Request baru dibuat dengan ID: ' . $url);
             // 4. Panggil API Python
             Log::info('SEBELUM PYTHON');
-            $response = Http::timeout(300)->post('http://localhost:8004/image-detection', [
+            $response = Http::timeout(300)->post(env('AI_API_URL') . '/image-detection', [
                 'image_url' => $url,
             ]);
             Log::info($response->body());

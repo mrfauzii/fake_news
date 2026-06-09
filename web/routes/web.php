@@ -30,9 +30,6 @@ use App\Http\Controllers\LandingPageController;
 */
 
 // Landing Page 
-Route::get('/', function () {
-    return 'OK';
-});
 Route::get('/beranda', [LandingPageController::class, 'index'])->name('beranda');
 
 // Footer information pages

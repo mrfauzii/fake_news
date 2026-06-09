@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Log;
 use Cloudinary\Configuration\Configuration;
 use Cloudinary\Api\Upload\UploadApi;
 
+set_time_limit(300);
+
 class ImageDetectionController extends Controller
 {
     public function detect(Request $request)
@@ -64,7 +66,7 @@ class ImageDetectionController extends Controller
             log::info('Request baru dibuat dengan ID: ' . $url);
             // 4. Panggil API Python
             Log::info('SEBELUM PYTHON');
-            $response = Http::timeout(300)->post(env('AI_API_URL') . '/image-detection', [
+            $response = Http::timeout(300)->post('http://localhost:8004/image-detection', [
                 'image_url' => $url,
             ]);
             Log::info($response->body());

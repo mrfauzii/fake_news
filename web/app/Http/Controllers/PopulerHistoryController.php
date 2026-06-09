@@ -22,8 +22,8 @@ class PopulerHistoryController extends Controller
                     'r.final_confidence',
                     'kb.fact_text as fact_text',
                     's2.summary_text as summary_text',
-                    DB::raw('YEAR(r.created_at) as year'),
-                    DB::raw('MONTH(r.created_at) as month'),
+                    DB::raw('YEAR(ui.created_at) as year'),
+                    DB::raw('MONTH(ui.created_at) as month'),
                     DB::raw('COUNT(*) as count')
                 )
             ->whereNotNull('r.final_label')

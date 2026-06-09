@@ -32,8 +32,8 @@ class AdminController extends Controller
         )
         ->whereNotNull('r.final_label')
         // Filter bulan & tahun berjalan
-        ->whereMonth('r.created_at', date('n'))
-        ->whereYear('r.created_at', date('Y'))
+        ->whereMonth('ui.created_at', date('n'))
+        ->whereYear('ui.created_at', date('Y'))
         ->groupBy('r.input_text', 'r.final_label', 'r.final_confidence')
         ->orderByDesc('count')
         ->limit(3)

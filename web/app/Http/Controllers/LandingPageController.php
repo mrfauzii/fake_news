@@ -19,10 +19,10 @@ class LandingPageController extends Controller
         $totalFake = Requests::where('final_label', 'fake')
             ->count();
 
-        $hoaxPercentage = $totalVerified > 0
-            ? round(($totalFake / $totalVerified) * 100)
-            : 0;
-
+        // $hoaxPercentage = $totalVerified > 0
+        //     ? round(($totalFake / $totalVerified) * 100)
+        //     : 0;
+        $hoaxPercentage = $totalFake;
 
         // Data Hoax Knowledge Base
         $totalHoax = KnowledgeBase::count();

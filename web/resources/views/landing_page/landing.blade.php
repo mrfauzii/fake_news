@@ -55,12 +55,12 @@
                 <p>Informasi Terverifikasi</p>
             </div>
             <div class="stat-card">
-                <h3>{{ $hoaxPercentage }}%</h3>
-                <p>Hoax Terdeteksi</p>
+                <h3>{{ $hoaxPercentage }}</h3>
+                <p>Hoaks Ditemukan </p>
             </div>
             <div class="stat-card">
                 <h3>{{ number_format($totalHoax) }}</h3>
-                <p>Data Hoax</p>
+                <p>Data Hoaks Tersimpan</p>
             </div>
             <div class="stat-card">
                 <h3>{{ number_format($totalUsers) }}</h3>

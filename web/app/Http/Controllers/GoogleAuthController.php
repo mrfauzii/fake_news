@@ -37,11 +37,14 @@ class GoogleAuthController extends Controller
             // Langsung login in usernya
             Auth::login($user);
 
-            if ($user->role === 'user') {
-                return redirect('pencarian')->with('success', 'Login berhasil pakai Google!');
-            }
+            if ($user->role === 'admin') {
+                return redirect(route('admin.dashboard'))->with('success', 'Login berhasil pakai Google!');
 
-            return redirect(route('admin.dashboard'))->with('success', 'Login berhasil pakai Google!');
+            }
+            
+            return redirect('pencarian')->with('success', 'Login berhasil pakai Google!');
+
+
         } catch (\Exception $e) {
             return redirect('/')->with('error', 'Gagal login pakai Google!');
         }

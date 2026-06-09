@@ -74,9 +74,12 @@ class ImageDetectionController extends Controller
                 Log::info('SESUDAH PYTHON');
                 // 5. Simpan ke tabel 'image_search_results'
                 // 6. Update hasil akhir di tabel 'requests'
-                $isHoax = $res['prediction'] == 1;
+                $isHoax = $res['prediction'];
+                Log::info('IS HOAX: ' . $isHoax);
                 $finalLabel = $isHoax == 1 ? 'fake' : 'real';
+                Log::info('FINAL LABEL: ' . $finalLabel);
                 $confidence = round($res['confidence'] * 100);
+                Log::info('CONFIDENCE: ' . $confidence);
                 if ($isHoax == 1) {
                     $hoaxPercentage = $confidence;
                     $factPercentage = 100 - $hoaxPercentage;
@@ -84,12 +87,14 @@ class ImageDetectionController extends Controller
                     $factPercentage = $confidence;
                     $hoaxPercentage = 100 - $factPercentage;
                 }
-                $finalLabel = $isHoax == 1 ? 'hoax' : 'fact';
+                Log::info('HOAX PERCENTAGE: ' . $hoaxPercentage);
+                $finalLabel = ($isHoax == 1 ? 'hoax' : 'fact');
+                Log::info('FINAL LABEL: ' . $finalLabel);
                 $status = '';
 
                 if ($confidence < 60) {
                     $status = '⚪ INFORMASI BELUM DAPAT DIPASTIKAN ⚪';
-                } elseif ($finalLabel === 'HOAX') {
+                } elseif ($finalLabel === 'hoax') {
                     if ($confidence >= 80) {
                         $status = '🔴 TERINDIKASI KUAT SEBAGAI HOAX 🔴';
                     } else {
@@ -119,7 +124,7 @@ class ImageDetectionController extends Controller
                 ]);
                 if ($confidence < 60) {
                     $verdict = 'uncertain';
-                } elseif ($finalLabel === 'fake') {
+                } elseif ($finalLabel === 'hoax') {
                     $verdict = $confidence >= 80
                         ? 'hoax'
                         : 'likely-hoax';
@@ -128,12 +133,11 @@ class ImageDetectionController extends Controller
                         ? 'fact'
                         : 'likely-fact';
                 }
-
-                // 7. RETURN SESUAI FIGMA
+                                // 7. RETURN SESUAI FIGMA
                 return response()->json([
                     'status' => 'success',
                     'verdict' => $verdict,
-                    'confidence' => $hoaxPercentage,
+                    'confidence' => $confidence,
                     'summary' => $summary ?? '-',
                     'sources' => $links,
                     'raw_data' => [

@@ -7,7 +7,6 @@
 <link rel="stylesheet" href="{{ asset('css/admin/riwayat-style.css') }}">
 <!-- CSS Bawaan Pencarian -->
 <link rel="stylesheet" href="{{ asset('css/user/background.css') }}">
-<link rel="stylesheet" href="{{ asset('css/user/navbar.css') }}">
 <link rel="stylesheet" href="{{ asset('css/user/profile-popup.css') }}">
 <link rel="stylesheet" href="{{ asset('css/user/pencarian.css') }}">
 @endpush

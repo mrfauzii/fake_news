@@ -47,7 +47,7 @@ class TextDetectionController extends Controller
             // A. CEK SIMILARITY SEARCH TERLEBIH DAHULU
             // ========================================================
             if ($skipSimilarity === 0) {
-                $simResponse = Http::timeout(60)->post('http://127.0.0.1:8004/similarity-search', [
+                $simResponse = Http::timeout(60)->post(env('AI_API_URL') . '/similarity-search', [
                     'query' => $inputText,
                 ]);
 
@@ -101,10 +101,11 @@ class TextDetectionController extends Controller
                 'request_id' => $requestId,
             ]);
             Log::info('AI API Request: ' . $inputText);
-            $response = Http::timeout(120)->post('http://127.0.0.1:8004/text-detection', [
+            $response = Http::timeout(120)->post(env('AI_API_URL') . '/text-detection', [
                 'query' => $inputText,
                 'id_request' => $requestId,
             ]);
+            
             Log::info('AI API Response: ' . $response->body());
             $data = $response->json();
 

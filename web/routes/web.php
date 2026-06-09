@@ -30,7 +30,10 @@ use App\Http\Controllers\LandingPageController;
 */
 
 // Landing Page 
-Route::get('/', [LandingPageController::class, 'index'])->name('beranda');
+Route::get('/', function () {
+    return 'OK';
+});
+Route::get('/beranda', [LandingPageController::class, 'index'])->name('beranda');
 
 // Footer information pages
 Route::view('/tentang-kami', 'footer.tentang-kami')->name('tentang.kami');

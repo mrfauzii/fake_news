@@ -138,7 +138,6 @@ Route::get('/scraper/done/{token}', [ScraperController::class, 'markDone']);
 
 
 // Admin logout 
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 /*
 |--------------------------------------------------------------------------
 | WHATSAPP WEBHOOK & API (NO AUTH)

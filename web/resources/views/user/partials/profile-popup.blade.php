@@ -39,6 +39,12 @@
 
         <!-- Logout Button -->
         @auth
+            @if(auth()->user()->role === 'admin')
+                <a href="{{ route('admin.dashboard') }}" class="lh-profile-popup__logout">
+                    <iconify-icon icon="mdi:shield-account" width="18" height="18"></iconify-icon>
+                    <span>Dashboard Admin</span>
+                </a>
+            @endif
             <form method="POST" action="{{ route('logout') }}" class="lh-profile-popup__logout-form" id="lh-logout-form" data-redirect="{{ route('login') }}">
                 @csrf
                 <button type="submit" class="lh-profile-popup__logout">

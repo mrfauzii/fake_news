@@ -134,10 +134,10 @@
         <div class="logout">
 
             <form
-                method="POST"
-                action="{{ route('logout') }}"
+                method="Get"
+                action="{{ route('beranda') }}"
             >
-                @csrf
+                
 
                 <button
                     type="submit"
@@ -146,7 +146,7 @@
 
                     <i class="fa fa-sign-out-alt"></i>
 
-                    Keluar Akun
+                    Keluar Dashboard
 
                 </button>
 

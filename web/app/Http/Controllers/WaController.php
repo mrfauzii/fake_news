@@ -92,7 +92,7 @@ class WaController extends Controller
                             $data = $result['data'];
                             $verdict = strtolower($data['verdict'] ?? '');
 
-                            if ($verdict === 'hoax') {
+                            if ($verdict === 'hoax' || $verdict === 'likely_hoax') {
                                 $statusTeks = "🚨 *HOAKS* 🚨";
                             } else {
                                 $statusTeks = "✅ *FAKTA* ✅";

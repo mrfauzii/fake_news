@@ -19,7 +19,7 @@ def get_img_classifier():
         raise Exception("Classifier model tidak ditemukan")
 
     models = joblib.load(IMG_MODEL_PATH)
-    model = models["Random Forest"]
+    model = models["Decision Tree"]
     return model
 
 import joblib

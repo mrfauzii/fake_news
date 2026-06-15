@@ -173,35 +173,30 @@ def delete_chroma_collection():
         print(f"⚠️ Gagal hapus collection: {e}")
 
 # ==========================================
-# SEED CSV TO MYSQL
+# SEED CSV TO supabase
 # ==========================================
 from contextlib import closing
 
-def clean_mysql_knowledge_base():
-    """
-    Bersihkan semua data knowledge_base (JSON schema version)
-    dipakai sebelum seed ulang CSV
-    """
-
+def clean_supabase_knowledge_base():
     try:
-        with closing(get_connection()) as conn, closing(conn.cursor()) as cursor:
+        supabase = get_connection()
 
-            print("🧹 Cleaning knowledge_base...")
+        print("🧹 Cleaning knowledge_base...")
 
-            # hapus semua data
-            cursor.execute("DELETE FROM knowledge_base")
-
-            # reset auto increment (biar ID mulai dari 1 lagi)
-            cursor.execute("ALTER TABLE knowledge_base AUTO_INCREMENT = 1")
-
-            conn.commit()
+        supabase.table("knowledge_base") \
+            .delete() \
+            .neq("id", 0) \
+            .execute()
 
         print("✅ Knowledge base berhasil dibersihkan")
 
     except Exception as e:
         print(f"❌ Gagal clean knowledge base: {e}")
         
-def seed_csv_to_mysql(path_csv):
+def seed_csv_to_supabase(path_csv):
+    """
+    Seed CSV ke Supabase
+    """
 
     # 1. Cek file
     if not os.path.exists(path_csv):
@@ -217,75 +212,81 @@ def seed_csv_to_mysql(path_csv):
         return
 
     # 2. Validasi kolom
-    required_cols = {"judul", "klaim", "fakta", "kategori", "link", "link_counter", "tanggal"}
+    required_cols = {
+        "judul",
+        "klaim",
+        "fakta",
+        "kategori",
+        "link",
+        "link_counter",
+        "tanggal"
+    }
+
     if not required_cols.issubset(df.columns):
         print("❌ Kolom wajib tidak lengkap")
         return
 
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    # 3. Cek data existing
-    cursor.execute("SELECT COUNT(*) FROM knowledge_base")
-    total = cursor.fetchone()[0]
-
-    if total > 0:
-        print(f"⚠️ Data sudah ada ({total} rows). Skip insert.")
-        cursor.close()
-        conn.close()
-        return
-
-    print(f"🚀 Menyisipkan {len(df)} data ke MySQL...")
+    supabase = get_connection()
 
     try:
+        # 3. Cek data existing
+        result = (
+            supabase
+            .table("knowledge_base")
+            .select("id", count="exact")
+            .execute()
+        )
+
+        total = result.count or 0
+
+        if total > 0:
+            print(f"⚠️ Data sudah ada ({total} rows). Skip insert.")
+            return
+
+        print(f"🚀 Menyisipkan {len(df)} data ke Supabase...")
+
+        rows = []
+
         for _, row in df.iterrows():
 
             # format tanggal
             published_at = None
+
             if pd.notna(row["tanggal"]):
                 try:
-                    published_at = datetime.strptime(row["tanggal"], "%Y-%m-%d")
+                    published_at = datetime.strptime(
+                        str(row["tanggal"]),
+                        "%Y-%m-%d"
+                    ).isoformat()
                 except:
-                    pass
+                    published_at = None
 
-            # parsing JSON links (list)
+            # parsing link_counter
             links = []
+
             if pd.notna(row["link_counter"]):
                 try:
                     links = ast.literal_eval(row["link_counter"])
                 except:
                     links = []
 
-            # convert ke JSON string
-            links_json = json.dumps(links)
+            rows.append({
+                "title": row["judul"],
+                "hoax_text": row["klaim"],
+                "fact_text": row["fakta"],
+                "category": row["kategori"],
+                "source_url": row["link"],
+                "link_counter": links,
+                "published_at": published_at
+            })
 
-            # insert knowledge_base (tanpa tabel relasi)
-            insert_kb = """
-                INSERT INTO knowledge_base
-                (title, hoax_text, fact_text, category, source_url, link_counter, published_at, created_at, updated_at)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
-            """
+        # bulk insert
+        supabase.table("knowledge_base").insert(rows).execute()
 
-            cursor.execute(insert_kb, (
-                row["judul"],
-                row["klaim"],
-                row["fakta"],
-                row["kategori"],
-                row["link"],
-                links_json,
-                published_at
-            ))
-
-        conn.commit()
-        print("✅ Seeder MySQL berhasil!")
+        print("✅ Seeder Supabase berhasil!")
 
     except Exception as e:
-        conn.rollback()
         print(f"❌ Gagal insert: {e}")
-
-    finally:
-        cursor.close()
-        conn.close()
 # ==========================================
 # MAIN
 # ==========================================
@@ -305,8 +306,8 @@ if __name__ == "__main__":
             "model",
             "nli",
             "playwright",
-            "mysql_seed",
-            "mysql_clean",
+            "supabase_seed",
+            "supabase_clean",
             "fresh",
             "all"
         ],
@@ -351,13 +352,13 @@ if __name__ == "__main__":
 
         download_playwright()
 
-    elif args.step == "mysql_seed":
+    elif args.step == "supabase_seed":
 
-        seed_csv_to_mysql(CSV_PATH)
+        seed_csv_to_supabase(CSV_PATH)
 
-    elif args.step == "mysql_clean":
+    elif args.step == "supabase_clean":
 
-        clean_mysql_knowledge_base()
+        clean_supabase_knowledge_base()
 
     # =========================
     # FRESH
@@ -372,14 +373,14 @@ if __name__ == "__main__":
         text_request = get_chroma_collection("text_request")
         knowledge_base = get_chroma_collection("knowledge_base")
 
-        print("=== CLEAN MYSQL ===")
-        clean_mysql_knowledge_base()
+        print("=== CLEAN supabase ===")
+        clean_supabase_knowledge_base()
 
         print("=== SEED CHROMA ===")
         seed_parquet_to_chroma(knowledge_base)
 
-        print("=== SEED MYSQL ===")
-        seed_csv_to_mysql(CSV_PATH)
+        print("=== SEED supabase ===")
+        seed_csv_to_supabase(CSV_PATH)
 
     # =========================
     # ALL
@@ -394,10 +395,10 @@ if __name__ == "__main__":
         text_request = get_chroma_collection("text_request")
         knowledge_base = get_chroma_collection("knowledge_base")
 
-        clean_mysql_knowledge_base()
+        clean_supabase_knowledge_base()
 
         seed_parquet_to_chroma(knowledge_base)
-        seed_csv_to_mysql(CSV_PATH)
+        seed_csv_to_supabase(CSV_PATH)
 
         print("=== DOWNLOAD MODELS ===")
 

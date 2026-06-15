@@ -5,7 +5,7 @@ sentence-transformers
 chromadb
 sentencepiece 
 tiktoken
-supabase
+mysql-connector-python
 python-dotenv
 playwright
 feedparser 

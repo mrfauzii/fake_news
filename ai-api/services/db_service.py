@@ -7,73 +7,74 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 now_wib = datetime.now(ZoneInfo("Asia/Jakarta"))
+
 def get_latest_title():
-    supabase = get_connection()
-
-    res = supabase.table("knowledge_base") \
-        .select("title") \
-        .order("published_at", desc=True) \
-        .limit(1) \
-        .execute()
-
-    data = res.data
-    return data[0]["title"].lower() if data else ""
+    """Ambil title terbaru dari knowledge_base"""
+    query = "SELECT title FROM knowledge_base ORDER BY published_at DESC LIMIT 1"
+    with closing(get_connection()) as conn, conn.cursor() as cursor:
+        cursor.execute(query)
+        result = cursor.fetchone()
+        return result[0].lower() if result else ""
 
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import json
 
-def insert_to_supabase(df):
-    supabase = get_connection()
+def insert_to_mysql(df):
 
     list_id_chroma = []
 
     df = df.where(pd.notnull(df), None)
 
+    insert_kb_query = """
+        INSERT INTO knowledge_base 
+        (title, source_url, category, hoax_text, fact_text, link_counter, published_at, created_at, updated_at)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """
+
     now_wib = datetime.now(ZoneInfo("Asia/Jakarta"))
 
-    for _, row in df.iterrows():
+    with closing(get_connection()) as db, closing(db.cursor()) as cursor:
+        for _, row in df.iterrows():
 
-        teks_hoaks = row.get('klaim') or row.get('penjelasan')
+            teks_hoaks = row.get('klaim') or row.get('penjelasan')
 
-        links = row.get('link_counter')
-        if isinstance(links, str):
-            try:
-                links = json.loads(links)
-            except:
+            links = row.get('link_counter')
+
+            if isinstance(links, str):
+                try:
+                    links = json.loads(links)
+                except:
+                    links = []
+
+            if not isinstance(links, list):
                 links = []
 
-        if not isinstance(links, list):
-            links = []
+            cursor.execute(insert_kb_query, (
+                row.get('judul'),
+                row.get('link'),
+                row.get('kategori_hoaks'),
+                teks_hoaks,
+                row.get('fakta'),
+                json.dumps(links),
 
-        payload = {
-            "title": row.get('judul'),
-            "source_url": row.get('link'),
-            "category": row.get('kategori_hoaks'),
-            "hoax_text": teks_hoaks,
-            "fact_text": row.get('fakta'),
-            "link_counter": links,
-            "published_at": row.get('tanggal'),
-            "created_at": str(now_wib),
-            "updated_at": str(now_wib),
-        }
+                row.get('tanggal'),  # published_at
+                now_wib,  # created_at
+                now_wib   # updated_at
+            ))
 
-        res = supabase.table("knowledge_base").insert(payload).execute()
-
-        if res.data:
-            kb_id = res.data[0]["id"]
+            kb_id = cursor.lastrowid
             list_id_chroma.append(str(kb_id))
 
-    print(f"✅ Berhasil insert {len(list_id_chroma)} data ke Supabase")
+        db.commit()
+
+    print(f"✅ Berhasil menyimpan {len(list_id_chroma)} data ke MySQL.")
     return list_id_chroma
 
 def get_row_by_id(id_):
-    supabase = get_connection()
-
-    res = supabase.table("knowledge_base") \
-        .select("title, hoax_text, fact_text, category") \
-        .eq("id", id_) \
-        .single() \
-        .execute()
-
-    return res.data if res.data else {}
+    """Ambil seluruh kolom dari knowledge_base kecuali id"""
+    query = "SELECT title, hoax_text, fact_text, category FROM knowledge_base WHERE id=%s"
+    with closing(get_connection()) as conn, closing(conn.cursor(dictionary=True)) as cursor:
+        cursor.execute(query, (id_,))
+        row = cursor.fetchone()
+        return row or {}

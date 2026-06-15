@@ -25,13 +25,12 @@
 
 @section('content')
 
-    <div id="alertContainer"></div>
+    {{-- Use top banner for session flash --}}
     @if (session('success'))
-        <div id="successAlert"
-            style="background-color: #28a745; color: white; padding: 15px 25px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; min-width: 300px; font-weight: 500; transition: 0.5s; opacity: 1;">
-            <i class="fa fa-check-circle"></i>
-            <span>{{ session('success') }}</span>
-        </div>
+        <script>document.addEventListener('DOMContentLoaded', function(){ showAdminBanner("{{ session('success') }}", 'success'); });</script>
+    @endif
+    @if (session('error'))
+        <script>document.addEventListener('DOMContentLoaded', function(){ showAdminBanner("{{ session('error') }}", 'error'); });</script>
     @endif
     <div class="feedback-title">
         <h1>Dashboard Utama</h1>
@@ -141,43 +140,7 @@
     </div>
     <script>
         function triggerSettingAlert(message, type = 'success') {
-            const container = document.getElementById('alertContainer');
-
-            container.innerHTML = `
-                    <div id="successAlert" class="success-alert">
-                        <i class="fa ${
-                            type === 'success'
-                                ? 'fa-circle-check'
-                                : 'fa-circle-exclamation'
-                        }"></i>
-                        ${message}
-                    </div>
-                `;
-
-            setTimeout(() => {
-                const alert = document.getElementById('successAlert');
-
-                if (alert) {
-                    alert.style.transition = '0.5s';
-                    alert.style.opacity = '0';
-
-                    setTimeout(() => {
-                        alert.remove();
-                    }, 500);
-                }
-            }, 5000);
-        }
-
-        // Jalankan fungsi auto-hide untuk session flash biasa jika ada saat load
-        const initialSuccessAlert = document.getElementById('successAlert');
-        if (initialSuccessAlert) {
-            setTimeout(() => {
-                initialSuccessAlert.style.transition = '0.5s';
-                initialSuccessAlert.style.opacity = '0';
-                setTimeout(() => {
-                    initialSuccessAlert.remove();
-                }, 500);
-            }, 5000);
+            showAdminBanner(message, type);
         }
     </script>
 @endsection

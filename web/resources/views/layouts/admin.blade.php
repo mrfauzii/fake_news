@@ -160,6 +160,7 @@
     <!-- MAIN CONTENT -->
     <div class="main-content">
 
+<div id="adminBannerContainer" class="admin-banner-container"></div>
         @yield('content')
 
     </div>
@@ -207,6 +208,33 @@ function(){
 
 });
 
+</script>
+
+<script>
+function showAdminBanner(message, type = 'success') {
+    const container = document.getElementById('adminBannerContainer');
+    if (!container) return;
+
+    const banner = document.createElement('div');
+    banner.className = `admin-banner admin-banner--${type}`;
+    banner.innerHTML = `
+        <i class="fa ${type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i>
+        <span>${message}</span>
+    `;
+
+    container.appendChild(banner);
+
+    requestAnimationFrame(() => {
+        banner.style.opacity = '1';
+        banner.style.transform = 'translateY(0)';
+    });
+
+    setTimeout(() => {
+        banner.style.opacity = '0';
+        banner.style.transform = 'translateY(-10px)';
+        setTimeout(() => { banner.remove(); }, 300);
+    }, 4500);
+}
 </script>
 
 </body>

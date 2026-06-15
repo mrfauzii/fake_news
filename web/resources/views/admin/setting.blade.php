@@ -14,23 +14,13 @@
         <p>Atur jadwal pembaruan knowledge base agar informasi dan data sistem tetap terbaru.</p>
     </div>
 
-    {{-- ALERT SUCCESS --}}
-   @if(session('success'))
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        showNotif("{{ session('success') }}", 'success');
-    });
-</script>
-@endif
-
-@if(session('error'))
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        showNotif("{{ session('error') }}", 'error');
-    });
-</script>
-@endif
-<div id="notif" class="notif hidden"></div>
+    {{-- Use centered modal for session flash --}}
+    @if(session('success'))
+        <script>document.addEventListener('DOMContentLoaded', function(){ showAdminBanner("{{ session('success') }}", 'success'); });</script>
+    @endif
+    @if(session('error'))
+        <script>document.addEventListener('DOMContentLoaded', function(){ showAdminBanner("{{ session('error') }}", 'error'); });</script>
+    @endif
     <div class="setting-box">
         <form action="{{ route("admin.setting.schedule-scrape") }}" method="POST">
             @csrf
@@ -107,14 +97,14 @@ document.addEventListener('DOMContentLoaded', function() {
 .then(result => {
 
     if (result.status === 'success') {
-        showNotif(result.message, 'success');
+        showAdminBanner(result.message, 'success');
     } else {
-        showNotif(result.message, 'error');
+        showAdminBanner(result.message, 'error');
     }
 
 })
 .catch(error => {
-    showNotif('Terjadi kesalahan server', 'error');
+    showAdminBanner('Terjadi kesalahan server', 'error');
     console.error(error);
 })
 .finally(() => {
@@ -126,16 +116,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-function showNotif(message, type = 'success') {
-    const notif = document.getElementById('notif');
-
-    notif.className = `notif ${type}`;
-    notif.textContent = message;
-
-    notif.classList.remove('hidden');
-
-    setTimeout(() => {
-        notif.classList.add('hidden');
-    }, 4000);
-}
+// Notifications are handled by the shared centered modal in layout
 </script>

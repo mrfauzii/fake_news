@@ -267,3 +267,72 @@ body {
         flex-direction: column;
     }
 }
+
+/* =========================
+   ADMIN TOP CENTER BANNER
+========================= */
+.admin-banner-container {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    z-index: 10010;
+    pointer-events: none;
+    width: 100%;
+    max-width: 100%;
+    padding: 0 20px;
+}
+
+.admin-banner {
+    min-width: 320px;
+    max-width: 100%;
+    background: #22c55e;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    border-radius: 10px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.18);
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: auto;
+}
+
+.admin-banner--error {
+    background: #ef4444;
+}
+
+.admin-banner--success {
+    background: #22c55e;
+}
+
+/* =========================
+   ADMIN CENTERED MODAL
+========================= */
+.admin-modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+.admin-modal.hidden { display: none; }
+.admin-modal__backdrop {
+    position: absolute; inset: 0; background: rgba(0,0,0,0.45);
+}
+.admin-modal__box {
+    position: relative; z-index: 10001; background: #fff; padding: 20px; border-radius: 10px; width: 420px; max-width: calc(100% - 40px); box-shadow: 0 30px 60px rgba(0,0,0,0.35);
+}
+.admin-modal__close { position: absolute; top: 6px; right: 8px; background: none; border: none; font-size: 20px; cursor: pointer; }
+.admin-modal__content { min-height: 24px; }
+
+.admin-notif { display:flex; gap:10px; align-items:center; padding:12px 14px; border-radius:8px; font-weight:600; }
+.admin-notif--success { background:#22c55e; color:#fff; }
+.admin-notif--error { background:#ef4444; color:#fff; }

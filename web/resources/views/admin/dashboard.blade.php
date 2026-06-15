@@ -5,24 +5,34 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/admin/dashboard-style.css') }}">
     <link rel="stylesheet" href="{{ asset('css/user/pencarian-terpopuler.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 
     <style>
-                .lh-popular-card__bottom {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                }
+        .lh-popular-card__bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-                .dashboard-popular-grid {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-                    gap: 20px;
-                }
-            </style>
+        .dashboard-popular-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+    </style>
 @endpush
 
 @section('content')
 
+    <div id="alertContainer"></div>
+    @if (session('success'))
+        <div id="successAlert"
+            style="background-color: #28a745; color: white; padding: 15px 25px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; min-width: 300px; font-weight: 500; transition: 0.5s; opacity: 1;">
+            <i class="fa fa-check-circle"></i>
+            <span>{{ session('success') }}</span>
+        </div>
+    @endif
     <div class="feedback-title">
         <h1>Dashboard Utama</h1>
         <p>Data terakhir diperbarui: {{ $lastDate }} </p>
@@ -69,10 +79,10 @@
 
     </div>
     <div class="section-header">
-            <h2><i class="fa fa-chart-line"></i> Pencarian Populer</h2>
-        </div>
+        <h2><i class="fa fa-chart-line"></i> Pencarian Populer</h2>
+    </div>
     <div class="dashboard-popular-grid">
-        
+
         @foreach ($dashboardPopular as $item)
             @php
                 $isHoax = str_contains(strtolower($item['badge']), 'hoax');
@@ -120,7 +130,7 @@
                             </span>
                         </span>
 
-                        
+
 
                     </div>
 
@@ -129,5 +139,45 @@
             </article>
         @endforeach
     </div>
+    <script>
+        function triggerSettingAlert(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
 
-    @endsection
+            container.innerHTML = `
+                    <div id="successAlert" class="success-alert">
+                        <i class="fa ${
+                            type === 'success'
+                                ? 'fa-circle-check'
+                                : 'fa-circle-exclamation'
+                        }"></i>
+                        ${message}
+                    </div>
+                `;
+
+            setTimeout(() => {
+                const alert = document.getElementById('successAlert');
+
+                if (alert) {
+                    alert.style.transition = '0.5s';
+                    alert.style.opacity = '0';
+
+                    setTimeout(() => {
+                        alert.remove();
+                    }, 500);
+                }
+            }, 5000);
+        }
+
+        // Jalankan fungsi auto-hide untuk session flash biasa jika ada saat load
+        const initialSuccessAlert = document.getElementById('successAlert');
+        if (initialSuccessAlert) {
+            setTimeout(() => {
+                initialSuccessAlert.style.transition = '0.5s';
+                initialSuccessAlert.style.opacity = '0';
+                setTimeout(() => {
+                    initialSuccessAlert.remove();
+                }, 500);
+            }, 5000);
+        }
+    </script>
+@endsection

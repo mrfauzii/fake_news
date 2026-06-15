@@ -1,6 +1,6 @@
 from services.scraper_service import *
 import pandas as pd
-from services.db_service import insert_to_mysql, get_latest_title
+from services.db_service import insert_to_supabase, get_latest_title
 from services.chroma_service import insert_to_chroma
 import requests
 

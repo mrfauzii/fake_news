@@ -48,7 +48,7 @@ class RunScraper extends Command
             $token = Str::random(40);
             Cache::put("scraper_token_$token", true, now()->addDay());
 
-            $response = Http::timeout(5)->post('http://127.0.0.1:8004/scrape', [
+            $response = Http::timeout(5)->post(env('AI_API_URL') . '/scrape', [
                 'token' => $token,
             ]);
 

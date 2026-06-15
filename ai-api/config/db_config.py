@@ -1,13 +1,13 @@
 import os
 from dotenv import load_dotenv
-import mysql.connector
+from supabase import create_client, Client
 
 load_dotenv()
 
-def get_connection():
-    return mysql.connector.connect(
-        host=os.getenv("DB_HOST"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        database=os.getenv("DB_NAME")
-    )
+url = os.getenv("SUPABASE_URL")
+key = os.getenv("SUPABASE_KEY")
+
+def get_connection() -> Client:
+    if not url or not key:
+        raise ValueError("SUPABASE env belum diset")
+    return create_client(url, key)

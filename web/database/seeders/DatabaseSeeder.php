@@ -32,7 +32,9 @@ class DatabaseSeeder extends Seeder
 
             // Anggota Kelompok lainnya
             ['id' => 3, 'name' => 'Desi', 'email' => 'desikarmila211@gmail.com', 'role' => 'admin', 'phone_number' => '083841065365'],
-        ];
+            ['id' => 4, 'name' => 'Purnama', 'email' => 'purnamanugraha492@gmail.com', 'role' => 'admin', 'phone_number' => '081224278659'],
+
+            ];
 
         $userData = [];
         foreach ($users as $user) {

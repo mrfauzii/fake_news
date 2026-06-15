@@ -55,31 +55,31 @@
 # CEK DATA COLLECTION
 # ==========================================
 
-# from config.chroma_config import get_chroma_collection
+from config.chroma_config import get_chroma_collection
 
-# text_request = get_chroma_collection("text_request")
-# def check_collection_data(collection):
+text_request = get_chroma_collection("text_request")
+def check_collection_data(collection):
 
-#     try:
+    try:
 
-#         data = collection.get()
+        data = collection.get()
 
-#         return {
-#             "status": "success",
-#             "total_data": len(data.get("ids", [])),
-#             "ids": data.get("ids", [])
-#         }
+        return {
+            "status": "success",
+            "total_data": len(data.get("ids", [])),
+            "ids": data.get("ids", [])
+        }
 
-#     except Exception as e:
+    except Exception as e:
 
-#         return {
-#             "status": "error",
-#             "message": str(e)
-#         }
+        return {
+            "status": "error",
+            "message": str(e)
+        }
         
-# result = check_collection_data(text_request)
+result = check_collection_data(text_request)
 
-# print(result)
+print(result)
 
 
 # from google import genai
@@ -97,27 +97,27 @@
 
 # testsimilarity
 
-from config.transformer_config import get_transformer_model
-from config.chroma_config import get_chroma_collection
-from services.chroma_service import search_similar
-from config.nli_config import get_nli_model
-from services.nli_service import run_nli_top_label
+# from config.transformer_config import get_transformer_model
+# from config.chroma_config import get_chroma_collection
+# from services.chroma_service import search_similar
+# from config.nli_config import get_nli_model
+# from services.nli_service import run_nli_top_label
 
 
-model = get_transformer_model()
-knowledge_base = get_chroma_collection("knowledge_base")
-query_embedding = model.encode("prabowo qurban pake dana apbn").tolist()
-result = search_similar(
-        knowledge_base,
-        query_embedding,
-        5
-    )
-print(result)
+# model = get_transformer_model()
+# knowledge_base = get_chroma_collection("knowledge_base")
+# query_embedding = model.encode("prabowo qurban pake dana apbn").tolist()
+# result = search_similar(
+#         knowledge_base,
+#         query_embedding,
+#         5
+#     )
+# print(result)
 
-nli = get_nli_model()
-pairs = [
-    ("prabowo qurban pake dana apbn", "wna asal tiongkok dianiaya di lampung"),
-    ("prabowo qurban pake dana apbn", "Faktanya, informasi dalam unggahan tersebut adalah tidak benar atau hoaks. Dikutip dari turnbackhoax.id, tidak ditemukan informasi dari laman berita kredibel atau akun resmi pemerintahan yang membenarkan klaim tersebut. Kemudian ditemukan video serupa dimuat dalam kanal YouTube KOMPASTV yang berjudul “Jual Emas Palsu, WNA Asal Tiongkok Ditangkap di Bandar Lampung”.Kategori : Hoaks"),
-]
+# nli = get_nli_model()
+# pairs = [
+#     ("prabowo qurban pake dana apbn", "wna asal tiongkok dianiaya di lampung"),
+#     ("prabowo qurban pake dana apbn", "Faktanya, informasi dalam unggahan tersebut adalah tidak benar atau hoaks. Dikutip dari turnbackhoax.id, tidak ditemukan informasi dari laman berita kredibel atau akun resmi pemerintahan yang membenarkan klaim tersebut. Kemudian ditemukan video serupa dimuat dalam kanal YouTube KOMPASTV yang berjudul “Jual Emas Palsu, WNA Asal Tiongkok Ditangkap di Bandar Lampung”.Kategori : Hoaks"),
+# ]
 
-print(run_nli_top_label(nli, pairs))
+# print(run_nli_top_label(nli, pairs))

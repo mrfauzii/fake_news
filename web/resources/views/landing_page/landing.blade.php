@@ -312,7 +312,7 @@
                 </div>
                 <div class="team-card">
                     <div class="avatar-wrapper">
-                        <img src="{{ asset('img/firman.jpeg') }}" alt="Foto Firman Dzaki Rahman">
+                        <img src="{{ asset('img/Firman.jpeg') }}" alt="Foto Firman Dzaki Rahman">
                     </div>
                     <h3>Firman Dzaki Rahman</h3>
                     <p class="role">Backend Developer</p>

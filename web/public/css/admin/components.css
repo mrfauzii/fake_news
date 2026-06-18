@@ -85,23 +85,22 @@
     margin-top: 25px;
 }
 
-.pagination-wrapper a, 
-.pagination-wrapper button {
+.pagination-wrapper a,
+.pagination-wrapper button,
+.pagination-wrapper span {
     padding: 12px 18px;
     border: 1px solid #ddd;
     text-decoration: none;
     color: #444;
     background: #fff;
     transition: 0.3s;
-    margin-left: -1px; /* Membuat border antar tombol menyatu */
+    margin-left: -1px;
     font-size: 14px;
     font-family: inherit;
-    cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
 }
-
 .pagination-wrapper a:first-child, 
 .pagination-wrapper button:first-child {
     border-radius: 10px 0 0 10px;

@@ -64,32 +64,48 @@
     </div>
 
     <div class="pagination-wrapper">
-        @if ($users->lastPage() > 1)
+    @if ($users->lastPage() > 1)
 
-            {{-- Tombol Previous --}}
-            @if($users->currentPage() > 1)
-                <a href="{{ $users->previousPageUrl() }}">Previous</a>
-            @else
-                <a class="disabled">Previous</a>
-            @endif
-
-            {{-- Nomor Angka Halaman --}}
-            @for ($i = 1; $i <= $users->lastPage(); $i++)
-                <a href="{{ $users->url($i) }}"
-                   class="page-number {{ $users->currentPage() == $i ? 'active' : '' }}">
-                    {{ $i }}
-                </a>
-            @endfor
-
-            {{-- Tombol Next --}}
-            @if($users->hasMorePages())
-                <a href="{{ $users->nextPageUrl() }}">Next</a>
-            @else
-                <a class="disabled">Next</a>
-            @endif
-
+        @if($users->currentPage() > 1)
+            <a href="{{ $users->previousPageUrl() }}">Previous</a>
+        @else
+            <a class="disabled">Previous</a>
         @endif
-    </div>
+
+        @if($users->currentPage() > 3)
+            <a href="{{ $users->url(1) }}" class="page-number">1</a>
+
+            @if($users->currentPage() > 4)
+                <a class="disabled">...</a>
+            @endif
+        @endif
+
+        @for($i = max(1, $users->currentPage() - 2); $i <= min($users->lastPage(), $users->currentPage() + 2); $i++)
+            <a href="{{ $users->url($i) }}"
+               class="page-number {{ $users->currentPage() == $i ? 'active' : '' }}">
+                {{ $i }}
+            </a>
+        @endfor
+
+        @if($users->currentPage() < $users->lastPage() - 2)
+
+            @if($users->currentPage() < $users->lastPage() - 3)
+                <a class="disabled">...</a>
+            @endif
+
+            <a href="{{ $users->url($users->lastPage()) }}" class="page-number">
+                {{ $users->lastPage() }}
+            </a>
+        @endif
+
+        @if($users->hasMorePages())
+            <a href="{{ $users->nextPageUrl() }}">Next</a>
+        @else
+            <a class="disabled">Next</a>
+        @endif
+
+    @endif
+</div>
 
 </div>
 

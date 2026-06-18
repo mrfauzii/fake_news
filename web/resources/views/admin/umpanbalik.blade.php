@@ -59,32 +59,53 @@
 
     {{-- 3. KOMPONEN TOMBOL NAVIGASI HALAMAN (PAGINATION) --}}
     <div class="pagination-wrapper">
-        @if ($feedbacks->lastPage() > 1)
+    @if ($feedbacks->lastPage() > 1)
 
-            {{-- Tombol Previous --}}
-            @if ($feedbacks->currentPage() > 1)
-                <a href="{{ $feedbacks->previousPageUrl() }}">Previous</a>
-            @else
-                <a class="disabled">Previous</a>
-            @endif
-
-            {{-- Nomor Angka Halaman --}}
-            @for ($i = 1; $i <= $feedbacks->lastPage(); $i++)
-                <a href="{{ $feedbacks->url($i) }}"
-                    class="page-number {{ $feedbacks->currentPage() == $i ? 'active' : '' }}">
-                    {{ $i }}
-                </a>
-            @endfor
-
-            {{-- Tombol Next --}}
-            @if ($feedbacks->hasMorePages())
-                <a href="{{ $feedbacks->nextPageUrl() }}">Next</a>
-            @else
-                <a class="disabled">Next</a>
-            @endif
-
+        {{-- Previous --}}
+        @if($feedbacks->currentPage() > 1)
+            <a href="{{ $feedbacks->previousPageUrl() }}">Previous</a>
+        @else
+            <a class="disabled">Previous</a>
         @endif
-    </div>
+
+        {{-- Halaman Awal + Titik-Titik --}}
+        @if($feedbacks->currentPage() > 3)
+            <a href="{{ $feedbacks->url(1) }}" class="page-number">1</a>
+
+            @if($feedbacks->currentPage() > 4)
+                <a class="disabled">...</a>
+            @endif
+        @endif
+
+        {{-- Halaman Sekitar Halaman Aktif --}}
+        @for($i = max(1, $feedbacks->currentPage() - 2); $i <= min($feedbacks->lastPage(), $feedbacks->currentPage() + 2); $i++)
+            <a href="{{ $feedbacks->url($i) }}"
+               class="page-number {{ $feedbacks->currentPage() == $i ? 'active' : '' }}">
+                {{ $i }}
+            </a>
+        @endfor
+
+        {{-- Titik-Titik + Halaman Terakhir --}}
+        @if($feedbacks->currentPage() < $feedbacks->lastPage() - 2)
+
+            @if($feedbacks->currentPage() < $feedbacks->lastPage() - 3)
+                <a class="disabled">...</a>
+            @endif
+
+            <a href="{{ $feedbacks->url($feedbacks->lastPage()) }}" class="page-number">
+                {{ $feedbacks->lastPage() }}
+            </a>
+        @endif
+
+        {{-- Next --}}
+        @if($feedbacks->hasMorePages())
+            <a href="{{ $feedbacks->nextPageUrl() }}">Next</a>
+        @else
+            <a class="disabled">Next</a>
+        @endif
+
+    @endif
+</div>
 
     {{-- 4. MODAL POPUP DETAIL UMPAN BALIK --}}
     <div id="feedbackPopup" class="popup-overlay" style="display:none;">

@@ -143,27 +143,49 @@
         @endforelse
     </div>
 
-    <div class="pagination-wrapper">
-        @if ($data->lastPage() > 1)
-            @if($data->currentPage() > 1)
-                <a href="{{ $data->previousPageUrl() }}">Previous</a>
-            @else
-                <a class="disabled">Previous</a>
-            @endif
+<div class="pagination-wrapper">
+    @if ($data->lastPage() > 1)
 
-            @for ($i = 1; $i <= $data->lastPage(); $i++)
-                <a href="{{ $data->url($i) }}" class="page-number {{ $data->currentPage() == $i ? 'active' : '' }}">
-                    {{ $i }}
-                </a>
-            @endfor
+        @if($data->currentPage() > 1)
+            <a href="{{ $data->previousPageUrl() }}">Previous</a>
+        @else
+            <a class="disabled">Previous</a>
+        @endif
 
-            @if($data->hasMorePages())
-                <a href="{{ $data->nextPageUrl() }}">Next</a>
-            @else
-                <a class="disabled">Next</a>
+        @if($data->currentPage() > 3)
+            <a href="{{ $data->url(1) }}" class="page-number">1</a>
+
+            @if($data->currentPage() > 4)
+                <span class="page-number disabled">...</span>
             @endif
         @endif
-    </div>
+
+        @for($i = max(1, $data->currentPage() - 2); $i <= min($data->lastPage(), $data->currentPage() + 2); $i++)
+            <a href="{{ $data->url($i) }}"
+               class="page-number {{ $data->currentPage() == $i ? 'active' : '' }}">
+                {{ $i }}
+            </a>
+        @endfor
+
+        @if($data->currentPage() < $data->lastPage() - 2)
+
+            @if($data->currentPage() < $data->lastPage() - 3)
+                <span class="page-number disabled">...</span>
+            @endif
+
+            <a href="{{ $data->url($data->lastPage()) }}" class="page-number">
+                {{ $data->lastPage() }}
+            </a>
+        @endif
+
+        @if($data->hasMorePages())
+            <a href="{{ $data->nextPageUrl() }}">Next</a>
+        @else
+            <a class="disabled">Next</a>
+        @endif
+
+    @endif
+</div>
 
     {{-- POPUP OVERLAY --}}
     <div class="popup-overlay" id="popupOverlay">

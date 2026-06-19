@@ -34,7 +34,7 @@
                             <span class="material-symbols-outlined icon-size-sm">verified_user</span>
                             <span>Visi Kami</span>
                         </div>
-                        <h2 class="section-main-title">Melawan Misinformasi dengan Kecerdasan Buatan</h2>
+                        <h2 class="section-main-title">Melawan Disinformasi dengan Kecerdasan Buatan</h2>
                         <p class="section-description">
                             Lensa Hoax hadir sebagai benteng pertahanan digital Anda. Kami mengintegrasikan teknologi AI tercanggih untuk menganalisis data secara objektif, memberikan transparansi di tengah arus informasi yang cepat.
                         </p>

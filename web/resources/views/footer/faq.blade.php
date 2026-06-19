@@ -30,37 +30,37 @@
             [
                 'icon' => 'auto_awesome',
                 'question' => 'Apa itu Lensa Hoax?',
-                'answer' => 'Lensa Hoax adalah platform berbasis Artificial Intelligence (AI) yang dirancang khusus untuk memverifikasi keaslian informasi digital. Kami mendeteksi manipulasi teks, disinformasi, hingga rekayasa foto digital secara real-time.',
+                'answer' => 'Lensa Hoax adalah platform verifikasi disinformasi cerdas yang memadukan basis pengetahuan (knowledge base) dan machine learning. Sistem ini dirancang untuk menganalisis kebenaran informasi berbasis teks dan kemiripan konten visual secara real-time.',
                 'whatsapp' => false
             ],
             [
                 'icon' => 'image_search',
                 'question' => 'Bagaimana cara kerja deteksi AI?',
-                'answer' => 'AI kami menggunakan metode digital forensics yang mendalam, meliputi analisis metadata file, pengecekan konsistensi pixel (Error Level Analysis), dan pencarian silang database visual untuk mengidentifikasi area yang telah dimanipulasi.',
+                'answer' => 'Untuk teks, AI kami membandingkan makna semantik kalimat dengan basis pengetahuan resmi (seperti Komdigi) dan mencari referensi terpercaya di internet. Untuk gambar, sistem mencari tingkat kemiripan visual (visual similarity) dan relevansi waktu publikasi, bukan melalui analisis forensik piksel.',
                 'whatsapp' => false
             ],
             [
                 'icon' => 'account_circle',
                 'question' => 'Apakah saya harus mendaftar?',
-                'answer' => 'Tidak harus. Anda bisa menggunakan fitur \'Cek Tanpa Login\' untuk verifikasi cepat. Namun, dengan login menggunakan Google, Anda dapat menyimpan riwayat verifikasi dan mendapatkan laporan analisis yang lebih mendalam secara gratis.',
+                'answer' => 'Tidak wajib. Anda dapat melakukan pengecekan teks dan gambar di Website sebagai tamu (Guest). Namun, jika Anda login, Anda dapat menyimpan riwayat pencarian, menghapus riwayat pribadi, dan menggabungkan akun (merge account) Website dengan riwayat pencarian WhatsApp Anda.',
                 'whatsapp' => false
             ],
             [
                 'icon' => 'verified',
                 'question' => 'Seberapa akurat hasilnya?',
-                'answer' => 'Sistem kami memiliki tingkat akurasi tinggi yang terus diperbarui melalui machine learning. Setiap hasil verifikasi dilengkapi dengan \'Confidence Score\' dan penjelasan teknis mengapa sebuah konten dikategorikan sebagai hoax atau asli.',
+                'answer' => 'Berdasarkan pengujian performa, model AI kami mencapai akurasi 90% untuk klasifikasi teks dan 81% untuk gambar. Hasil verifikasi akan menampilkan label (Hoaks/Fakta), tingkat keyakinan (Confidence Score), serta penjelasan logis yang dihasilkan oleh sistem (Explainable AI).',
                 'whatsapp' => false
             ],
             [
                 'icon' => 'chat',
                 'question' => 'Cara kerja WhatsApp Bot?',
-                'answer' => 'Sangat mudah. Cukup klik tombol \'Hubungi Bot Whatsapp\', simpan nomornya, dan teruskan (forward) pesan teks atau gambar yang mencurigakan. Bot kami akan memprosesnya dalam hitungan detik dan mengirimkan ringkasan hasilnya.',
+                'answer' => 'Sangat praktis. Cukup teruskan (forward) klaim teks berita yang mencurigakan ke nomor WhatsApp Bot kami. Sistem akan memproses teks tersebut dan memberikan balasan hasil verifikasi secara instan. Harap dicatat, layanan WhatsApp Bot saat ini difokuskan khusus untuk pengecekan berbasis teks.',
                 'whatsapp' => true
             ],
             [
                 'icon' => 'shield_lock',
-                'question' => 'Apakah data saya aman?',
-                'answer' => 'Keamanan privasi Anda adalah prioritas kami. Semua data yang diunggah dienkripsi secara end-to-end dan hanya digunakan untuk keperluan analisis verifikasi. Kami tidak pernah membagikan data pribadi Anda kepada pihak ketiga.',
+                'question' => 'Apakah data pencarian saya aman?',
+                'answer' => 'Seluruh riwayat permintaan deteksi dan gambar yang diunggah disimpan di database kami secara terstruktur untuk keperluan riwayat akun Anda dan evaluasi sistem. Anda memiliki kontrol penuh untuk melihat dan menghapus riwayat pencarian pribadi Anda kapan saja melalui dashboard.',
                 'whatsapp' => false
             ]
         ];

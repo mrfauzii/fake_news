@@ -17,16 +17,18 @@ class PopulerHistoryController extends Controller
             ->leftJoin('stage2_results as s2', 'r.id', '=', 's2.request_id')
             ->whereNull('r.deleted_at')
             ->select(
-                    'r.input_text',
-                    'r.final_label',
-                    'r.final_confidence',
-                    'kb.fact_text as fact_text',
-                    's2.summary_text as summary_text',
-                    DB::raw('EXTRACT(YEAR FROM ui.created_at) as year'),
-                    DB::raw('EXTRACT(MONTH FROM ui.created_at) as month'),
-                    DB::raw('COUNT(*) as count')
-                )
+                'r.input_text',
+                'r.final_label',
+                'r.final_confidence',
+                'kb.fact_text as fact_text',
+                's2.summary_text as summary_text',
+                DB::raw('EXTRACT(YEAR FROM ui.created_at) as year'),
+                DB::raw('EXTRACT(MONTH FROM ui.created_at) as month'),
+                DB::raw('COUNT(*) as count')
+            )
             ->whereNotNull('r.final_label')
+            ->whereNotNull('r.input_text')
+            ->where('r.input_text', '!=', '')
             ->groupBy(
                 'r.input_text',
                 'r.final_label',
@@ -56,7 +58,7 @@ class PopulerHistoryController extends Controller
         ];
 
         $popularItems = [];
-    
+
         // 3. Format data agar SAMA PERSIS dengan contentBlueprints di file JS kamu
         foreach ($histories as $idx => $row) {
             $category = strtolower($row->final_label) === 'fake' ? 'hoax' : 'fakta';

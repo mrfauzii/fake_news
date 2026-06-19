@@ -23,39 +23,41 @@ class AdminController extends Controller
         |--------------------------------------------------------------------------
         */
         $histories = DB::table('user_interactions as ui')
-        ->join('requests as r', 'ui.request_id', '=', 'r.id')
-        ->select(
-            'r.input_text',
-            'r.final_label',
-            'r.final_confidence',
-            DB::raw('COUNT(*) as count')
-        )
-        ->whereNotNull('r.final_label')
-        // Filter bulan & tahun berjalan
-        ->whereMonth('ui.created_at', date('n'))
-        ->whereYear('ui.created_at', date('Y'))
-        ->groupBy('r.input_text', 'r.final_label', 'r.final_confidence')
-        ->orderByDesc('count')
-        ->limit(3)
-        ->get();
+            ->join('requests as r', 'ui.request_id', '=', 'r.id')
+            ->select(
+                'r.input_text',
+                'r.final_label',
+                'r.final_confidence',
+                DB::raw('COUNT(*) as count')
+            )
+            ->whereNotNull('r.final_label')
+            // Filter bulan & tahun berjalan
+            ->whereMonth('ui.created_at', date('n'))
+            ->whereYear('ui.created_at', date('Y'))
+            ->whereNotNull('r.input_text')
+            ->where('r.input_text', '!=', '')
+            ->groupBy('r.input_text', 'r.final_label', 'r.final_confidence')
+            ->orderByDesc('count')
+            ->limit(3)
+            ->get();
 
-    $dashboardPopular = [];
+        $dashboardPopular = [];
 
-    foreach ($histories as $idx => $row) {
-        $category = (strtolower($row->final_label) === 'fake' || strtolower($row->final_label) === 'hoax') 
-            ? 'hoax' 
-            : 'fakta';
-            
-        $dashboardPopular[] = [
-            'rank'       => $idx + 1,
-            'category'   => $category,
-            'input'      => $row->input_text,
-            'badge'      => strtoupper($category),
-            'excerpt'    => $row->input_text,                 // Judul utuh
-            'confidence' => $row->final_confidence,
-            'count'      => $row->count,
-        ];
-    }
+        foreach ($histories as $idx => $row) {
+            $category = (strtolower($row->final_label) === 'fake' || strtolower($row->final_label) === 'hoax')
+                ? 'hoax'
+                : 'fakta';
+
+            $dashboardPopular[] = [
+                'rank'       => $idx + 1,
+                'category'   => $category,
+                'input'      => $row->input_text,
+                'badge'      => strtoupper($category),
+                'excerpt'    => $row->input_text,                 // Judul utuh
+                'confidence' => $row->final_confidence,
+                'count'      => $row->count,
+            ];
+        }
 
         /*
         |--------------------------------------------------------------------------
@@ -68,32 +70,32 @@ class AdminController extends Controller
         // 1. STATISTIK PENGGUNA
         $total_pengguna = Users::count();
         $pengguna_sekarang = Users::whereMonth('created_at', $now->month)
-                                  ->whereYear('created_at', $now->year)->count();
+            ->whereYear('created_at', $now->year)->count();
         $pengguna_lalu = Users::whereMonth('created_at', $lastMonth->month)
-                              ->whereYear('created_at', $lastMonth->year)->count();
+            ->whereYear('created_at', $lastMonth->year)->count();
 
         // 2. STATISTIK BERITA (Diambil dari tabel requests)
         $total_berita = Requests::count();
         $berita_sekarang = Requests::whereMonth('created_at', $now->month)
-                                   ->whereYear('created_at', $now->year)->count();
+            ->whereYear('created_at', $now->year)->count();
         $berita_lalu = Requests::whereMonth('created_at', $lastMonth->month)
-                               ->whereYear('created_at', $lastMonth->year)->count();
+            ->whereYear('created_at', $lastMonth->year)->count();
 
         // 3. STATISTIK HOAX (Cari yang labelnya 'hoax' atau 'fake')
         $total_hoax = history_view::whereIn('final_label', ['hoax', 'fake'])->count();
         $hoax_sekarang = history_view::whereIn('final_label', ['hoax', 'fake'])
-                                     ->whereMonth('created_at', $now->month)
-                                     ->whereYear('created_at', $now->year)->count();
+            ->whereMonth('created_at', $now->month)
+            ->whereYear('created_at', $now->year)->count();
         $hoax_lalu = history_view::whereIn('final_label', ['hoax', 'fake'])
-                                 ->whereMonth('created_at', $lastMonth->month)
-                                 ->whereYear('created_at', $lastMonth->year)->count();
+            ->whereMonth('created_at', $lastMonth->month)
+            ->whereYear('created_at', $lastMonth->year)->count();
 
         // 4. STATISTIK UMPAN BALIK
         $total_umpan_balik = Feedbacks::count();
         $umpan_balik_sekarang = Feedbacks::whereMonth('created_at', $now->month)
-                                         ->whereYear('created_at', $now->year)->count();
+            ->whereYear('created_at', $now->year)->count();
         $umpan_balik_lalu = Feedbacks::whereMonth('created_at', $lastMonth->month)
-                                     ->whereYear('created_at', $lastMonth->year)->count();
+            ->whereYear('created_at', $lastMonth->year)->count();
 
         // 5. GABUNGKAN KE VARIABLE $dashboardStats
         $dashboardStats = [
@@ -113,8 +115,8 @@ class AdminController extends Controller
 
         $lastDate = Carbon::parse($lastDate)
             ->translatedFormat('l, d F Y H:i');
-            return view('admin.dashboard', compact('dashboardPopular', 'dashboardStats','lastDate'));
-        }
+        return view('admin.dashboard', compact('dashboardPopular', 'dashboardStats', 'lastDate'));
+    }
 
     /**
      * Fungsi Helper untuk menghitung persentase kenaikan/penurunan bulan ini vs bulan lalu
@@ -158,10 +160,10 @@ class AdminController extends Controller
     // {
     //     try {
     //         $currentRealTime = Carbon::now()->format('H:i');
-            
+
     //         // 1. Simpan jam real-time baru ke Cache secara permanen
     //         Cache::forever('knowledge_base_update_time', $currentRealTime);
-            
+
     //         // 2. Membuat alert hijau muncul setelah halaman di-reload otomatis oleh JS
     //         session()->flash('success', 'Jadwal pembaruan knowledge base berhasil diperbarui secara instan!');
 
